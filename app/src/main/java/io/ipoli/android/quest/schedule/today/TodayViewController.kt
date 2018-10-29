@@ -272,14 +272,19 @@ class TodayViewController(args: Bundle? = null) :
                 imageUrl = it,
                 view = view.todayBackdrop,
                 onReady = {
-                    view.todayBackdrop.fadeIn(mediumAnimTime, onComplete = {
-                        dispatch(TodayAction.ImageLoaded)
-                    })
+                    activity?.let { _ ->
+                        view.todayBackdrop.fadeIn(mediumAnimTime, onComplete = {
+                            dispatch(TodayAction.ImageLoaded)
+                        })
+                    }
+
                 },
                 onError = { _ ->
-                    view.todayBackdrop.fadeIn(mediumAnimTime, onComplete = {
-                        dispatch(TodayAction.ImageLoaded)
-                    })
+                    activity?.let { _ ->
+                        view.todayBackdrop.fadeIn(mediumAnimTime, onComplete = {
+                            dispatch(TodayAction.ImageLoaded)
+                        })
+                    }
                 }
             )
         }
