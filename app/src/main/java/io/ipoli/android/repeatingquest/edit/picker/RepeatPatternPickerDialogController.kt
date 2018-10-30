@@ -216,6 +216,47 @@ class RepeatPatternPickerDialogController :
             RepeatType.WEEKLY -> renderWeekly(view, state)
             RepeatType.MONTHLY -> renderMonthly(view, state)
             RepeatType.YEARLY -> renderYearly(view, state)
+            RepeatType.EVERY_X_DAYS -> renderEveryXDays(view, state)
+        }
+    }
+
+    private fun renderEveryXDays(view: View, state: RepeatPatternViewState) {
+        ViewUtils.goneViews(
+            view.rpWeekDayList,
+            view.rpMonthDayList,
+            view.yearlyPatternGroup,
+            view.countGroup,
+            view.rpPetSchedulingHint
+        )
+        ViewUtils.showViews(
+            view.everyXDaysPatternGroup
+        )
+
+        renderFrequencies(view, state)
+
+        val xDaysCount = view.rpEveryXDaysCount
+        xDaysCount.adapter = ArrayAdapter(
+            view.context,
+            R.layout.item_dropdown_number_spinner,
+            state.everyXDaysValues
+        )
+        xDaysCount.onItemSelectedListener = null
+        xDaysCount.setSelection(state.everyXDaysCountIndex)
+        xDaysCount.post {
+            xDaysCount.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    dispatch(RepeatPatternAction.ChangeEveryXDaysCount(position))
+                }
+
+            }
         }
     }
 
@@ -226,7 +267,8 @@ class RepeatPatternPickerDialogController :
         ViewUtils.goneViews(
             view.rpWeekDayList,
             view.rpMonthDayList,
-            view.countGroup
+            view.countGroup,
+            view.everyXDaysPatternGroup
         )
         ViewUtils.showViews(
             view.yearlyPatternGroup
@@ -259,7 +301,8 @@ class RepeatPatternPickerDialogController :
     ) {
         ViewUtils.goneViews(
             view.rpWeekDayList,
-            view.yearlyPatternGroup
+            view.yearlyPatternGroup,
+            view.everyXDaysPatternGroup
         )
         ViewUtils.showViews(
             view.rpMonthDayList,
@@ -278,7 +321,8 @@ class RepeatPatternPickerDialogController :
     ) {
         ViewUtils.goneViews(
             view.rpMonthDayList,
-            view.yearlyPatternGroup
+            view.yearlyPatternGroup,
+            view.everyXDaysPatternGroup
         )
         ViewUtils.showViews(
             view.rpWeekDayList,
@@ -299,6 +343,7 @@ class RepeatPatternPickerDialogController :
             view.rpWeekDayList,
             view.rpMonthDayList,
             view.yearlyPatternGroup,
+            view.everyXDaysPatternGroup,
             view.countGroup
         )
         renderFrequencies(view, state)

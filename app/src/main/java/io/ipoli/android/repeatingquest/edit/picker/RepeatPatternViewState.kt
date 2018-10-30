@@ -55,6 +55,10 @@ sealed class RepeatPatternAction : Action {
         override fun toMap() = mapOf("date" to date)
     }
 
+    data class ChangeEveryXDaysCount(val index: Int) : RepeatPatternAction() {
+        override fun toMap() = mapOf("index" to index)
+    }
+
     object CreatePattern : RepeatPatternAction()
 }
 
@@ -107,12 +111,19 @@ object RepeatPatternReducer : BaseViewStateReducer<RepeatPatternViewState>() {
                 val isFlexible =
                     pattern?.let { it is RepeatPattern.Flexible } ?: defaultState().isFlexible
 
+                val everyXDaysCountIndex = pattern?.let {
+                    if (it is RepeatPattern.EveryXDays) {
+                        defaultState().everyXDaysValues.indexOfFirst { v -> v == it.xDays }
+                    } else defaultState().everyXDaysCountIndex
+                } ?: defaultState().everyXDaysCountIndex
+
                 subState.copy(
                     type = DATA_LOADED,
                     repeatType = repeatType,
                     repeatTypeIndex = repeatTypeIndexFor(repeatType),
                     weekDaysCountIndex = weekDaysCountIndex,
                     monthDaysCountIndex = monthDaysCountIndex,
+                    everyXDaysCountIndex = everyXDaysCountIndex,
                     selectedWeekDays = selectedWeekDays,
                     selectedMonthDays = selectedMonthDays,
                     isFlexible = isFlexible,
@@ -175,6 +186,13 @@ object RepeatPatternReducer : BaseViewStateReducer<RepeatPatternViewState>() {
                     type = COUNT_CHANGED,
                     monthDaysCountIndex = action.index,
                     isFlexible = subState.monthCountValues[action.index] != subState.selectedMonthDays.size
+                )
+            }
+
+            is RepeatPatternAction.ChangeEveryXDaysCount -> {
+                subState.copy(
+                    type = EVERY_X_DAYS_CHANGED,
+                    everyXDaysCountIndex = action.index
                 )
             }
 
@@ -265,6 +283,13 @@ object RepeatPatternReducer : BaseViewStateReducer<RepeatPatternViewState>() {
                     endDate = state.endDate
                 )
             }
+            RepeatType.EVERY_X_DAYS -> {
+                RepeatPattern.EveryXDays(
+                    xDays = state.everyXDaysValues[state.everyXDaysCountIndex],
+                    startDate = state.startDate,
+                    endDate = state.endDate
+                )
+            }
 
         }
 
@@ -275,6 +300,7 @@ object RepeatPatternReducer : BaseViewStateReducer<RepeatPatternViewState>() {
         when (repeatType) {
             RepeatType.DAILY -> false
             RepeatType.YEARLY -> false
+            RepeatType.EVERY_X_DAYS -> false
             RepeatType.WEEKLY -> {
                 val daysCount = state.weekCountValues[state.weekDaysCountIndex]
                 daysCount != state.selectedWeekDays.size
@@ -312,10 +338,12 @@ object RepeatPatternReducer : BaseViewStateReducer<RepeatPatternViewState>() {
             repeatTypeIndex = repeatTypeIndexFor(RepeatType.WEEKLY),
             weekDaysCountIndex = 0,
             monthDaysCountIndex = 0,
+            everyXDaysCountIndex = 0,
             selectedWeekDays = setOf(),
             selectedMonthDays = setOf(),
             weekCountValues = (1..6).toList(),
             monthCountValues = (1..31).toList(),
+            everyXDaysValues = (2..7).toList(),
             isFlexible = true,
             dayOfYear = LocalDate.now(),
             startDate = LocalDate.now(),
@@ -333,10 +361,12 @@ data class RepeatPatternViewState(
     val repeatTypeIndex: Int,
     val weekDaysCountIndex: Int,
     val monthDaysCountIndex: Int,
+    val everyXDaysCountIndex: Int,
     val selectedWeekDays: Set<DayOfWeek>,
     val selectedMonthDays: Set<Int>,
     val weekCountValues: List<Int>,
     val monthCountValues: List<Int>,
+    val everyXDaysValues: List<Int>,
     val isFlexible: Boolean,
     val dayOfYear: LocalDate,
     val startDate: LocalDate,
@@ -355,7 +385,8 @@ data class RepeatPatternViewState(
         YEAR_DAY_CHANGED,
         START_DATE_CHANGED,
         END_DATE_CHANGED,
-        PATTERN_CREATED
+        PATTERN_CREATED,
+        EVERY_X_DAYS_CHANGED
     }
 
     val weekDaysCount

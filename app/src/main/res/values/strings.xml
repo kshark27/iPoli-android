@@ -93,6 +93,7 @@
     <string name="note">Note</string>
     <string name="times_a_week">%d times a week</string>
     <string name="times_a_month">%d times a month</string>
+    <string name="x_days">every %d days</string>
     <string name="once_a_week">Once a week</string>
     <string name="three_times_a_week">3 times a week</string>
     <string name="five_times_a_week">5 times a week</string>
@@ -539,6 +540,7 @@
         <item>Week</item>
         <item>Month</item>
         <item>Year</item>
+        <item>X days</item>
     </string-array>
 
 
@@ -547,6 +549,7 @@
         <item>Weekly</item>
         <item>Monthly</item>
         <item>Yearly</item>
+        <item>Week</item>
     </string-array>
 
     <string-array name="difficulties">
@@ -613,6 +616,7 @@
     <string name="empty_tag_list_message">Organize Quests &amp; Challenges better with Tags. Start by creating one now.</string>
     <string name="every_work_day">Every work day</string>
     <string name="every_weekend_day">Every weekend day</string>
+    <string name="every_x_days">Every X days</string>
     <string name="ten_minutes">10 minutes</string>
     <string name="fifteen_minutes">15 minutes</string>
     <string name="twenty_five_minutes">25 minutes</string>

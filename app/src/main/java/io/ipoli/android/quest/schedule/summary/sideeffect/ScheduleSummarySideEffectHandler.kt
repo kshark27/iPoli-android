@@ -30,6 +30,16 @@ object ScheduleSummarySideEffectHandler : AppSideEffectHandler() {
                 listenForScheduleSummary(state.dataState.agendaDate, state.dataState.player)
             }
 
+            is ScheduleSummaryAction.ChangeMonth -> {
+                listenForScheduleSummary(
+                    LocalDate.of(
+                        action.yearMonth.year,
+                        action.yearMonth.month,
+                        1
+                    ), state.dataState.player
+                )
+            }
+
             is ScheduleSummaryAction.GoToToday -> {
                 listenForScheduleSummary(LocalDate.now(), state.dataState.player)
             }

@@ -346,6 +346,12 @@ class RepeatingQuestViewController(args: Bundle? = null) :
             RepeatingQuestViewState.RepeatType.Yearly -> {
                 "Once per year"
             }
+
+            is RepeatingQuestViewState.RepeatType.EveryXDays -> {
+                repeat.frequency.let {
+                    "Every $it days"
+                }
+            }
         }
 
     data class ProgressViewModel(@LayoutRes val layout: Int, @ColorInt val color: Int)

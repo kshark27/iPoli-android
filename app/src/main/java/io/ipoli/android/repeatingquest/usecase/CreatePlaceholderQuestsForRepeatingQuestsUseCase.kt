@@ -49,7 +49,6 @@ class CreatePlaceholderQuestsForRepeatingQuestsUseCase(
 
                 is RepeatPattern.Daily -> currStart.datesBetween(currEnd).toSet()
 
-
                 is RepeatPattern.Weekly ->
                     weeklyDatesToScheduleInPeriod(
                         it.repeatPattern,
@@ -71,6 +70,14 @@ class CreatePlaceholderQuestsForRepeatingQuestsUseCase(
                         currStart,
                         currEnd
                     )
+
+                is RepeatPattern.EveryXDays ->
+                    RepeatPattern.everyXDatesToScheduleInPeriod(
+                        it.repeatPattern,
+                        currStart,
+                        currEnd
+                    )
+
 
                 else -> throw IllegalArgumentException("Cannot create placeholders for $it")
             }

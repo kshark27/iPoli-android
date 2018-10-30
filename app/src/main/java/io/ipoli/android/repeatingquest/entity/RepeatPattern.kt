@@ -1,5 +1,7 @@
 package io.ipoli.android.repeatingquest.entity
 
+import io.ipoli.android.common.datetime.datesBetween
+import io.ipoli.android.common.datetime.daysUntil
 import io.ipoli.android.common.datetime.isBetween
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
@@ -84,6 +86,7 @@ sealed class RepeatPattern(
         override val startDate: LocalDate = LocalDate.now(),
         override val endDate: LocalDate? = null
     ) : RepeatPattern(startDate, endDate) {
+
         override fun periodRangeFor(date: LocalDate) =
             PeriodRange(
                 start = date.with(TemporalAdjusters.firstDayOfMonth()),
@@ -105,6 +108,43 @@ sealed class RepeatPattern(
         }
     }
 
+    data class EveryXDays(
+        val xDays: Int,
+        override val startDate: LocalDate = LocalDate.now(),
+        override val endDate: LocalDate? = null
+    ) : RepeatPattern(
+        startDate, endDate
+    ) {
+        override val periodCount: Int
+            get() {
+                val today = LocalDate.now()
+                val periodStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                val periodEnd = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+                return periodStart.datesBetween(periodEnd).sumBy { date ->
+                    if (shouldBeDoneOn(date)) 1
+                    else 0
+                }
+            }
+
+        override fun periodRangeFor(date: LocalDate) = PeriodRange(
+            start = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)),
+            end = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+        )
+
+        override fun nextDateWithoutRange(from: LocalDate): LocalDate? {
+            var nextDate = from
+            while (true) {
+                if (shouldBeDoneOn(nextDate)) {
+                    return nextDate
+                }
+                nextDate = nextDate.plusDays(1)
+            }
+        }
+
+        fun shouldBeDoneOn(date: LocalDate) =
+            startDate.daysUntil(date) % xDays == 0L
+    }
+
     sealed class Flexible(
         override val startDate: LocalDate,
         override val endDate: LocalDate?,
@@ -118,6 +158,7 @@ sealed class RepeatPattern(
             override val startDate: LocalDate = LocalDate.now(),
             override val endDate: LocalDate? = null
         ) : Flexible(startDate, endDate) {
+
             override fun periodRangeFor(date: LocalDate) =
                 PeriodRange(
                     start = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)),
@@ -135,7 +176,8 @@ sealed class RepeatPattern(
                     return null
                 }
 
-                val nextDate = scheduledPeriods[periodStart]!!.sorted().firstOrNull { !it.isBefore(from) }
+                val nextDate =
+                    scheduledPeriods[periodStart]!!.sorted().firstOrNull { !it.isBefore(from) }
                 return nextDate ?: firstDateForNextPeriod(periodStart)
             }
 
@@ -274,6 +316,24 @@ sealed class RepeatPattern(
 
         }
 
+        fun everyXDatesToScheduleInPeriod(
+            repeatPattern: RepeatPattern.EveryXDays,
+            start: LocalDate,
+            end: LocalDate
+        ): List<LocalDate> {
+
+            var date = start
+            val dates = mutableListOf<LocalDate>()
+            while (date.isBefore(end.plusDays(1))) {
+                if (repeatPattern.shouldBeDoneOn(date)) {
+                    dates.add(date)
+                }
+                date = date.plusDays(1)
+            }
+            return dates
+
+        }
+
         fun yearlyDatesToScheduleInPeriod(
             repeatPattern: RepeatPattern.Yearly,
             start: LocalDate,
@@ -319,7 +379,8 @@ enum class RepeatType {
     DAILY,
     WEEKLY,
     MONTHLY,
-    YEARLY
+    YEARLY,
+    EVERY_X_DAYS
 }
 
 val RepeatPattern.repeatType: RepeatType
@@ -330,4 +391,5 @@ val RepeatPattern.repeatType: RepeatType
         is RepeatPattern.Monthly -> RepeatType.MONTHLY
         is RepeatPattern.Flexible.Monthly -> RepeatType.MONTHLY
         is RepeatPattern.Yearly -> RepeatType.YEARLY
+        is RepeatPattern.EveryXDays -> RepeatType.EVERY_X_DAYS
     }

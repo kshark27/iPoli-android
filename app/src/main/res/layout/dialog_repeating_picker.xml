@@ -170,17 +170,6 @@
             tools:text="Day" />
 
         <Button
-            android:id="@+id/rpStart"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
-            app:layout_constraintStart_toEndOf="@+id/textView6"
-            app:layout_constraintTop_toBottomOf="@+id/rpPetSchedulingHint"
-            tools:text="Today" />
-
-        <Button
             android:id="@+id/rpDayOfYear"
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
@@ -190,6 +179,56 @@
             app:layout_constraintStart_toEndOf="@+id/textView"
             app:layout_constraintTop_toBottomOf="@+id/rpEvery"
             tools:text="21 Feb" />
+
+        <TextView
+            android:id="@+id/rpEveryXDaysRepeatLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:text="Repeat every"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="?android:textColorSecondary"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/rpEveryXDaysCount"
+            app:layout_constraintTop_toTopOf="@+id/rpEveryXDaysCount"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="Day" />
+
+        <Spinner
+            android:id="@+id/rpEveryXDaysCount"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/bordered_rectangle_accent_background"
+            android:dropDownWidth="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/rpEvery"
+            app:layout_constraintStart_toEndOf="@+id/rpEveryXDaysRepeatLabel" />
+
+        <TextView
+            android:id="@+id/rpEveryXDaysLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="days"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="?android:textColorSecondary"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/rpEveryXDaysCount"
+            app:layout_constraintStart_toEndOf="@id/rpEveryXDaysCount"
+            app:layout_constraintTop_toTopOf="@+id/rpEveryXDaysCount"
+            tools:text="Day" />
+
+        <Button
+            android:id="@+id/rpStart"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintStart_toEndOf="@+id/textView6"
+            app:layout_constraintTop_toBottomOf="@+id/rpPetSchedulingHint"
+            tools:text="Today" />
 
         <Button
             android:id="@+id/rpEnd"
@@ -206,7 +245,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="rpMonthDayList,rpWeekDayList,rpDayOfYear, rpRepeatType" />
+            app:constraint_referenced_ids="rpMonthDayList,rpWeekDayList,rpDayOfYear, rpRepeatType, rpEveryXDaysCount" />
 
         <android.support.constraint.Group
             android:id="@+id/yearlyPatternGroup"
@@ -214,6 +253,13 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:constraint_referenced_ids="rpDayOfYear,textView" />
+
+        <android.support.constraint.Group
+            android:id="@+id/everyXDaysPatternGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="rpEveryXDaysCount,rpEveryXDaysLabel,rpEveryXDaysRepeatLabel" />
 
         <android.support.constraint.Group
             android:id="@+id/countGroup"

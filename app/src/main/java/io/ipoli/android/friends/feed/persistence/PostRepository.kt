@@ -80,7 +80,9 @@ class AndroidPostRepository(
 
             GlobalScope.launch(Dispatchers.IO) {
                 val dbPlayers = playerIds.map {
-                    it to DbPlayer(playerRef(it).getAsync().data!!)
+                    GlobalScope.async(Dispatchers.IO) {
+                        it to DbPlayer(playerRef(it).getAsync().data!!)
+                    }.await()
                 }.toMap()
 
                 val entities = dbPosts.map {

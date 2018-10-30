@@ -10,6 +10,7 @@ import io.ipoli.android.R
 import io.ipoli.android.common.datetime.DateUtils
 import io.ipoli.android.common.redux.android.ReduxViewController
 import io.ipoli.android.common.view.*
+import io.ipoli.android.habit.show.HabitViewController
 import io.ipoli.android.quest.schedule.summary.ScheduleSummaryViewState.StateType.*
 import io.ipoli.android.quest.schedule.summary.usecase.CreateScheduleSummaryItemsUseCase
 import kotlinx.android.synthetic.main.controller_schedule_summary.view.*
@@ -18,6 +19,7 @@ import org.json.JSONObject
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
 import org.threeten.bp.Month
+import org.threeten.bp.YearMonth
 import org.threeten.bp.format.TextStyle
 import java.util.*
 
@@ -50,6 +52,10 @@ class ScheduleSummaryViewController(args: Bundle? = null) :
             DayOfWeek.SUNDAY -> view.calendarView.setWeekStarWithSun()
             else -> view.calendarView.setWeekStarWithMon()
         }
+
+        view.calendarView.setOnMonthChangeListener(HabitViewController.SkipFirstChangeMonthListener { year, month ->
+            dispatch(ScheduleSummaryAction.ChangeMonth(YearMonth.of(year, month)))
+        })
 
         view.calendarView.setOnCalendarSelectListener(SkipFirstChangeDateListener { calendar, isClicked ->
 
@@ -126,6 +132,10 @@ class ScheduleSummaryViewController(args: Bundle? = null) :
                     currentDate.dayOfMonth
                 )
                 renderToolbarDate(view, currentDate.monthValue, currentDate.year)
+            }
+
+            MONTH_CHANGED -> {
+                renderToolbarDate(view, state.currentDate.monthValue, state.currentDate.year)
             }
 
             SCHEDULE_SUMMARY_DATA_CHANGED -> {

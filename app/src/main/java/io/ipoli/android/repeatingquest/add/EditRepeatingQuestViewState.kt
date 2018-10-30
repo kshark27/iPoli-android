@@ -470,6 +470,7 @@ data class EditRepeatingQuestViewState(
         FIVE_PER_WEEK,
         WORK_DAYS,
         WEEKEND_DAYS,
+        EVERY_X_DAYS,
         MORE_OPTIONS
     }
 

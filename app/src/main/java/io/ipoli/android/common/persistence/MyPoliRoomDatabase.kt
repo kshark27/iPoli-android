@@ -490,6 +490,13 @@ object Migration7To8 : Migration(7, 8) {
     }
 }
 
+object Migration8To9 : Migration(8, 9) {
+
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE repeating_quests ADD COLUMN `repeatPattern_xDays` INTEGER DEFAULT NULL")
+    }
+}
+
 @Database(
     entities = [
         RoomPlayer::class,
@@ -505,7 +512,7 @@ object Migration7To8 : Migration(7, 8) {
         RoomHabit.Companion.RoomTagJoin::class,
         RoomEntityReminder::class
     ],
-    version = 8,
+    version = 9,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -550,7 +557,8 @@ abstract class MyPoliRoomDatabase : RoomDatabase() {
                     Migration4To5,
                     Migration5To6,
                     Migration6To7,
-                    Migration7To8
+                    Migration7To8,
+                    Migration8To9
                 )
                 .addCallback(CALLBACK)
                 .build()

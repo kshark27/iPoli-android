@@ -253,6 +253,14 @@ class RoomRepeatingQuestRepository(dao: RepeatingQuestDao, private val tagDao: T
                 )
             }
 
+            EVERY_X_DAYS -> {
+                RepeatPattern.EveryXDays(
+                    xDays = rp.xDays!!.toInt(),
+                    startDate = rp.startDate.startOfDayUTC,
+                    endDate = rp.endDate?.startOfDayUTC
+                )
+            }
+
             FLEXIBLE_WEEKLY -> {
                 RepeatPattern.Flexible.Weekly(
                     timesPerWeek = rp.timesPerWeek!!.toInt(),
@@ -327,7 +335,6 @@ class RoomRepeatingQuestRepository(dao: RepeatingQuestDao, private val tagDao: T
                 )
             }
             is RepeatPattern.Monthly -> {
-
                 RoomRepeatPattern(
                     type = MONTHLY.name,
                     startDate = repeatPattern.startDate.startOfDayUTC(),
@@ -342,6 +349,15 @@ class RoomRepeatingQuestRepository(dao: RepeatingQuestDao, private val tagDao: T
                     endDate = repeatPattern.endDate?.startOfDayUTC(),
                     dayOfMonth = repeatPattern.dayOfMonth.toLong(),
                     month = repeatPattern.month.name
+                )
+            }
+
+            is RepeatPattern.EveryXDays -> {
+                RoomRepeatPattern(
+                    type = EVERY_X_DAYS.name,
+                    xDays = repeatPattern.xDays.toLong(),
+                    startDate = repeatPattern.startDate.startOfDayUTC(),
+                    endDate = repeatPattern.endDate?.startOfDayUTC()
                 )
             }
 
@@ -480,7 +496,8 @@ data class RoomRepeatPattern(
     val timesPerWeek: Long? = null,
     val timesPerMonth: Long? = null,
     val preferredDays: List<String> = emptyList(),
-    val scheduledPeriods: MutableMap<String, List<Long>> = mutableMapOf()
+    val scheduledPeriods: MutableMap<String, List<Long>> = mutableMapOf(),
+    val xDays: Long? = null
 )
 
 data class DbRepeatPattern(val map: MutableMap<String, Any?> = mutableMapOf()) {
@@ -491,13 +508,14 @@ data class DbRepeatPattern(val map: MutableMap<String, Any?> = mutableMapOf()) {
     var month: String by map
     var daysOfWeek: List<String> by map
     var daysOfMonth: List<Long> by map
-    var timesPerWeek: Long by map
-    var timesPerMonth: Long by map
+    var timesPerWeek: Long? by map
+    var timesPerMonth: Long? by map
     var preferredDays: List<String> by map
     var scheduledPeriods: MutableMap<String, List<Long>> by map
+    var xDays: Long? by map
 
     enum class Type {
-        DAILY, WEEKLY, MONTHLY, YEARLY, FLEXIBLE_WEEKLY, FLEXIBLE_MONTHLY
+        DAILY, WEEKLY, MONTHLY, YEARLY, FLEXIBLE_WEEKLY, FLEXIBLE_MONTHLY, EVERY_X_DAYS
     }
 }
 
@@ -599,9 +617,17 @@ class FirestoreRepeatingQuestRepository(
                 )
             }
 
+            EVERY_X_DAYS -> {
+                RepeatPattern.EveryXDays(
+                    xDays = rp.xDays!!.toInt(),
+                    startDate = rp.startDate.startOfDayUTC,
+                    endDate = rp.endDate?.startOfDayUTC
+                )
+            }
+
             FLEXIBLE_WEEKLY -> {
                 RepeatPattern.Flexible.Weekly(
-                    timesPerWeek = rp.timesPerWeek.toInt(),
+                    timesPerWeek = rp.timesPerWeek!!.toInt(),
                     preferredDays = rp.preferredDays.map { DayOfWeek.valueOf(it) }.toSet(),
                     scheduledPeriods = rp.scheduledPeriods.entries
                         .associate { it.key.toLong().startOfDayUTC to it.value.map { it.startOfDayUTC } },
@@ -612,7 +638,7 @@ class FirestoreRepeatingQuestRepository(
 
             FLEXIBLE_MONTHLY -> {
                 RepeatPattern.Flexible.Monthly(
-                    timesPerMonth = rp.timesPerMonth.toInt(),
+                    timesPerMonth = rp.timesPerMonth!!.toInt(),
                     preferredDays = rp.preferredDays.map { it.toInt() }.toSet(),
                     scheduledPeriods = rp.scheduledPeriods.entries
                         .associate { it.key.toLong().startOfDayUTC to it.value.map { it.startOfDayUTC } },
@@ -677,6 +703,12 @@ class FirestoreRepeatingQuestRepository(
                 rp.dayOfMonth = repeatPattern.dayOfMonth.toLong()
                 rp.month = repeatPattern.month.name
             }
+
+            is RepeatPattern.EveryXDays -> {
+                rp.type = EVERY_X_DAYS.name
+                rp.xDays = repeatPattern.xDays.toLong()
+            }
+
             is RepeatPattern.Flexible.Weekly -> {
                 rp.type = FLEXIBLE_WEEKLY.name
                 rp.timesPerWeek = repeatPattern.timesPerWeek.toLong()

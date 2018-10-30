@@ -244,6 +244,17 @@ class AgendaViewController(args: Bundle? = null) :
     override fun onCreateLoadAction() =
         AgendaAction.Load
 
+    override fun onAttach(view: View) {
+        view.post {
+            if (!view.calendarContainer.isExpand) {
+                val lp = view.agendaListContainer.layoutParams as ViewGroup.MarginLayoutParams
+                lp.topMargin = 0
+                view.agendaListContainer.layoutParams = lp
+            }
+        }
+        super.onAttach(view)
+    }
+
     override fun onDetach(view: View) {
         view.agendaList.clearOnScrollListeners()
         super.onDetach(view)

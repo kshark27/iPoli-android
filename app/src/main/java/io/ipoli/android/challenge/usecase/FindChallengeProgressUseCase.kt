@@ -5,6 +5,7 @@ import io.ipoli.android.common.UseCase
 import io.ipoli.android.common.datetime.*
 import io.ipoli.android.quest.Quest
 import io.ipoli.android.repeatingquest.entity.RepeatPattern
+import io.ipoli.android.repeatingquest.entity.RepeatPattern.Companion.everyXDatesToScheduleInPeriod
 import io.ipoli.android.repeatingquest.entity.RepeatPattern.Companion.findMonthlyPeriods
 import io.ipoli.android.repeatingquest.entity.RepeatPattern.Companion.findWeeklyPeriods
 import io.ipoli.android.repeatingquest.entity.RepeatPattern.Companion.monthlyDatesToScheduleInPeriod
@@ -46,6 +47,10 @@ class FindChallengeProgressUseCase : UseCase<FindChallengeProgressUseCase.Params
 
                 is RepeatPattern.Yearly -> {
                     yearlyDatesToScheduleInPeriod(repeatingPattern, start, end).size
+                }
+
+                is RepeatPattern.EveryXDays -> {
+                    everyXDatesToScheduleInPeriod(repeatingPattern, start, end).size
                 }
 
                 is RepeatPattern.Flexible.Weekly -> {

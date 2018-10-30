@@ -9,6 +9,7 @@ import io.ipoli.android.quest.data.persistence.QuestRepository
 import io.ipoli.android.quest.job.ReminderScheduler
 import io.ipoli.android.repeatingquest.entity.Period
 import io.ipoli.android.repeatingquest.entity.RepeatPattern
+import io.ipoli.android.repeatingquest.entity.RepeatPattern.Companion.everyXDatesToScheduleInPeriod
 import io.ipoli.android.repeatingquest.entity.RepeatPattern.Companion.findMonthlyPeriods
 import io.ipoli.android.repeatingquest.entity.RepeatPattern.Companion.findWeeklyPeriods
 import io.ipoli.android.repeatingquest.entity.RepeatPattern.Companion.monthlyDatesToScheduleInPeriod
@@ -71,6 +72,13 @@ class SaveQuestsForRepeatingQuestUseCase(
                     end
                 )
 
+            is RepeatPattern.EveryXDays -> {
+                everyXDatesToScheduleInPeriod(
+                    rq.repeatPattern,
+                    start,
+                    end
+                )
+            }
 
             is RepeatPattern.Flexible.Weekly -> {
                 val scheduledPeriods = rq.repeatPattern.scheduledPeriods.toMutableMap()

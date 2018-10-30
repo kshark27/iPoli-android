@@ -306,5 +306,23 @@ class RepeatPatternSpek : Spek({
                 shouldHaveNextDate(pattern.nextDate(today), firstDayOfYear.plusYears(1))
             }
         }
+
+        describe("Every x days") {
+
+            it("should repeat every 2 days") {
+                val today = LocalDate.now()
+                val tommorow = today.plusDays(1)
+                val pattern = RepeatPattern.EveryXDays(2)
+                shouldHaveNextDate(pattern.nextDate(today), today)
+                shouldHaveNextDate(pattern.nextDate(tommorow), tommorow.plusDays(1))
+            }
+
+            it("should repeat when start date is from previous month") {
+                val today = LocalDate.of(2018, Month.OCTOBER, 11)
+                val startDate = today.minusMonths(1)
+                val pattern = RepeatPattern.EveryXDays(3, startDate)
+                shouldHaveNextDate(pattern.nextDate(today), today)
+            }
+        }
     }
 })

@@ -65,6 +65,7 @@ data class RepeatingQuestViewState(
         object Daily : RepeatType()
         data class Weekly(val frequency: Int) : RepeatType()
         data class Monthly(val frequency: Int) : RepeatType()
+        data class EveryXDays(val frequency: Int) : RepeatType()
         object Yearly : RepeatType()
     }
 }
@@ -143,6 +144,8 @@ object RepeatingQuestReducer : BaseViewStateReducer<RepeatingQuestViewState>() {
             is RepeatPattern.Weekly, is RepeatPattern.Flexible.Weekly -> RepeatingQuestViewState.RepeatType.Weekly(
                 repeatPattern.periodCount
             )
+
+            is RepeatPattern.EveryXDays -> RepeatingQuestViewState.RepeatType.EveryXDays(repeatPattern.xDays)
 
             is RepeatPattern.Monthly, is RepeatPattern.Flexible.Monthly -> RepeatingQuestViewState.RepeatType.Monthly(
                 repeatPattern.periodCount
