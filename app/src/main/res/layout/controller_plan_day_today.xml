@@ -9,7 +9,8 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:theme="?android:toolbarStyle">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbarContainer"
@@ -30,8 +31,8 @@
                     android:id="@+id/dailyChallengePet"
                     android:layout_width="wrap_content"
                     android:layout_height="80dp"
-                    android:layout_marginBottom="16dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginBottom="16dp"
                     android:adjustViewBounds="true"
                     android:visibility="invisible"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -63,9 +64,9 @@
                     android:id="@+id/constraintLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="16dp"
                     android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/dailyChallengePet"
@@ -89,9 +90,9 @@
                         android:id="@+id/dailyChallengePetMessage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
                         android:layout_marginStart="28dp"
                         android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
                         android:gravity="center_horizontal"
                         android:paddingTop="8dp"
                         android:text="@string/selected_daily_challenge_quests"
@@ -105,8 +106,8 @@
                         android:id="@+id/selectedQuestsCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
                         android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/md_dark_text_87"
                         app:layout_constraintBottom_toBottomOf="@+id/petBubble"
@@ -123,6 +124,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:theme="?android:toolbarStyle"
                 app:layout_collapseMode="pin" />
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -141,9 +143,9 @@
             <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/rounded_rectangle_surface_background"
                 android:elevation="2dp">
 
@@ -151,9 +153,9 @@
                     android:id="@+id/descriptionIcon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:layout_marginBottom="8dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -161,10 +163,10 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/daily_challenge_description"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -178,9 +180,9 @@
                 android:id="@+id/suggestionQuestsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/rounded_rectangle_surface_background"
                 android:elevation="2dp"
                 android:visibility="gone">
@@ -207,10 +209,10 @@
             <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="16dp"
-                android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
                 android:background="@drawable/rounded_rectangle_surface_background"
                 android:elevation="2dp">
 
@@ -227,9 +229,9 @@
                     android:id="@+id/timelineIndicator"
                     android:layout_width="2.5dp"
                     android:layout_height="0dp"
-                    android:layout_marginBottom="13dp"
                     android:layout_marginStart="33dp"
                     android:layout_marginTop="13dp"
+                    android:layout_marginBottom="13dp"
                     android:background="?android:listDivider"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@+id/todayQuests"
@@ -250,8 +252,8 @@
                     layout="@layout/view_empty_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
                     android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -295,8 +297,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:src="@drawable/ic_add_white_24dp"
         app:elevation="6dp" />
 </android.support.design.widget.CoordinatorLayout>

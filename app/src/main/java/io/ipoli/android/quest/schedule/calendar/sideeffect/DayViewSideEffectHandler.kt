@@ -40,7 +40,10 @@ object DayViewSideEffectHandler : AppSideEffectHandler() {
         when (a) {
 
             is ScheduleAction.Load ->
-                startListenForCalendarQuests(a.currentDate)
+                startListenForCalendarQuests(state.dataState.agendaDate)
+
+            is ScheduleAction.GoToToday ->
+                startListenForCalendarQuests(LocalDate.now())
 
             DayViewAction.AddQuest ->
                 saveQuest(state, action)
@@ -57,10 +60,7 @@ object DayViewSideEffectHandler : AppSideEffectHandler() {
             is DayViewAction.UndoRemoveQuest ->
                 undoRemoveQuestUseCase.execute(a.questId)
 
-            is ScheduleAction.ScheduleChangeDate ->
-                startListenForCalendarQuests(a.date)
-
-            is CalendarAction.ChangeVisibleDate ->
+            is CalendarAction.ChangeDate ->
                 startListenForCalendarQuests(a.date)
 
             is ScheduleAction.ToggleViewMode -> {
@@ -200,9 +200,9 @@ object DayViewSideEffectHandler : AppSideEffectHandler() {
     override fun canHandle(action: Action): Boolean {
         val a = (action as? NamespaceAction)?.source ?: action
         return a is DayViewAction
-            || a is CalendarAction.ChangeVisibleDate
-            || a is ScheduleAction.ScheduleChangeDate
-            || a === ScheduleAction.ToggleViewMode
+            || a is CalendarAction.ChangeDate
+            || a is ScheduleAction.ToggleViewMode
             || a is ScheduleAction.Load
+            || a is ScheduleAction.GoToToday
     }
 }

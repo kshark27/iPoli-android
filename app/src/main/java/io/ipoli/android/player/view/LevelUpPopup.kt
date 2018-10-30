@@ -61,6 +61,9 @@ object PlayerSideEffectHandler : AppSideEffectHandler() {
 
             is ReviveAction -> {
                 val p = playerRepository.find()!!
+                if (!p.isDead) {
+                    return
+                }
                 playerRepository.save(p.revive())
 
                 sharedPreferences.edit().putBoolean(Constants.KEY_PLAYER_DEAD, false).commit()

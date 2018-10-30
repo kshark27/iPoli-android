@@ -37,7 +37,7 @@ open class RewardPlayerUseCase(
         val QUEST_HP_BASE_REWARDS = intArrayOf(1, 2, 3)
 
         val QUEST_XP_BASE_REWARDS = intArrayOf(2, 5, 7, 10, 15)
-        val QUEST_COINS_BASE_REWARDS = intArrayOf(1, 2, 3, 5)
+        val QUEST_COINS_BASE_REWARDS = intArrayOf(1, 2, 3, 4)
         val QUEST_ATTRIBUTE_BASE_REWARDS = intArrayOf(1, 2, 3, 4)
 
         val HABIT_XP_BASE_REWARDS = intArrayOf(1, 2, 4, 5)
@@ -48,7 +48,7 @@ open class RewardPlayerUseCase(
         val DC_COINS_BASE_REWARDS = QUEST_COINS_BASE_REWARDS.map { it * 2 }.toIntArray()
 
         val CHALLENGE_XP_BASE_REWARDS = intArrayOf(20, 30, 40, 50, 60)
-        val CHALLENGE_COINS_BASE_REWARDS = intArrayOf(10, 15, 25, 40, 50)
+        val CHALLENGE_COINS_BASE_REWARDS = intArrayOf(10, 15, 25, 40)
         val CHALLENGE_ATTRIBUTE_BASE_REWARDS = intArrayOf(3, 6, 9, 12, 15)
     }
 

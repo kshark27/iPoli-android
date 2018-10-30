@@ -1,4 +1,4 @@
-package io.ipoli.android.quest.schedule.agenda
+package io.ipoli.android.quest.schedule.agenda.view
 
 import io.ipoli.android.common.AppState
 import io.ipoli.android.common.BaseViewStateReducer
@@ -6,8 +6,14 @@ import io.ipoli.android.common.DataLoadedAction
 import io.ipoli.android.common.datetime.isBetween
 import io.ipoli.android.common.redux.Action
 import io.ipoli.android.common.redux.BaseViewState
+import io.ipoli.android.quest.schedule.ScheduleAction
 import io.ipoli.android.quest.schedule.agenda.usecase.CreateAgendaItemsUseCase.AgendaItem
+import io.ipoli.android.quest.schedule.agenda.usecase.CreateAgendaPreviewItemsUseCase
+import io.ipoli.android.quest.schedule.agenda.view.AgendaViewState.PreviewMode.MONTH
+import io.ipoli.android.quest.schedule.agenda.view.AgendaViewState.PreviewMode.WEEK
+import io.ipoli.android.quest.schedule.agenda.view.AgendaViewState.StateType.*
 import org.threeten.bp.LocalDate
+import org.threeten.bp.YearMonth
 
 /**
  * Created by Venelin Valkov <venelin@mypoli.fun>
@@ -15,9 +21,7 @@ import org.threeten.bp.LocalDate
  */
 
 sealed class AgendaAction : Action {
-    data class Load(val startDate: LocalDate) : AgendaAction() {
-        override fun toMap() = mapOf("startDate" to startDate)
-    }
+    object Load : AgendaAction()
 
     data class LoadBefore(val itemPosition: Int) : AgendaAction() {
         override fun toMap() = mapOf("itemPosition" to itemPosition)
@@ -50,6 +54,10 @@ sealed class AgendaAction : Action {
     data class FirstVisibleItemChanged(val itemPosition: Int) : AgendaAction() {
         override fun toMap() = mapOf("itemPosition" to itemPosition)
     }
+
+    data class AutoChangeDate(val date: LocalDate) : AgendaAction()
+    data class ChangePreviewMonth(val yearMonth: YearMonth) : AgendaAction()
+    data class ChangePreviewDate(val date: LocalDate) : AgendaAction()
 }
 
 object AgendaReducer : BaseViewStateReducer<AgendaViewState>() {
@@ -60,12 +68,12 @@ object AgendaReducer : BaseViewStateReducer<AgendaViewState>() {
         state: AppState,
         subState: AgendaViewState,
         action: Action
-    ): AgendaViewState {
-        return when (action) {
+    ) =
+        when (action) {
 
             is DataLoadedAction.AgendaItemsChanged -> {
                 subState.copy(
-                    type = AgendaViewState.StateType.DATA_CHANGED,
+                    type = DATA_CHANGED,
                     agendaItems = action.agendaItems,
                     scrollToPosition = findItemPositionToScrollTo(
                         action.currentAgendaItemDate,
@@ -73,39 +81,70 @@ object AgendaReducer : BaseViewStateReducer<AgendaViewState>() {
                     )
                 )
             }
+
+            is DataLoadedAction.AgendaPreviewItemsChanged -> {
+                subState.copy(
+                    type = CALENDAR_DATA_CHANGED,
+                    previewItems = action.previewItems
+                )
+            }
+
             is AgendaAction.LoadBefore -> {
                 subState.copy(
-                    type = AgendaViewState.StateType.SHOW_TOP_LOADER
+                    type = SHOW_TOP_LOADER
                 )
             }
             is AgendaAction.LoadAfter -> {
                 subState.copy(
-                    type = AgendaViewState.StateType.SHOW_BOTTOM_LOADER
+                    type = SHOW_BOTTOM_LOADER
                 )
             }
-            is AgendaAction.FirstVisibleItemChanged -> {
+
+            is ScheduleAction.ToggleAgendaPreviewMode -> {
                 subState.copy(
-                    type = AgendaViewState.StateType.IDLE
+                    type = PREVIEW_MODE_CHANGED,
+                    previewMode = if (subState.previewMode == WEEK) MONTH else WEEK
                 )
             }
+
+            is AgendaAction.AutoChangeDate -> {
+                subState.copy(
+                    type = VISIBLE_DATE_CHANGED,
+                    currentDate = action.date
+                )
+            }
+
+            is AgendaAction.ChangePreviewDate -> {
+                subState.copy(
+                    type = IDLE,
+                    currentDate = action.date
+                )
+            }
+
+            is ScheduleAction.GoToToday -> {
+                subState.copy(
+                    type = SHOW_TODAY,
+                    currentDate = LocalDate.now()
+                )
+            }
+
             else -> subState
 
         }
-    }
 
     private fun findItemPositionToScrollTo(
         date: LocalDate?,
         agendaItems: List<AgendaItem>
     ) = date?.let {
         val currentAgendaItemDate = it
-        val index = agendaItems.indexOfLast {
-            when (it) {
+        val index = agendaItems.indexOfLast { item ->
+            when (item) {
                 is AgendaItem.Date ->
-                    it.startDate() == currentAgendaItemDate
+                    item.startDate() == currentAgendaItemDate
                 is AgendaItem.Week ->
                     currentAgendaItemDate.isBetween(
-                        it.start,
-                        it.end
+                        item.start,
+                        item.end
                     )
                 else -> false
             }
@@ -115,9 +154,12 @@ object AgendaReducer : BaseViewStateReducer<AgendaViewState>() {
     }
 
     override fun defaultState() = AgendaViewState(
-        type = AgendaViewState.StateType.LOADING,
+        type = LOADING,
         agendaItems = listOf(),
-        scrollToPosition = null
+        scrollToPosition = null,
+        currentDate = LocalDate.now(),
+        previewItems = null,
+        previewMode = WEEK
     )
 
     const val ITEMS_BEFORE_COUNT = 25
@@ -125,9 +167,12 @@ object AgendaReducer : BaseViewStateReducer<AgendaViewState>() {
 }
 
 data class AgendaViewState(
-    val type: AgendaViewState.StateType,
+    val type: StateType,
+    val currentDate: LocalDate?,
     val scrollToPosition: Int?,
-    val agendaItems: List<AgendaItem>
+    val agendaItems: List<AgendaItem>,
+    val previewItems: List<CreateAgendaPreviewItemsUseCase.PreviewItem>?,
+    val previewMode: PreviewMode
 ) : BaseViewState() {
 
     enum class StateType {
@@ -135,7 +180,15 @@ data class AgendaViewState(
         DATA_CHANGED,
         SHOW_TOP_LOADER,
         SHOW_BOTTOM_LOADER,
-        IDLE
+        IDLE,
+        PREVIEW_MODE_CHANGED,
+        CALENDAR_DATA_CHANGED,
+        SHOW_TODAY,
+        VISIBLE_DATE_CHANGED
+    }
+
+    enum class PreviewMode {
+        WEEK, MONTH
     }
 
 }

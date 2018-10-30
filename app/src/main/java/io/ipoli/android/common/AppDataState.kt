@@ -25,7 +25,12 @@ import io.ipoli.android.player.data.Avatar
 import io.ipoli.android.player.data.Player
 import io.ipoli.android.quest.Quest
 import io.ipoli.android.quest.RepeatingQuest
+import io.ipoli.android.quest.schedule.ScheduleAction
 import io.ipoli.android.quest.schedule.agenda.usecase.CreateAgendaItemsUseCase
+import io.ipoli.android.quest.schedule.agenda.usecase.CreateAgendaPreviewItemsUseCase
+import io.ipoli.android.quest.schedule.agenda.view.AgendaAction
+import io.ipoli.android.quest.schedule.calendar.CalendarAction
+import io.ipoli.android.quest.schedule.summary.ScheduleSummaryAction
 import io.ipoli.android.quest.schedule.summary.usecase.CreateScheduleSummaryItemsUseCase
 import io.ipoli.android.quest.schedule.today.usecase.CreateTodayItemsUseCase
 import io.ipoli.android.quest.usecase.Schedule
@@ -60,10 +65,11 @@ sealed class DataLoadedAction : Action {
         val currentAgendaItemDate: LocalDate?
     ) : DataLoadedAction()
 
-    data class CalendarScheduleChanged(val schedule: Map<LocalDate, Schedule>) :
-        DataLoadedAction()
+    data class AgendaPreviewItemsChanged(
+        val previewItems: List<CreateAgendaPreviewItemsUseCase.PreviewItem>
+    ) : DataLoadedAction()
 
-    data class MonthPreviewScheduleChanged(val schedule: Map<LocalDate, Schedule>) :
+    data class CalendarScheduleChanged(val schedule: Map<LocalDate, Schedule>) :
         DataLoadedAction()
 
     data class RepeatingQuestHistoryChanged(
@@ -204,7 +210,8 @@ data class AppDataState(
     val todayImage: String?,
     val awesomenessScore: Double?,
     val focusDuration: Duration<Minute>?,
-    val dailyChallengeProgress: CheckDailyChallengeProgressUseCase.Result?
+    val dailyChallengeProgress: CheckDailyChallengeProgressUseCase.Result?,
+    val agendaDate: LocalDate
 ) : State
 
 object AppDataReducer : Reducer<AppState, AppDataState> {
@@ -272,6 +279,41 @@ object AppDataReducer : Reducer<AppState, AppDataState> {
                     unscheduledQuests = action.quests
                 )
 
+            is AgendaAction.AutoChangeDate ->
+                subState.copy(
+                    agendaDate = action.date
+                )
+
+            is AgendaAction.ChangePreviewDate ->
+                subState.copy(
+                    agendaDate = action.date
+                )
+
+            is ScheduleAction.GoToToday ->
+                subState.copy(
+                    agendaDate = LocalDate.now()
+                )
+
+            is CalendarAction.ChangeDate ->
+                subState.copy(
+                    agendaDate = action.date
+                )
+
+            is ScheduleSummaryAction.ChangeDate ->
+                subState.copy(
+                    agendaDate = action.date
+                )
+
+            is ScheduleSummaryAction.GoToToday ->
+                subState.copy(
+                    agendaDate = LocalDate.now()
+                )
+
+            is ScheduleAction.ResetAgendaDate ->
+                subState.copy(
+                    agendaDate = LocalDate.now()
+                )
+
             else -> subState
         }
 
@@ -289,6 +331,7 @@ object AppDataReducer : Reducer<AppState, AppDataState> {
             todayImage = null,
             awesomenessScore = null,
             focusDuration = null,
-            dailyChallengeProgress = null
+            dailyChallengeProgress = null,
+            agendaDate = LocalDate.now()
         )
 }

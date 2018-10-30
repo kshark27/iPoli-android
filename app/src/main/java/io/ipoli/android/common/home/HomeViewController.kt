@@ -251,12 +251,10 @@ class HomeViewController(args: Bundle? = null) :
         val showTitle =
             appBarOffsetListener.currentState != AppBarStateChangeListener.State.EXPANDED
         (activity as MainActivity).supportActionBar?.setDisplayShowTitleEnabled(showTitle)
-
     }
 
     override fun onDetach(view: View) {
         view.rootCoordinator.bringToFront()
-
         super.onDetach(view)
     }
 

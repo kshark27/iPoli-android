@@ -174,13 +174,13 @@ class StoreViewController(args: Bundle? = null) : RestoreViewOnCreateController(
         ),
         THEMES(
             id = R.id.storeThemes,
-            color = R.color.md_purple_800,
+            color = R.color.md_pink_400,
             icon = R.drawable.ic_theme_black_24dp,
             title = R.string.themes
         ),
         COLORS(
             id = R.id.storeColors,
-            color = R.color.md_pink_400,
+            color = R.color.md_purple_600,
             icon = R.drawable.ic_color_palette_white_24dp,
             title = R.string.colors
         ),

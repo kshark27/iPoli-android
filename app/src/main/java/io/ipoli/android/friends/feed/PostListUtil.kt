@@ -649,7 +649,7 @@ fun toPostViewModel(
                 "${post.playerDisplayName} unlocked an Achievement - $message"
             }
 
-            return PostViewModel.AchievementViewModel(
+            PostViewModel.AchievementViewModel(
                 id = post.id,
                 playerId = post.playerId,
                 playerAvatar = AndroidAvatar.valueOf(post.playerAvatar.name),

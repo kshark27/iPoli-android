@@ -135,6 +135,7 @@ import io.ipoli.android.quest.job.RewardScheduler
 import io.ipoli.android.quest.reminder.formatter.TimeUnitFormatter
 import io.ipoli.android.quest.schedule.agenda.sideeffect.AgendaSideEffectHandler
 import io.ipoli.android.quest.schedule.agenda.usecase.CreateAgendaItemsUseCase
+import io.ipoli.android.quest.schedule.agenda.usecase.CreateAgendaPreviewItemsUseCase
 import io.ipoli.android.quest.schedule.agenda.usecase.FindAgendaDatesUseCase
 import io.ipoli.android.quest.schedule.calendar.sideeffect.DayViewSideEffectHandler
 import io.ipoli.android.quest.schedule.summary.sideeffect.ScheduleSummarySideEffectHandler
@@ -433,6 +434,7 @@ interface UseCaseModule {
     val createChallengeFromPresetUseCase: CreateChallengeFromPresetUseCase
     val createHabitHistoryItemsUseCase: CreateHabitHistoryItemsUseCase
     val createChallengeProgressItemsUseCase: CreateChallengeProgressItemsUseCase
+    val createAgendaPreviewItemsUseCase : CreateAgendaPreviewItemsUseCase
 }
 
 class MainUseCaseModule(private val context: Context) : UseCaseModule {
@@ -1023,6 +1025,9 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
 
     override val createChallengeProgressItemsUseCase
         get() = CreateChallengeProgressItemsUseCase()
+
+    override val createAgendaPreviewItemsUseCase
+        get() = CreateAgendaPreviewItemsUseCase()
 }
 
 interface StateStoreModule {

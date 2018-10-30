@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/md_white"
-        >
+        android:theme="?android:toolbarStyle">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbarContainer"
@@ -32,8 +32,8 @@
                     android:id="@+id/reviewPet"
                     android:layout_width="wrap_content"
                     android:layout_height="80dp"
-                    android:layout_marginBottom="16dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginBottom="16dp"
                     android:adjustViewBounds="true"
                     android:src="@drawable/pet_13"
                     android:visibility="invisible"
@@ -67,9 +67,9 @@
                     android:id="@+id/constraintLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="16dp"
                     android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/reviewPet"
@@ -93,9 +93,9 @@
                         android:id="@+id/reviewAwesomenessScoreTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
                         android:layout_marginStart="28dp"
                         android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
                         android:gravity="center_horizontal"
                         android:paddingTop="8dp"
                         android:text="@string/daily_awesomeness_score"
@@ -109,8 +109,8 @@
                         android:id="@+id/reviewAwesomenessScore"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
                         android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
                         android:fontFamily="@font/mystery_quest_regular"
                         android:padding="0dp"
                         android:textAlignment="center"
@@ -130,8 +130,8 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                 />
+                android:theme="?android:toolbarStyle"
+                app:layout_collapseMode="pin" />
         </android.support.design.widget.CollapsingToolbarLayout>
 
     </android.support.design.widget.AppBarLayout>
@@ -198,8 +198,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:src="@drawable/ic_add_white_24dp"
         app:elevation="6dp" />
 

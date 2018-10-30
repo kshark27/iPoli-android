@@ -11,16 +11,14 @@ import io.ipoli.android.common.datetime.instant
 import io.ipoli.android.common.datetime.minutes
 import io.ipoli.android.common.datetime.startOfDayUTC
 import io.ipoli.android.common.persistence.documents
+import io.ipoli.android.common.persistence.getAsync
 import io.ipoli.android.common.persistence.getSync
 import io.ipoli.android.friends.feed.data.Post
 import io.ipoli.android.player.data.Avatar
 import io.ipoli.android.player.persistence.model.DbPlayer
-import kotlinx.coroutines.experimental.GlobalScope
-import kotlinx.coroutines.experimental.asCoroutineDispatcher
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.channels.Channel
 import kotlinx.coroutines.experimental.channels.ConflatedChannel
-import kotlinx.coroutines.experimental.runBlocking
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
 import java.util.*
@@ -65,7 +63,6 @@ class AndroidPostRepository(
 
     override fun listenForAll(limit: Int): Channel<List<Post>> {
 
-        val coroutineDispatcher = executorService.asCoroutineDispatcher()
         val currentPlayerId = FirebaseAuth.getInstance().currentUser?.uid
         val channel = FirestoreSnapshotChannel<List<Post>>()
         val snapshotListener = EventListener<QuerySnapshot> { s, exception ->
@@ -81,11 +78,9 @@ class AndroidPostRepository(
 
             val playerIds = dbPosts.map { it.playerId }.toSet()
 
-            runBlocking {
+            GlobalScope.launch(Dispatchers.IO) {
                 val dbPlayers = playerIds.map {
-                    GlobalScope.async(coroutineDispatcher) {
-                        it to DbPlayer(playerRef(it).getSync().data!!)
-                    }.await()
+                    it to DbPlayer(playerRef(it).getAsync().data!!)
                 }.toMap()
 
                 val entities = dbPosts.map {
@@ -109,8 +104,6 @@ class AndroidPostRepository(
     }
 
     override fun listenForPlayer(playerId: String, limit: Int): Channel<List<Post>> {
-        val coroutineDispatcher = executorService.asCoroutineDispatcher()
-
         val currentPlayerId = FirebaseAuth.getInstance().currentUser?.uid
 
         val channel = FirestoreSnapshotChannel<List<Post>>()
@@ -127,11 +120,9 @@ class AndroidPostRepository(
 
             val playerIds = dbPosts.map { it.playerId }.toSet()
 
-            runBlocking {
+            GlobalScope.launch(Dispatchers.IO) {
                 val dbPlayers = playerIds.map {
-                    GlobalScope.async(coroutineDispatcher) {
-                        it to DbPlayer(playerRef(it).getSync().data!!)
-                    }.await()
+                    it to DbPlayer(playerRef(it).getSync().data!!)
                 }.toMap()
 
                 val entities = dbPosts.map {
@@ -157,8 +148,6 @@ class AndroidPostRepository(
 
     override fun listen(postId: String): Channel<Post> {
 
-        val coroutineDispatcher = executorService.asCoroutineDispatcher()
-
         val channel = FirestoreSnapshotChannel<Post>()
 
         val currentPlayerId = FirebaseAuth.getInstance().currentUser?.uid
@@ -183,11 +172,9 @@ class AndroidPostRepository(
 
             val playerIds = setOf(dbPost.playerId) + commentPlayerIds
 
-            runBlocking {
+            GlobalScope.launch(Dispatchers.IO) {
                 val dbPlayers = playerIds.map {
-                    GlobalScope.async(coroutineDispatcher) {
-                        it to DbPlayer(playerRef(it).getSync().data!!)
-                    }.await()
+                    it to DbPlayer(playerRef(it).getSync().data!!)
                 }.toMap()
 
                 val dbPlayer = dbPlayers[dbPost.playerId]!!

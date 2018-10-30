@@ -15,11 +15,9 @@ import org.threeten.bp.LocalDate
  */
 sealed class ScheduleSummaryAction : Action {
 
-    data class Load(val currentDate: LocalDate) : ScheduleSummaryAction()
-    data class ChangeDate(val currentDate: LocalDate) : ScheduleSummaryAction()
-    data class RescheduleQuest(val questId: String, val date: LocalDate?) : ScheduleSummaryAction()
-    data class RemoveQuest(val questId: String) : ScheduleSummaryAction()
-    data class UndoRemoveQuest(val questId: String) : ScheduleSummaryAction()
+    object Load : ScheduleSummaryAction()
+    data class ChangeDate(val date: LocalDate) : ScheduleSummaryAction()
+    object GoToToday : ScheduleSummaryAction()
 }
 
 object ScheduleSummaryReducer : BaseViewStateReducer<ScheduleSummaryViewState>() {
@@ -36,34 +34,20 @@ object ScheduleSummaryReducer : BaseViewStateReducer<ScheduleSummaryViewState>()
             is ScheduleSummaryAction.Load ->
                 subState.copy(
                     type = ScheduleSummaryViewState.StateType.DATE_DATA_CHANGED,
-                    currentDate = action.currentDate
+                    currentDate = state.dataState.agendaDate
                 )
 
             is ScheduleSummaryAction.ChangeDate ->
-                if (subState.currentDate != action.currentDate) {
-                    subState.copy(
-                        type = ScheduleSummaryViewState.StateType.DATE_DATA_CHANGED,
-                        currentDate = action.currentDate,
-                        previousDate = subState.currentDate
-                    )
-                } else subState
+                subState.copy(
+                    type = ScheduleSummaryViewState.StateType.DATE_SELECTED,
+                    currentDate = action.date
+                )
 
             is DataLoadedAction.ScheduleSummaryChanged -> {
                 if (subState.currentDate == action.currentDate) {
                     subState.copy(
                         type = ScheduleSummaryViewState.StateType.SCHEDULE_SUMMARY_DATA_CHANGED,
                         items = action.schedules
-                    )
-                } else subState
-            }
-
-            is DataLoadedAction.MonthPreviewScheduleChanged -> {
-                require(action.schedule.keys.size == 1)
-                val schedule = action.schedule[action.schedule.keys.first()]!!
-                if (subState.currentDate == schedule.date) {
-                    subState.copy(
-                        type = ScheduleSummaryViewState.StateType.SCHEDULE_DATA_CHANGED,
-                        schedule = schedule
                     )
                 } else subState
             }
@@ -75,7 +59,6 @@ object ScheduleSummaryReducer : BaseViewStateReducer<ScheduleSummaryViewState>()
         ScheduleSummaryViewState(
             type = ScheduleSummaryViewState.StateType.LOADING,
             currentDate = LocalDate.now(),
-            previousDate = LocalDate.now(),
             items = emptyList(),
             schedule = null
         )
@@ -84,7 +67,6 @@ object ScheduleSummaryReducer : BaseViewStateReducer<ScheduleSummaryViewState>()
 data class ScheduleSummaryViewState(
     val type: StateType,
     val currentDate: LocalDate,
-    val previousDate: LocalDate,
     val items: List<CreateScheduleSummaryItemsUseCase.Schedule>,
     val schedule: Schedule?
 ) : BaseViewState() {
@@ -92,6 +74,6 @@ data class ScheduleSummaryViewState(
         LOADING,
         DATE_DATA_CHANGED,
         SCHEDULE_SUMMARY_DATA_CHANGED,
-        SCHEDULE_DATA_CHANGED
+        DATE_SELECTED
     }
 }

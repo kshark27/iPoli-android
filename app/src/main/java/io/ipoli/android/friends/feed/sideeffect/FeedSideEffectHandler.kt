@@ -26,7 +26,6 @@ import space.traversal.kapsule.required
  */
 object FeedSideEffectHandler : AppSideEffectHandler() {
 
-    private val savePostsUseCase by required { savePostsUseCase }
     private val postRepository by required { postRepository }
     private val createReactionHistoryItemsUseCase by required { createReactionHistoryItemsUseCase }
     private val savePostReactionUseCase by required { savePostReactionUseCase }
@@ -47,7 +46,7 @@ object FeedSideEffectHandler : AppSideEffectHandler() {
                 listenForChanges(
                     oldChannel = postsChangedChannel,
                     channelCreator = {
-                        postsChangedChannel = postRepository.listenForAll(100)
+                        postsChangedChannel = postRepository.listenForAll(50)
                         postsChangedChannel!!
                     },
                     onResult = { posts ->

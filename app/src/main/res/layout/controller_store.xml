@@ -18,6 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
+            android:paddingBottom="16dp"
             app:columnCount="2">
 
             <include
@@ -45,6 +46,12 @@
                 app:layout_columnWeight="1" />
 
             <include
+                android:id="@+id/storeThemes"
+                style="@style/StoreItemContainer"
+                layout="@layout/item_store"
+                app:layout_columnWeight="1" />
+
+            <include
                 android:id="@+id/storeAvatars"
                 style="@style/StoreItemContainer"
                 layout="@layout/item_store"
@@ -60,15 +67,8 @@
                 android:id="@+id/storeIcons"
                 style="@style/StoreItemContainer"
                 layout="@layout/item_store"
-                android:layout_marginBottom="16dp"
                 app:layout_columnWeight="1" />
 
-            <include
-                android:id="@+id/storeThemes"
-                style="@style/StoreItemContainer"
-                layout="@layout/item_store"
-                android:layout_marginBottom="16dp"
-                app:layout_columnWeight="1" />
 
         </android.support.v7.widget.GridLayout>
     </ScrollView>

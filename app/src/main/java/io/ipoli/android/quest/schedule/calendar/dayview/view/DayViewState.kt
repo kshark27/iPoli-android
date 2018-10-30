@@ -42,6 +42,7 @@ sealed class DayViewAction : Action {
     data class AddNewScheduledQuest(val startTime: Time, val duration: Int) : DayViewAction() {
         override fun toMap() = mapOf("startTime" to startTime, "duration" to duration)
     }
+
     data class DragResizeView(val startTime: Time?, val endTime: Time?, val duration: Int) :
         DayViewAction() {
         override fun toMap() = mapOf(
@@ -52,6 +53,7 @@ sealed class DayViewAction : Action {
     data class DragMoveView(val startTime: Time?, val endTime: Time?) : DayViewAction() {
         override fun toMap() = mapOf("startTime" to startTime, "endTime" to endTime)
     }
+
     object AddQuest : DayViewAction()
     object QuestSaved : DayViewAction()
     object SaveInvalidQuestName : DayViewAction()
@@ -62,6 +64,7 @@ sealed class DayViewAction : Action {
     data class ChangeEditViewName(val name: String) : DayViewAction() {
         override fun toMap() = mapOf("name" to name)
     }
+
     object EditQuest : DayViewAction()
     object EditUnscheduledQuest : DayViewAction()
     data class DatePicked(val date: LocalDate?) : DayViewAction() {
@@ -83,6 +86,7 @@ sealed class DayViewAction : Action {
     data class TagsPicked(val tags: Set<Tag>) : DayViewAction() {
         override fun toMap() = mapOf("tags" to tags.joinToString(",") { it.name })
     }
+
     data class StartEditUnscheduledQuest(val questViewModel: DayViewController.UnscheduledQuestViewModel) :
         DayViewAction() {
         override fun toMap() = mapOf("questViewModel" to questViewModel)
