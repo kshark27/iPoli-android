@@ -76,6 +76,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:text="Remind later"
+                android:textColor="?android:textColorHint"
                 app:layout_constraintBottom_toBottomOf="@+id/join"
                 app:layout_constraintEnd_toStartOf="@+id/join"
                 app:layout_constraintTop_toTopOf="@+id/join" />
