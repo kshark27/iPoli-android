@@ -96,6 +96,9 @@ object AgendaSideEffectHandler : AppSideEffectHandler() {
                     return
                 }
                 val agendaItems = state.stateFor(AgendaViewState::class.java).agendaItems
+                if (action.itemPosition >= agendaItems.size) {
+                    return
+                }
                 val date = agendaItems[action.itemPosition].startDate()
                 dispatch(AgendaAction.AutoChangeDate(date))
             }
