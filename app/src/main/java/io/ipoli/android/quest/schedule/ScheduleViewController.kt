@@ -112,6 +112,13 @@ class ScheduleViewController(args: Bundle? = null) :
                 true
             }
 
+            R.id.actionDailyChallenge -> {
+                closeAddIfShown {
+                    navigateFromRoot().toDailyChallenge()
+                }
+                true
+            }
+
             else -> super.onOptionsItemSelected(item)
         }
 

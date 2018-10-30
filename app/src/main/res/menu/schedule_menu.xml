@@ -19,4 +19,11 @@
         android:icon="@drawable/ic_calendar_blank_grey_24dp"
         android:title="Month Overview"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/actionDailyChallenge"
+        android:icon="@drawable/ic_sword_cross_white_24dp"
+        android:title="@string/daily_challenge_title"
+        app:showAsAction="never" />
+
 </menu>
