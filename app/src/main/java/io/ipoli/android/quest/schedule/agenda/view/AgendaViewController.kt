@@ -2,6 +2,7 @@ package io.ipoli.android.quest.schedule.agenda.view
 
 import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Bundle
 import android.support.annotation.ColorInt
 import android.support.annotation.ColorRes
@@ -238,6 +239,8 @@ class AgendaViewController(args: Bundle? = null) :
 
         })
 
+        fixInitialHeight(view)
+
         return view
     }
 
@@ -245,16 +248,24 @@ class AgendaViewController(args: Bundle? = null) :
         AgendaAction.Load
 
     override fun onAttach(view: View) {
+        if (!view.calendarContainer.isExpand) {
+            fixInitialHeight(view)
+        }
+        super.onAttach(view)
+    }
+
+    private fun fixInitialHeight(view: View) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            return
+        }
         view.postDelayed({
             activity?.let {
-                if (!view.calendarContainer.isExpand) {
-                    val lp = view.agendaListContainer.layoutParams as ViewGroup.MarginLayoutParams
-                    lp.topMargin = 0
-                    view.agendaListContainer.layoutParams = lp
-                }
+                val calendarHeight = ViewUtils.dpToPx(80f, view.context).toInt()
+                val lp = view.agendaListContainer.layoutParams as ViewGroup.MarginLayoutParams
+                lp.topMargin = calendarHeight
+                view.agendaListContainer.layoutParams = lp
             }
         }, 100)
-        super.onAttach(view)
     }
 
     override fun onDetach(view: View) {

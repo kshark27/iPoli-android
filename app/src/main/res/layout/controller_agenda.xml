@@ -11,8 +11,7 @@
     app:calendar_content_view_id="@+id/agendaListContainer"
     app:calendar_show_mode="both_month_week_view"
     app:default_status="shrink"
-    app:gesture_mode="disabled"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    app:gesture_mode="disabled">
 
     <com.haibin.calendarview.CalendarView
         android:id="@+id/calendarView"
@@ -42,6 +41,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <View
+            android:id="@+id/agendaDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/agendaList"
             android:layout_width="match_parent"
@@ -49,7 +57,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/agendaDivider" />
 
         <ProgressBar
             android:id="@+id/topLoader"
