@@ -18,6 +18,7 @@ import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler
+import com.bluelinelabs.conductor.changehandler.SimpleSwapChangeHandler
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.crashlytics.android.Crashlytics
@@ -349,7 +350,7 @@ class AuthViewController(args: Bundle? = null) :
     }
 
     private fun startHomeViewController() {
-        navigateFromRoot().replaceWithHome(HorizontalChangeHandler())
+        navigateFromRoot().replaceWithHome(SimpleSwapChangeHandler())
     }
 
     private fun startSignUpForProvider(provider: AuthUI.IdpConfig): Intent {
