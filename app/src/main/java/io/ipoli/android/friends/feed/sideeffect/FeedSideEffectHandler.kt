@@ -46,7 +46,7 @@ object FeedSideEffectHandler : AppSideEffectHandler() {
                 listenForChanges(
                     oldChannel = postsChangedChannel,
                     channelCreator = {
-                        postsChangedChannel = postRepository.listenForAll(50)
+                        postsChangedChannel = postRepository.listenForAll(30)
                         postsChangedChannel!!
                     },
                     onResult = { posts ->

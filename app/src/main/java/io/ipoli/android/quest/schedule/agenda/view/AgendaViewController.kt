@@ -245,13 +245,15 @@ class AgendaViewController(args: Bundle? = null) :
         AgendaAction.Load
 
     override fun onAttach(view: View) {
-        view.post {
-            if (!view.calendarContainer.isExpand) {
-                val lp = view.agendaListContainer.layoutParams as ViewGroup.MarginLayoutParams
-                lp.topMargin = 0
-                view.agendaListContainer.layoutParams = lp
+        view.postDelayed({
+            activity?.let {
+                if (!view.calendarContainer.isExpand) {
+                    val lp = view.agendaListContainer.layoutParams as ViewGroup.MarginLayoutParams
+                    lp.topMargin = 0
+                    view.agendaListContainer.layoutParams = lp
+                }
             }
-        }
+        }, 100)
         super.onAttach(view)
     }
 
