@@ -1,43 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.haibin.calendarview.CalendarLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/calendarContainer"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginTop="8dp"
+    android:background="?android:colorBackground"
+    android:orientation="vertical"
+    app:calendar_content_view_id="@+id/agendaListContainer"
+    app:calendar_show_mode="both_month_week_view"
+    app:default_status="shrink"
+    app:gesture_mode="disabled"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/agendaList"
+    <com.haibin.calendarview.CalendarView
+        android:id="@+id/calendarView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ProgressBar
-        android:id="@+id/topLoader"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="gone" />
+        android:background="?colorSurface"
+        android:paddingBottom="4dp"
+        app:calendar_height="88dp"
+        app:current_day_text_color="@color/md_white"
+        app:current_month_lunar_text_color="#CFCFCF"
+        app:current_month_text_color="?android:textColorPrimary"
+        app:day_text_size="12sp"
+        app:min_year="2004"
+        app:month_view="io.ipoli.android.quest.schedule.agenda.view.widget.AgendaMonthView"
+        app:month_view_show_mode="mode_all"
+        app:other_month_text_color="?android:textColorHint"
+        app:scheme_text=""
+        app:scheme_text_color="?android:textColorPrimary"
+        app:scheme_theme_color="?android:textColorPrimary"
+        app:select_mode="single_mode"
+        app:week_bar_view="io.ipoli.android.quest.schedule.summary.view.widget.SimpleWeekBar"
+        app:week_text_color="?android:textColorSecondary"
+        app:week_view="io.ipoli.android.quest.schedule.agenda.view.widget.AgendaWeekView" />
 
-    <ProgressBar
-        android:id="@+id/bottomLoader"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:visibility="gone" />
-</android.support.constraint.ConstraintLayout>
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/agendaListContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/agendaList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/topLoader"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/bottomLoader"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="gone" />
+    </android.support.constraint.ConstraintLayout>
+
+</com.haibin.calendarview.CalendarLayout>
+

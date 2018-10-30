@@ -13,8 +13,7 @@ import io.ipoli.android.quest.edit.EditQuestAction
 import io.ipoli.android.quest.edit.EditQuestViewState
 import io.ipoli.android.quest.schedule.addquest.AddQuestAction
 import io.ipoli.android.quest.schedule.addquest.AddQuestViewState
-import io.ipoli.android.quest.schedule.agenda.AgendaAction
-import io.ipoli.android.quest.schedule.summary.ScheduleSummaryAction
+import io.ipoli.android.quest.schedule.agenda.view.AgendaAction
 import io.ipoli.android.quest.schedule.today.TodayAction
 import io.ipoli.android.quest.subquest.SubQuest
 import io.ipoli.android.quest.usecase.CompleteQuestUseCase
@@ -163,14 +162,6 @@ object EditQuestSideEffectHandler : AppSideEffectHandler() {
             is BucketListAction.CompleteQuest ->
                 completeQuest(action.questId)
 
-            is ScheduleSummaryAction.RescheduleQuest ->
-                rescheduleQuestUseCase.execute(
-                    RescheduleQuestUseCase.Params(
-                        action.questId,
-                        action.date
-                    )
-                )
-
             is TagAction.CompleteQuest ->
                 completeQuest(action.questId)
 
@@ -254,7 +245,6 @@ object EditQuestSideEffectHandler : AppSideEffectHandler() {
             || action is TagAction.CompleteQuest
             || action is BucketListAction
             || action is PlanDayAction
-            || action is ScheduleSummaryAction.RescheduleQuest
             || action is AgendaAction
 
 }

@@ -8,7 +8,7 @@ import io.ipoli.android.common.redux.Action
 import io.ipoli.android.common.redux.BaseViewState
 import io.ipoli.android.quest.Color
 import io.ipoli.android.quest.Icon
-import io.ipoli.android.quest.schedule.agenda.AgendaReducer
+import io.ipoli.android.quest.schedule.agenda.view.AgendaReducer
 import io.ipoli.android.tag.Tag
 import org.threeten.bp.LocalDate
 

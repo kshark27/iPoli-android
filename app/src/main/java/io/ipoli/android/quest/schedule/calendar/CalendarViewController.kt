@@ -12,6 +12,7 @@ import com.bluelinelabs.conductor.RouterTransaction
 import com.bluelinelabs.conductor.support.RouterPagerAdapter
 import io.ipoli.android.R
 import io.ipoli.android.common.redux.android.ReduxViewController
+import io.ipoli.android.common.view.inflate
 import io.ipoli.android.quest.schedule.ScheduleViewController
 import io.ipoli.android.quest.schedule.calendar.dayview.view.DayViewController
 import kotlinx.android.synthetic.main.controller_calendar.view.*
@@ -31,7 +32,7 @@ class CalendarViewController(args: Bundle? = null) :
     private val pageChangeListener = object : ViewPager.SimpleOnPageChangeListener() {
 
         override fun onPageSelected(position: Int) {
-            dispatch(CalendarAction.SwipeChangeDate(position))
+            dispatch(CalendarAction.SwipePage(position))
         }
     }
 
@@ -40,17 +41,11 @@ class CalendarViewController(args: Bundle? = null) :
         override fun getCount() = 0
     }
 
-    private var startDate = LocalDate.now()
-
-    constructor(startDate: LocalDate) : this() {
-        this.startDate = startDate
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup,
         savedViewState: Bundle?
-    ): View = inflater.inflate(R.layout.controller_calendar, container, false)
+    ): View = container.inflate(R.layout.controller_calendar)
 
     override fun render(state: CalendarViewState, view: View) =
         when (state.type) {
@@ -66,14 +61,14 @@ class CalendarViewController(args: Bundle? = null) :
 
             CalendarViewState.StateType.SWIPE_DATE_CHANGED -> {
                 updateDayViewPagerAdapter(state)
-                dispatch(CalendarAction.ChangeVisibleDate(state.currentDate))
+                dispatch(CalendarAction.ChangeDate(state.currentDate))
             }
 
             else -> {
             }
         }
 
-    override fun onCreateLoadAction() = CalendarAction.Load(startDate)
+    override fun onCreateLoadAction() = CalendarAction.Load
 
     private fun removeDayViewPagerAdapter(view: View) {
         view.pager.removeOnPageChangeListener(pageChangeListener)

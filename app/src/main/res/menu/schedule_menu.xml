@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/actionGoToToday"
+        android:icon="@drawable/ic_today_white_24dp"
+        android:title="@string/today"
+        app:showAsAction="always" />
+
     <item
         android:id="@+id/actionViewMode"
         android:icon="@drawable/ic_format_list_bulleted_white_24dp"
@@ -8,8 +15,8 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/actionDailyChallenge"
-        android:icon="@drawable/ic_sword_cross_white_24dp"
-        android:title="@string/daily_challenge_title"
+        android:id="@+id/actionScheduleSummary"
+        android:icon="@drawable/ic_calendar_blank_grey_24dp"
+        android:title="Month Overview"
         app:showAsAction="never" />
 </menu>

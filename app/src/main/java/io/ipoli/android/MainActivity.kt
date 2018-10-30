@@ -63,7 +63,6 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
     private val stateStore by required { stateStore }
     private val dataExporter by required { dataExporter }
     private val eventLogger by required { eventLogger }
-    private val savePostsUseCase by required { savePostsUseCase }
 
     val rootRouter get() = router
 

@@ -4,17 +4,12 @@ import android.content.Context
 import io.ipoli.android.common.AppDataState
 import io.ipoli.android.common.AppState
 import io.ipoli.android.common.BaseViewStateReducer
-import io.ipoli.android.common.DataLoadedAction
-
 import io.ipoli.android.common.redux.Action
 import io.ipoli.android.common.redux.BaseViewState
 import io.ipoli.android.common.text.CalendarFormatter
-import io.ipoli.android.quest.schedule.agenda.AgendaAction
-import io.ipoli.android.quest.schedule.agenda.AgendaViewState
+import io.ipoli.android.quest.schedule.agenda.view.AgendaAction
 import io.ipoli.android.quest.schedule.calendar.CalendarAction
 import org.threeten.bp.LocalDate
-import org.threeten.bp.YearMonth
-import org.threeten.bp.format.DateTimeFormatter
 
 /**
  * Created by Venelin Valkov <venelin@mypoli.fun>
@@ -22,19 +17,13 @@ import org.threeten.bp.format.DateTimeFormatter
  */
 
 sealed class ScheduleAction : Action {
-    object ExpandToolbar : ScheduleAction()
-    object ExpandWeekToolbar : ScheduleAction()
-
-    data class ScheduleChangeDate(val date: LocalDate) : ScheduleAction() {
-        override fun toMap() = mapOf("date" to date)
-    }
-
-    data class ChangeMonth(val year: Int, val month: Int) : ScheduleAction() {
-        override fun toMap() = mapOf("year" to year, "month" to month)
-    }
 
     object ToggleViewMode : ScheduleAction()
-    data class Load(val currentDate: LocalDate) : ScheduleAction()
+    object ToggleAgendaPreviewMode : ScheduleAction()
+
+    object Load : ScheduleAction()
+    object GoToToday : ScheduleAction()
+    object ResetAgendaDate : ScheduleAction()
 }
 
 object ScheduleReducer : BaseViewStateReducer<ScheduleViewState>() {
@@ -44,57 +33,48 @@ object ScheduleReducer : BaseViewStateReducer<ScheduleViewState>() {
     override fun defaultState() =
         ScheduleViewState(
             type = ScheduleViewState.StateType.LOADING,
-            showDailyChallenge = false,
-            currentMonth = YearMonth.now(),
             currentDate = LocalDate.now(),
-            viewMode = ScheduleViewState.ViewMode.CALENDAR,
-            datePickerState = ScheduleViewState.DatePickerState.INVISIBLE
+            viewMode = ScheduleViewState.ViewMode.AGENDA
         )
 
     override fun reduce(state: AppState, subState: ScheduleViewState, action: Action) =
         when (action) {
 
-            is ScheduleAction -> reduceCalendarAction(
-                state.dataState,
-                subState,
-                action
-            )
-
-            is DataLoadedAction.PlayerChanged -> {
-                subState.copy(
-                    type = ScheduleViewState.StateType.SHOW_DAILY_CHALLENGE_CHANGED,
-                    showDailyChallenge = action.player.preferences.planDays.contains(
-                        LocalDate.now().dayOfWeek
-                    )
+            is ScheduleAction ->
+                reduceCalendarAction(
+                    state.dataState,
+                    subState,
+                    action
                 )
-            }
 
-            is CalendarAction.ChangeVisibleDate -> {
+            is CalendarAction.ChangeDate ->
                 subState.copy(
                     type = ScheduleViewState.StateType.SWIPE_DATE_CHANGED,
                     currentDate = action.date
                 )
-            }
-            is AgendaAction.FirstVisibleItemChanged -> {
 
-                val itemPos = action.itemPosition
-                val startDate =
-                    state.stateFor(AgendaViewState::class.java).agendaItems[itemPos].startDate()
+            is AgendaAction.AutoChangeDate ->
+                autoChangeDate(subState, action.date)
 
-                if (subState.currentDate.isEqual(startDate)) {
-                    subState.copy(
-                        type = ScheduleViewState.StateType.IDLE
-                    )
-                } else {
-                    subState.copy(
-                        type = ScheduleViewState.StateType.DATE_AUTO_CHANGED,
-                        currentDate = startDate,
-                        currentMonth = YearMonth.of(startDate.year, startDate.month)
-                    )
-                }
+            is AgendaAction.ChangePreviewDate ->
+                autoChangeDate(subState, action.date)
 
-            }
             else -> subState
+        }
+
+    private fun autoChangeDate(
+        subState: ScheduleViewState,
+        date: LocalDate
+    ) =
+        if (subState.currentDate.isEqual(date)) {
+            subState.copy(
+                type = ScheduleViewState.StateType.IDLE
+            )
+        } else {
+            subState.copy(
+                type = ScheduleViewState.StateType.DATE_AUTO_CHANGED,
+                currentDate = date
+            )
         }
 
     private fun reduceCalendarAction(
@@ -105,56 +85,15 @@ object ScheduleReducer : BaseViewStateReducer<ScheduleViewState>() {
         when (action) {
             is ScheduleAction.Load -> {
                 if (state.type != ScheduleViewState.StateType.LOADING) {
-                    state
+                    state.copy(
+                        currentDate = dataState.agendaDate
+                    )
                 } else {
                     state.copy(
                         type = ScheduleViewState.StateType.INITIAL,
-                        showDailyChallenge = dataState.player?.preferences?.planDays?.contains(
-                            action.currentDate.dayOfWeek
-                        ) ?: false
+                        currentDate = dataState.agendaDate
                     )
                 }
-            }
-
-            ScheduleAction.ExpandWeekToolbar -> {
-                when (state.datePickerState) {
-                    ScheduleViewState.DatePickerState.SHOW_WEEK -> state.copy(
-                        type = ScheduleViewState.StateType.DATE_PICKER_CHANGED,
-                        datePickerState = ScheduleViewState.DatePickerState.SHOW_MONTH
-                    )
-                    else -> state.copy(
-                        type = ScheduleViewState.StateType.DATE_PICKER_CHANGED,
-                        datePickerState = ScheduleViewState.DatePickerState.SHOW_WEEK
-                    )
-                }
-            }
-
-            is ScheduleAction.ScheduleChangeDate -> {
-                state.copy(
-                    type = ScheduleViewState.StateType.CALENDAR_DATE_CHANGED,
-                    currentDate = action.date,
-                    currentMonth = YearMonth.of(action.date.year, action.date.month)
-                )
-            }
-
-            ScheduleAction.ExpandToolbar -> {
-                when (state.datePickerState) {
-                    ScheduleViewState.DatePickerState.INVISIBLE -> state.copy(
-                        type = ScheduleViewState.StateType.DATE_PICKER_CHANGED,
-                        datePickerState = ScheduleViewState.DatePickerState.SHOW_WEEK
-                    )
-                    else -> state.copy(
-                        type = ScheduleViewState.StateType.DATE_PICKER_CHANGED,
-                        datePickerState = ScheduleViewState.DatePickerState.INVISIBLE
-                    )
-                }
-            }
-
-            is ScheduleAction.ChangeMonth -> {
-                state.copy(
-                    type = ScheduleViewState.StateType.MONTH_CHANGED,
-                    currentMonth = YearMonth.of(action.year, action.month)
-                )
             }
 
             is ScheduleAction.ToggleViewMode -> {
@@ -163,35 +102,36 @@ object ScheduleReducer : BaseViewStateReducer<ScheduleViewState>() {
                     viewMode = if (state.viewMode == ScheduleViewState.ViewMode.CALENDAR) ScheduleViewState.ViewMode.AGENDA else ScheduleViewState.ViewMode.CALENDAR
                 )
             }
+
+            is ScheduleAction.GoToToday -> {
+                state.copy(
+                    type = ScheduleViewState.StateType.DATE_AUTO_CHANGED,
+                    currentDate = LocalDate.now()
+                )
+            }
+
+
+            else -> state
         }
 }
 
 data class ScheduleViewState(
     val type: StateType,
-    val showDailyChallenge: Boolean,
-    val currentMonth: YearMonth,
     val currentDate: LocalDate,
-    val datePickerState: DatePickerState,
     val viewMode: ViewMode
 ) : BaseViewState() {
 
     enum class StateType {
         LOADING, INITIAL, IDLE,
-        SHOW_DAILY_CHALLENGE_CHANGED,
         CALENDAR_DATE_CHANGED,
         SWIPE_DATE_CHANGED,
         DATE_PICKER_CHANGED,
-        MONTH_CHANGED,
         VIEW_MODE_CHANGED,
         DATE_AUTO_CHANGED
     }
 
     enum class ViewMode {
         CALENDAR, AGENDA
-    }
-
-    enum class DatePickerState {
-        INVISIBLE, SHOW_WEEK, SHOW_MONTH
     }
 }
 
@@ -204,6 +144,3 @@ fun ScheduleViewState.dayText(context: Context) =
 
 fun ScheduleViewState.dateText(context: Context) =
     CalendarFormatter(context).date(currentDate)
-
-val ScheduleViewState.monthText: String
-    get() = DateTimeFormatter.ofPattern("MMMM").format(currentMonth)

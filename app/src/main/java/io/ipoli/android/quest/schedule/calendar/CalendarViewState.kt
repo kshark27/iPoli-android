@@ -5,6 +5,7 @@ import io.ipoli.android.common.BaseViewStateReducer
 import io.ipoli.android.common.redux.Action
 import io.ipoli.android.common.redux.BaseViewState
 import io.ipoli.android.quest.schedule.ScheduleAction
+import io.ipoli.android.quest.schedule.calendar.CalendarViewState.StateType.*
 import org.threeten.bp.LocalDate
 
 /**
@@ -24,17 +25,19 @@ object CalendarReducer : BaseViewStateReducer<CalendarViewState>() {
         when (action) {
 
             is CalendarAction.Load -> {
-                if (subState.type == CalendarViewState.StateType.LOADING) {
+                if (subState.type == LOADING) {
                     subState.copy(
-                        type = CalendarViewState.StateType.INITIAL,
-                        currentDate = action.startDate
+                        type = INITIAL,
+                        currentDate = state.dataState.agendaDate
                     )
                 } else {
-                    subState
+                    subState.copy(
+                        currentDate = state.dataState.agendaDate
+                    )
                 }
             }
 
-            is CalendarAction.SwipeChangeDate -> {
+            is CalendarAction.SwipePage -> {
 
                 val currentPos = subState.adapterPosition
                 val newPos = action.adapterPosition
@@ -45,24 +48,27 @@ object CalendarReducer : BaseViewStateReducer<CalendarViewState>() {
                     currentDate.plusDays(1)
 
                 subState.copy(
-                    type = CalendarViewState.StateType.SWIPE_DATE_CHANGED,
+                    type = SWIPE_DATE_CHANGED,
                     adapterPosition = action.adapterPosition,
                     currentDate = newDate
                 )
             }
-            is ScheduleAction.ScheduleChangeDate -> {
+
+            is ScheduleAction.GoToToday -> {
                 subState.copy(
-                    type = CalendarViewState.StateType.CALENDAR_DATE_CHANGED,
+                    type = CALENDAR_DATE_CHANGED,
+                    adapterMidPosition = MID_POSITION,
                     adapterPosition = MID_POSITION,
-                    currentDate = action.date
+                    currentDate = LocalDate.now()
                 )
             }
+
             else -> subState
         }
 
     override fun defaultState() =
         CalendarViewState(
-            type = CalendarViewState.StateType.LOADING,
+            type = LOADING,
             currentDate = LocalDate.now(),
             adapterPosition = MID_POSITION,
             adapterMidPosition = MID_POSITION
@@ -72,17 +78,15 @@ object CalendarReducer : BaseViewStateReducer<CalendarViewState>() {
 }
 
 sealed class CalendarAction : Action {
-    data class SwipeChangeDate(val adapterPosition: Int) : CalendarAction() {
+    data class SwipePage(val adapterPosition: Int) : CalendarAction() {
         override fun toMap() = mapOf("adapterPosition" to adapterPosition)
     }
 
-    data class ChangeVisibleDate(val date: LocalDate) : CalendarAction() {
+    data class ChangeDate(val date: LocalDate) : CalendarAction() {
         override fun toMap() = mapOf("date" to date)
     }
 
-    data class Load(val startDate: LocalDate) : CalendarAction() {
-        override fun toMap() = mapOf("startDate" to startDate)
-    }
+    object Load : CalendarAction()
 }
 
 data class CalendarViewState(

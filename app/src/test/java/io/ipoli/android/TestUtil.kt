@@ -7,6 +7,8 @@ import com.nhaarman.mockito_kotlin.mock
 import io.ipoli.android.challenge.entity.Challenge
 import io.ipoli.android.challenge.persistence.ChallengeRepository
 import io.ipoli.android.common.Reward
+import io.ipoli.android.common.datetime.Time
+import io.ipoli.android.event.Event
 import io.ipoli.android.habit.data.Habit
 import io.ipoli.android.habit.persistence.HabitRepository
 import io.ipoli.android.pet.Pet
@@ -104,6 +106,17 @@ object TestUtil {
         color = Color.BLUE,
         duration = 60,
         scheduledDate = LocalDate.now()
+    )
+
+    val event = Event(
+        name = "Test",
+        startTime = Time.now(),
+        endTime = Time.now().plus(60),
+        startDate = LocalDate.now(),
+        endDate = LocalDate.now(),
+        color = 123,
+        isAllDay = false,
+        isRepeating = false
     )
 
     val repeatingQuest = RepeatingQuest(

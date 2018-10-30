@@ -44,43 +44,30 @@
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
-    <com.haibin.calendarview.CalendarLayout
-        android:id="@+id/calendarContainer"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="16dp"
-        android:background="?android:colorBackground"
-        android:orientation="vertical"
-        app:calendar_content_view_id="@+id/dailyQuests"
-        app:calendar_show_mode="both_month_week_view"
-        app:default_status="expand">
+        android:layout_height="wrap_content">
 
         <com.haibin.calendarview.CalendarView
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:calendar_height="76dp"
+            app:calendar_height="122dp"
             app:current_day_text_color="?android:textColorPrimary"
             app:current_month_lunar_text_color="#CFCFCF"
             app:current_month_text_color="?android:textColorPrimary"
             app:day_text_size="12sp"
             app:min_year="2004"
             app:month_view="io.ipoli.android.quest.schedule.summary.view.widget.ScheduleSummaryMonthView"
-            app:month_view_show_mode="mode_all"
+            app:month_view_show_mode="mode_fix"
             app:other_month_text_color="?android:textColorHint"
             app:scheme_text=""
             app:scheme_text_color="?android:textColorPrimary"
             app:scheme_theme_color="?android:textColorPrimary"
+            app:select_mode="single_mode"
             app:week_background="?android:colorBackground"
             app:week_bar_view="io.ipoli.android.quest.schedule.summary.view.widget.SimpleWeekBar"
             app:week_text_color="?android:textColorSecondary"
             app:week_view="io.ipoli.android.quest.schedule.summary.view.widget.ScheduleSummaryWeekView" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/dailyQuests"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?android:colorBackground"
-            android:paddingTop="16dp" />
-    </com.haibin.calendarview.CalendarLayout>
+    </android.support.v4.widget.NestedScrollView>
 </LinearLayout>

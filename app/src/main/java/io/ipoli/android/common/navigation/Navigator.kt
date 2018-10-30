@@ -70,10 +70,9 @@ import io.ipoli.android.quest.edit.EditQuestViewController
 import io.ipoli.android.quest.reminder.picker.ReminderPickerDialogController
 import io.ipoli.android.quest.reminder.picker.ReminderViewModel
 import io.ipoli.android.quest.schedule.addquest.AddQuestViewController
-import io.ipoli.android.quest.schedule.agenda.AgendaViewController
+import io.ipoli.android.quest.schedule.agenda.view.AgendaViewController
 import io.ipoli.android.quest.schedule.calendar.CalendarViewController
 import io.ipoli.android.quest.schedule.summary.ScheduleSummaryViewController
-import io.ipoli.android.quest.schedule.today.TodayViewController
 import io.ipoli.android.quest.show.QuestViewController
 import io.ipoli.android.repeatingquest.add.AddRepeatingQuestViewController
 import io.ipoli.android.repeatingquest.edit.EditRepeatingQuestViewController
@@ -143,8 +142,8 @@ class Navigator(private val router: Router) {
         pushController({ PlanDayViewController() }, VerticalChangeHandler())
     }
 
-    fun toScheduleSummary(currentDate: LocalDate) {
-        pushController({ ScheduleSummaryViewController(currentDate) }, VerticalChangeHandler())
+    fun toScheduleSummary() {
+        pushController({ ScheduleSummaryViewController() }, VerticalChangeHandler())
     }
 
     fun toAttributes(attribute: Player.AttributeType? = null) {
@@ -672,12 +671,12 @@ class Navigator(private val router: Router) {
         replaceTopController({ CompletedQuestViewController(questId) }, changeHandler)
     }
 
-    fun replaceWithCalendar(currentDate: LocalDate) {
-        replaceTopController({ CalendarViewController(currentDate) }, FadeChangeHandler())
+    fun replaceWithCalendar() {
+        replaceTopController({ CalendarViewController() }, FadeChangeHandler())
     }
 
-    fun replaceWithAgenda(currentDate: LocalDate) {
-        replaceTopController({ AgendaViewController(currentDate) }, FadeChangeHandler())
+    fun replaceWithAgenda() {
+        replaceTopController({AgendaViewController() }, FadeChangeHandler())
     }
 
     fun replaceWithHome(changeHandler: ControllerChangeHandler? = null) {

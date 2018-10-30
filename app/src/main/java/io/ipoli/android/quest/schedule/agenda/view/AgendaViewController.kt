@@ -1,4 +1,4 @@
-package io.ipoli.android.quest.schedule.agenda
+package io.ipoli.android.quest.schedule.agenda.view
 
 import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
@@ -17,12 +17,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.bluelinelabs.conductor.RouterTransaction
+import com.haibin.calendarview.Calendar
+import com.haibin.calendarview.CalendarView
 import com.mikepenz.iconics.typeface.IIcon
 import com.mikepenz.ionicons_typeface_library.Ionicons
 import io.ipoli.android.R
 import io.ipoli.android.common.ViewUtils
-import io.ipoli.android.common.datetime.isToday
-import io.ipoli.android.common.datetime.weekOfYear
+import io.ipoli.android.common.datetime.*
 import io.ipoli.android.common.redux.android.ReduxViewController
 import io.ipoli.android.common.text.DateFormatter
 import io.ipoli.android.common.text.QuestStartTimeFormatter
@@ -32,14 +33,21 @@ import io.ipoli.android.common.view.recyclerview.MultiViewTypeSwipeCallback
 import io.ipoli.android.common.view.recyclerview.RecyclerViewViewModel
 import io.ipoli.android.common.view.recyclerview.SwipeResource
 import io.ipoli.android.event.Event
+import io.ipoli.android.habit.show.HabitViewController
 import io.ipoli.android.quest.CompletedQuestViewController
 import io.ipoli.android.quest.schedule.agenda.usecase.CreateAgendaItemsUseCase
+import io.ipoli.android.quest.schedule.agenda.usecase.CreateAgendaPreviewItemsUseCase
+import io.ipoli.android.quest.schedule.agenda.view.AgendaViewState.StateType.*
 import kotlinx.android.synthetic.main.controller_agenda.view.*
 import kotlinx.android.synthetic.main.item_agenda_event.view.*
 import kotlinx.android.synthetic.main.item_agenda_month_divider.view.*
 import kotlinx.android.synthetic.main.item_agenda_quest.view.*
+import org.json.JSONArray
+import org.json.JSONObject
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
 import org.threeten.bp.Month
+import org.threeten.bp.YearMonth
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.TextStyle
 import java.util.*
@@ -55,8 +63,6 @@ class AgendaViewController(args: Bundle? = null) :
 
     private var scrollToPositionListener: RecyclerView.OnScrollListener? = null
 
-    private var startDate = LocalDate.now()
-
     private val monthToImage = mapOf(
         Month.JANUARY to R.drawable.agenda_january,
         Month.FEBRUARY to R.drawable.agenda_february,
@@ -71,10 +77,6 @@ class AgendaViewController(args: Bundle? = null) :
         Month.NOVEMBER to R.drawable.agenda_november,
         Month.DECEMBER to R.drawable.agenda_december
     )
-
-    constructor(startDate: LocalDate) : this() {
-        this.startDate = startDate
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -114,7 +116,11 @@ class AgendaViewController(args: Bundle? = null) :
                 when (viewHolder.itemViewType) {
                     ItemType.QUEST.ordinal -> {
                         if (direction == ItemTouchHelper.END) {
-                            dispatch(AgendaAction.CompleteQuest(questId))
+                            dispatch(
+                                AgendaAction.CompleteQuest(
+                                    questId
+                                )
+                            )
                         } else if (direction == ItemTouchHelper.START) {
                             val a = view.agendaList.adapter as AgendaAdapter
                             val vm =
@@ -123,7 +129,12 @@ class AgendaViewController(args: Bundle? = null) :
                                 .toReschedule(
                                     includeToday = !vm.isScheduledForToday,
                                     listener = { date ->
-                                        dispatch(AgendaAction.RescheduleQuest(questId, date))
+                                        dispatch(
+                                            AgendaAction.RescheduleQuest(
+                                                questId,
+                                                date
+                                            )
+                                        )
                                     },
                                     cancelListener = {
                                         view.agendaList.adapter.notifyItemChanged(viewHolder.adapterPosition)
@@ -134,13 +145,25 @@ class AgendaViewController(args: Bundle? = null) :
 
                     ItemType.COMPLETED_QUEST.ordinal -> {
                         if (direction == ItemTouchHelper.END) {
-                            dispatch(AgendaAction.UndoCompleteQuest(questId))
+                            dispatch(
+                                AgendaAction.UndoCompleteQuest(
+                                    questId
+                                )
+                            )
                         } else if (direction == ItemTouchHelper.START) {
-                            dispatch(AgendaAction.RemoveQuest(questId))
+                            dispatch(
+                                AgendaAction.RemoveQuest(
+                                    questId
+                                )
+                            )
                             PetMessagePopup(
                                 stringRes(R.string.remove_quest_undo_message),
                                 {
-                                    dispatch(AgendaAction.UndoRemoveQuest(questId))
+                                    dispatch(
+                                        AgendaAction.UndoRemoveQuest(
+                                            questId
+                                        )
+                                    )
                                     view.agendaList.adapter.notifyItemChanged(viewHolder.adapterPosition)
                                 },
                                 stringRes(R.string.undo)
@@ -183,10 +206,43 @@ class AgendaViewController(args: Bundle? = null) :
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(view.agendaList)
 
+        when (DateUtils.firstDayOfWeek) {
+            DayOfWeek.SATURDAY -> view.calendarView.setWeekStarWithSat()
+            DayOfWeek.SUNDAY -> view.calendarView.setWeekStarWithSun()
+            else -> view.calendarView.setWeekStarWithMon()
+        }
+
+        view.calendarView.setOnMonthChangeListener(HabitViewController.SkipFirstChangeMonthListener { year, month ->
+            dispatch(AgendaAction.ChangePreviewMonth(YearMonth.of(year, month)))
+        })
+
+        view.calendarView.setOnCalendarSelectListener(object :
+            CalendarView.OnCalendarSelectListener {
+            override fun onCalendarSelect(calendar: Calendar, isClick: Boolean) {
+
+                if (isClick) {
+                    dispatch(
+                        AgendaAction.ChangePreviewDate(
+                            LocalDate.of(
+                                calendar.year,
+                                calendar.month,
+                                calendar.day
+                            )
+                        )
+                    )
+                }
+            }
+
+            override fun onCalendarOutOfRange(calendar: Calendar) {
+            }
+
+        })
+
         return view
     }
 
-    override fun onCreateLoadAction() = AgendaAction.Load(startDate)
+    override fun onCreateLoadAction() =
+        AgendaAction.Load
 
     override fun onDetach(view: View) {
         view.agendaList.clearOnScrollListeners()
@@ -197,7 +253,7 @@ class AgendaViewController(args: Bundle? = null) :
 
         when (state.type) {
 
-            AgendaViewState.StateType.DATA_CHANGED -> {
+            DATA_CHANGED -> {
                 ViewUtils.goneViews(view.topLoader, view.bottomLoader)
                 val agendaList = view.agendaList
                 agendaList.clearOnScrollListeners()
@@ -205,17 +261,70 @@ class AgendaViewController(args: Bundle? = null) :
                 addScrollListeners(agendaList, state)
             }
 
-            AgendaViewState.StateType.SHOW_TOP_LOADER -> {
+            CALENDAR_DATA_CHANGED -> {
+                view.calendarView.setSchemeDate(state.previewCalendars.map { it.toString() to it }.toMap())
+            }
+
+            SHOW_TOP_LOADER -> {
                 ViewUtils.showViews(view.topLoader)
             }
 
-            AgendaViewState.StateType.SHOW_BOTTOM_LOADER -> {
+            SHOW_BOTTOM_LOADER -> {
                 ViewUtils.showViews(view.bottomLoader)
+            }
+
+            PREVIEW_MODE_CHANGED -> {
+                if (state.previewMode == AgendaViewState.PreviewMode.MONTH) {
+                    renderMonthPreview(view)
+                } else {
+                    renderWeekPreview(view)
+                }
+            }
+
+            VISIBLE_DATE_CHANGED -> {
+                val date = state.currentDate!!
+                if (view.calendarView.curDay != date.dayOfMonth || view.calendarView.curMonth != date.monthValue || view.calendarView.curYear != date.year) {
+                    view.calendarView.scrollToCalendar(
+                        date.year,
+                        date.monthValue,
+                        date.dayOfMonth,
+                        true
+                    )
+                }
+            }
+
+            SHOW_TODAY -> {
+                val date = state.currentDate!!
+                view.calendarView.scrollToCalendar(
+                    date.year,
+                    date.monthValue,
+                    date.dayOfMonth,
+                    true
+                )
             }
 
             else -> {
             }
         }
+    }
+
+    private fun renderWeekPreview(view: View) {
+        val calendarHeight = ViewUtils.dpToPx(88f, view.context).toInt()
+        view.calendarView.setCalendarItemHeight(calendarHeight)
+        view.calendarContainer.shrink()
+
+        val lp = view.agendaListContainer.layoutParams as ViewGroup.MarginLayoutParams
+        lp.topMargin = calendarHeight
+        view.agendaListContainer.layoutParams = lp
+    }
+
+    private fun renderMonthPreview(view: View) {
+        val calendarHeight = ViewUtils.dpToPx(36f, view.context).toInt()
+        view.calendarView.setCalendarItemHeight(calendarHeight)
+        view.calendarContainer.expand()
+        val lp = view.agendaListContainer.layoutParams as ViewGroup.MarginLayoutParams
+        lp.topMargin = 0
+        view.agendaListContainer.layoutParams = lp
     }
 
     private fun addScrollListeners(
@@ -229,9 +338,17 @@ class AgendaViewController(args: Bundle? = null) :
                 { side, position ->
                     agendaList.clearOnScrollListeners()
                     if (side == EndlessRecyclerViewScrollListener.Side.TOP) {
-                        dispatch(AgendaAction.LoadBefore(position))
+                        dispatch(
+                            AgendaAction.LoadBefore(
+                                position
+                            )
+                        )
                     } else {
-                        dispatch(AgendaAction.LoadAfter(position))
+                        dispatch(
+                            AgendaAction.LoadAfter(
+                                position
+                            )
+                        )
                     }
                 },
                 15
@@ -239,9 +356,12 @@ class AgendaViewController(args: Bundle? = null) :
         val changeItemScrollListener = ChangeItemScrollListener(
             agendaList.layoutManager as LinearLayoutManager
         ) { pos ->
-            dispatch(AgendaAction.FirstVisibleItemChanged(pos))
+            dispatch(
+                AgendaAction.FirstVisibleItemChanged(
+                    pos
+                )
+            )
         }
-
 
         scrollToPositionListener = object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
@@ -253,10 +373,12 @@ class AgendaViewController(args: Bundle? = null) :
 
         if (state.scrollToPosition != null) {
             agendaList.addOnScrollListener(scrollToPositionListener)
-            (agendaList.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
-                state.scrollToPosition,
-                0
-            )
+            agendaList.postDelayed({
+                (agendaList.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
+                    state.scrollToPosition, 0
+                )
+            }, 100)
+
         } else {
             agendaList.addOnScrollListener(endlessRecyclerViewScrollListener)
             agendaList.addOnScrollListener(changeItemScrollListener)
@@ -296,7 +418,8 @@ class AgendaViewController(args: Bundle? = null) :
             override val isRepeating: Boolean,
             override val isFromChallenge: Boolean,
             val isScheduledForToday: Boolean
-        ) : AgendaViewModel(id), QuestItemViewModel
+        ) : AgendaViewModel(id),
+            QuestItemViewModel
 
         data class QuestPlaceholderViewModel(
             override val id: String,
@@ -308,7 +431,8 @@ class AgendaViewController(args: Bundle? = null) :
             override val showDivider: Boolean,
             override val isRepeating: Boolean,
             override val isFromChallenge: Boolean
-        ) : AgendaViewModel(id), QuestItemViewModel
+        ) : AgendaViewModel(id),
+            QuestItemViewModel
 
         data class CompletedQuestViewModel(
             override val id: String,
@@ -320,7 +444,8 @@ class AgendaViewController(args: Bundle? = null) :
             override val showDivider: Boolean,
             override val isRepeating: Boolean,
             override val isFromChallenge: Boolean
-        ) : AgendaViewModel(id), QuestItemViewModel
+        ) : AgendaViewModel(id),
+            QuestItemViewModel
 
         data class EventViewModel(
             override val id: String,
@@ -333,7 +458,8 @@ class AgendaViewController(args: Bundle? = null) :
 
         data class DateHeaderViewModel(
             override val id: String,
-            val text: String
+            val text: String,
+            @ColorInt val textColor: Int
         ) : AgendaViewModel(id)
 
         data class MonthDividerViewModel(
@@ -444,7 +570,9 @@ class AgendaViewController(args: Bundle? = null) :
             viewModel: AgendaViewModel.DateHeaderViewModel
         ) {
             view.setOnClickListener(null)
-            (view as TextView).text = viewModel.text
+            val tv = view as TextView
+            tv.text = viewModel.text
+            tv.setTextColor(viewModel.textColor)
         }
 
         private fun bindCompleteQuestViewModel(
@@ -517,7 +645,7 @@ class AgendaViewController(args: Bundle? = null) :
         }
     }
 
-    fun AgendaViewState.toAgendaItemViewModels() =
+    private fun AgendaViewState.toAgendaItemViewModels() =
         agendaItems.mapIndexed { index, item ->
             toAgendaViewModel(
                 item,
@@ -528,9 +656,8 @@ class AgendaViewController(args: Bundle? = null) :
     private fun toAgendaViewModel(
         agendaItem: CreateAgendaItemsUseCase.AgendaItem,
         nextAgendaItem: CreateAgendaItemsUseCase.AgendaItem? = null
-    ): AgendaViewController.AgendaViewModel {
-
-        return when (agendaItem) {
+    ): AgendaViewModel =
+        when (agendaItem) {
             is CreateAgendaItemsUseCase.AgendaItem.QuestItem -> {
                 val quest = agendaItem.quest
                 val color = if (quest.isCompleted)
@@ -539,11 +666,11 @@ class AgendaViewController(args: Bundle? = null) :
                     AndroidColor.valueOf(quest.color.name).color500
 
                 when {
-                    quest.isCompleted -> AgendaViewController.AgendaViewModel.CompletedQuestViewModel(
+                    quest.isCompleted -> AgendaViewModel.CompletedQuestViewModel(
                         id = quest.id,
                         name = quest.name,
                         tags = quest.tags.map {
-                            AgendaViewController.TagViewModel(
+                            TagViewModel(
                                 it.name,
                                 AndroidColor.valueOf(it.color.name).color500
                             )
@@ -560,11 +687,11 @@ class AgendaViewController(args: Bundle? = null) :
                         isRepeating = quest.isFromRepeatingQuest,
                         isFromChallenge = quest.isFromChallenge
                     )
-                    quest.id.isEmpty() -> AgendaViewController.AgendaViewModel.QuestPlaceholderViewModel(
+                    quest.id.isEmpty() -> AgendaViewModel.QuestPlaceholderViewModel(
                         id = quest.id,
                         name = quest.name,
                         tags = quest.tags.map {
-                            AgendaViewController.TagViewModel(
+                            TagViewModel(
                                 it.name,
                                 AndroidColor.valueOf(it.color.name).color500
                             )
@@ -581,11 +708,11 @@ class AgendaViewController(args: Bundle? = null) :
                         isRepeating = quest.isFromRepeatingQuest,
                         isFromChallenge = quest.isFromChallenge
                     )
-                    else -> AgendaViewController.AgendaViewModel.QuestViewModel(
+                    else -> AgendaViewModel.QuestViewModel(
                         id = quest.id,
                         name = quest.name,
                         tags = quest.tags.map {
-                            AgendaViewController.TagViewModel(
+                            TagViewModel(
                                 it.name,
                                 AndroidColor.valueOf(it.color.name).color500
                             )
@@ -609,7 +736,7 @@ class AgendaViewController(args: Bundle? = null) :
             is CreateAgendaItemsUseCase.AgendaItem.EventItem -> {
                 val event = agendaItem.event
 
-                AgendaViewController.AgendaViewModel.EventViewModel(
+                AgendaViewModel.EventViewModel(
                     id = event.name,
                     name = event.name,
                     startTime = formatStartTime(event),
@@ -620,13 +747,30 @@ class AgendaViewController(args: Bundle? = null) :
 
             is CreateAgendaItemsUseCase.AgendaItem.Date -> {
                 val date = agendaItem.date
-                val dayOfMonth = date.dayOfMonth
-                val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
                     .toUpperCase()
-                AgendaViewController.AgendaViewModel.DateHeaderViewModel(
+                val month = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+                val dayOfMonth = date.dayOfMonth
+
+                val prefix = if (date.isToday) {
+                    "today - "
+                } else if (date.isTomorrow) {
+                    "tomorrow - "
+                } else if (date.isYesterday) {
+                    "yesterday - "
+                } else {
+                    ""
+                }
+
+                AgendaViewModel.DateHeaderViewModel(
                     date.toString(),
-                    "$dayOfMonth $dayOfWeek"
+                    "$prefix$dayOfWeek, $month $dayOfMonth",
+                    if (date.isToday)
+                        attrData(R.attr.colorAccent)
+                    else
+                        colorRes(colorTextSecondaryResource)
                 )
+
             }
             is CreateAgendaItemsUseCase.AgendaItem.Week -> {
                 val start = agendaItem.start
@@ -639,14 +783,14 @@ class AgendaViewController(args: Bundle? = null) :
                     "${start.dayOfMonth} - ${DateFormatter.formatDayWithWeek(end)}"
                 }
 
-                AgendaViewController.AgendaViewModel.WeekHeaderViewModel(
+                AgendaViewModel.WeekHeaderViewModel(
                     start.weekOfYear.toString() + start.year.toString(),
                     label
                 )
             }
             is CreateAgendaItemsUseCase.AgendaItem.Month -> {
-                AgendaViewController.AgendaViewModel.MonthDividerViewModel(
-                    startDate.month.toString() + startDate.year.toString(),
+                AgendaViewModel.MonthDividerViewModel(
+                    agendaItem.startDate().month.toString() + agendaItem.startDate().year.toString(),
                     monthToImage[agendaItem.month.month]!!,
                     agendaItem.month.format(
                         DateTimeFormatter.ofPattern("MMMM yyyy")
@@ -654,7 +798,6 @@ class AgendaViewController(args: Bundle? = null) :
                 )
             }
         }
-    }
 
     private fun shouldShowDivider(nextAgendaItem: CreateAgendaItemsUseCase.AgendaItem?) =
         !(nextAgendaItem == null || (nextAgendaItem !is CreateAgendaItemsUseCase.AgendaItem.QuestItem && nextAgendaItem !is CreateAgendaItemsUseCase.AgendaItem.EventItem))
@@ -664,4 +807,53 @@ class AgendaViewController(args: Bundle? = null) :
         val end = start.plus(event.duration.intValue)
         return "${start.toString(shouldUse24HourFormat)} - ${end.toString(shouldUse24HourFormat)}"
     }
+
+    private val AgendaViewState.previewCalendars: List<com.haibin.calendarview.Calendar>
+        get() = previewItems!!.map {
+            val itemDate = it.date
+
+            val schemeData = JSONObject()
+
+            val weekIndicators = it.weekIndicators.map { i ->
+                val json = JSONObject()
+                when (i) {
+                    is CreateAgendaPreviewItemsUseCase.PreviewItem.WeekIndicator.Quest -> {
+                        json.put("type", "quest")
+                        json.put("color", i.color.name)
+                    }
+                    is CreateAgendaPreviewItemsUseCase.PreviewItem.WeekIndicator.Event -> {
+                        json.put("type", "event")
+                        json.put("color", i.color.toString())
+                    }
+                }
+                json.put("duration", i.duration)
+                json.put("start", i.startMinute)
+            }
+
+            schemeData.put("weekIndicators", JSONArray(weekIndicators))
+
+            val monthIndicators = it.monthIndicators.map { i ->
+                when (i) {
+                    is CreateAgendaPreviewItemsUseCase.PreviewItem.MonthIndicator.Event -> {
+                        i.color
+                    }
+                    is CreateAgendaPreviewItemsUseCase.PreviewItem.MonthIndicator.Quest -> {
+                        colorRes(i.color.androidColor.color500)
+                    }
+                }
+            }
+
+            schemeData.put("monthIndicators", JSONArray(monthIndicators))
+
+            com.haibin.calendarview.Calendar().apply {
+                day = itemDate.dayOfMonth
+                month = itemDate.monthValue
+                year = itemDate.year
+                isCurrentDay = itemDate == currentDate
+                isCurrentMonth = itemDate.month == currentDate!!.month
+                isLeapYear = itemDate.isLeapYear
+                scheme = schemeData.toString()
+            }
+        }
+
 }

@@ -21,7 +21,7 @@ import io.ipoli.android.player.attribute.AttributeRank
 import io.ipoli.android.player.data.Player
 import io.ipoli.android.player.usecase.RewardPlayerUseCase
 import io.ipoli.android.quest.bucketlist.BucketListAction
-import io.ipoli.android.quest.schedule.agenda.AgendaAction
+import io.ipoli.android.quest.schedule.agenda.view.AgendaAction
 import io.ipoli.android.quest.schedule.calendar.dayview.view.DayViewAction
 import io.ipoli.android.repeatingquest.add.EditRepeatingQuestAction
 import io.ipoli.android.store.avatar.AvatarStoreAction
