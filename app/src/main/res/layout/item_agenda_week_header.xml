@@ -4,6 +4,7 @@
     android:layout_height="48dp"
     android:gravity="center_vertical"
     android:paddingStart="72dp"
+    android:background="?android:colorBackground"
     android:paddingEnd="16dp"
     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
     android:textColor="?android:textColorSecondary" />
