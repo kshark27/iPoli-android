@@ -255,7 +255,7 @@ class AgendaViewController(args: Bundle? = null) :
     }
 
     private fun fixInitialHeight(view: View) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return
         }
         view.postDelayed({
