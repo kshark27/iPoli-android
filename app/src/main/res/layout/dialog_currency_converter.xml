@@ -13,10 +13,10 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:progress="0"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView3"
-        app:layout_constraintEnd_toStartOf="@+id/imageView5"
-        app:layout_constraintStart_toEndOf="@+id/imageView3"
-        app:layout_constraintTop_toTopOf="@+id/imageView3" />
+        app:layout_constraintBottom_toBottomOf="@+id/playerCoinsImage"
+        app:layout_constraintEnd_toStartOf="@+id/gemsToConvertImage"
+        app:layout_constraintStart_toEndOf="@+id/playerCoinsImage"
+        app:layout_constraintTop_toTopOf="@+id/playerCoinsImage" />
 
     <TextView
         android:id="@+id/coins"
@@ -24,9 +24,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center_vertical"
-        app:layout_constraintEnd_toEndOf="@+id/imageView3"
-        app:layout_constraintStart_toStartOf="@+id/imageView3"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3"
+        app:layout_constraintEnd_toEndOf="@+id/playerCoinsImage"
+        app:layout_constraintStart_toStartOf="@+id/playerCoinsImage"
+        app:layout_constraintTop_toBottomOf="@+id/playerCoinsImage"
         tools:text="1000" />
 
     <TextView
@@ -35,9 +35,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center_vertical"
-        app:layout_constraintEnd_toEndOf="@+id/imageView5"
-        app:layout_constraintStart_toStartOf="@+id/imageView5"
-        app:layout_constraintTop_toBottomOf="@+id/imageView5"
+        app:layout_constraintEnd_toEndOf="@+id/gemsToConvertImage"
+        app:layout_constraintStart_toStartOf="@+id/gemsToConvertImage"
+        app:layout_constraintTop_toBottomOf="@+id/gemsToConvertImage"
         tools:text="0" />
 
     <Button
@@ -54,26 +54,40 @@
         app:layout_constraintTop_toBottomOf="@+id/seekBar"
         tools:text="deal" />
 
+    <TextView
+        android:id="@+id/leftGemsToConvertMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:layout_marginEnd="16dp"
+        tools:text="You have no gems left to convert this month"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exchangeRateEqual" />
+
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/playerCoinsImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:scaleType="centerInside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/exchangeRateEqual"
+        app:layout_constraintTop_toBottomOf="@+id/leftGemsToConvertMessage"
         app:srcCompat="@drawable/coins" />
 
     <ImageView
-        android:id="@+id/imageView5"
+        android:id="@+id/gemsToConvertImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginEnd="16dp"
         android:scaleType="centerInside"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView3"
+        app:layout_constraintBottom_toBottomOf="@+id/playerCoinsImage"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView3"
+        app:layout_constraintTop_toTopOf="@+id/playerCoinsImage"
         app:srcCompat="@drawable/gems" />
 
     <ImageView

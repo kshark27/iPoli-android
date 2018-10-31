@@ -321,7 +321,7 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
             findViewById(R.id.activityContainer),
             getString(
                 R.string.trial_membership_message,
-                Constants.POWER_UPS_TRIAL_PERIOD_DAYS
+                Constants.MEMBERSHIP_TRIAL_PERIOD_DAYS
             ),
             Snackbar.LENGTH_INDEFINITE
         ).setAction(R.string.go_premium, Debounce.clickListener { _ ->

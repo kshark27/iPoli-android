@@ -112,7 +112,11 @@ class RewardPopup(
                     val messageAnim = ObjectAnimator.ofFloat(contentView.message, "alpha", 1f, 0f)
                     messageAnim.addListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator?) {
-                            playAttributesAnimation(contentView)
+                            if (attributes.isEmpty() && bounty == null) {
+                                hide()
+                            } else {
+                                playAttributesAnimation(contentView)
+                            }
                         }
                     })
                     messageAnim.startDelay = 500

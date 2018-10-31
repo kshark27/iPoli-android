@@ -26,7 +26,12 @@ class UndoCompletedQuestUseCase(
 
         reminderScheduler.schedule()
 
-        removeRewardFromPlayerUseCase.execute(RemoveRewardFromPlayerUseCase.Params(newQuest.reward!!))
+        removeRewardFromPlayerUseCase.execute(
+            RemoveRewardFromPlayerUseCase.Params(
+                rewardType = RemoveRewardFromPlayerUseCase.Params.RewardType.QUEST,
+                reward = newQuest.reward!!
+            )
+        )
 
         return newQuest
     }

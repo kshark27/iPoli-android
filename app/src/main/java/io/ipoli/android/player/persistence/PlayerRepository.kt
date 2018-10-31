@@ -42,6 +42,7 @@ import kotlinx.coroutines.experimental.channels.Channel
 import kotlinx.coroutines.experimental.runBlocking
 import org.jetbrains.annotations.NotNull
 import org.threeten.bp.DayOfWeek
+import org.threeten.bp.YearMonth
 import java.util.*
 import kotlin.coroutines.experimental.suspendCoroutine
 
@@ -221,7 +222,7 @@ class AndroidPlayerRepository(
         )
 
         val iData = dbObject.inventory
-        if(!iData.containsKey("presetChallengeIds")) {
+        if (!iData.containsKey("presetChallengeIds")) {
             iData["presetChallengeIds"] = emptyList<String>()
         }
 
@@ -375,9 +376,20 @@ class AndroidPlayerRepository(
         )
         return Statistics(
             questCompletedCount = createCountStatistic("questCompletedCount", stats),
-            questCompletedCountForToday = createCountStatistic(
-                "questCompletedCountForToday",
+            questCompletedCountForDay = createDayStatistic(
+                "questCompletedCountForDay",
                 stats
+            ),
+            habitCompletedCountForDay = createDayStatistic(
+                "habitCompletedCountForDay",
+                stats
+            ),
+            challengeCompletedCountForDay = createDayStatistic(
+                "challengeCompletedCountForDay",
+                stats
+            ),
+            gemConvertedCountForMonth = createMonthStatistic(
+                "gemConvertedCountForMonth", stats
             ),
             questCompletedStreak = createStreakStatistic("questCompletedStreak", stats),
             dailyChallengeCompleteStreak = dailyChallengeCompleteStreak,
@@ -433,30 +445,6 @@ class AndroidPlayerRepository(
             )
         )
     }
-
-    private fun createCountStatistic(
-        statisticKey: String,
-        stats: Map<String, Any?>,
-        defaultValue: Long = 0
-    ) =
-        stats[statisticKey]?.let { it as Long } ?: defaultValue
-
-    private fun createStreakStatistic(
-        statisticKey: String,
-        stats: Map<String, Any?>
-    ) =
-        if (stats.containsKey(statisticKey)) {
-            @Suppress("UNCHECKED_CAST")
-            val statisticData = stats[statisticKey]!! as Map<String, Any>
-            Statistics.StreakStatistic(
-                statisticData["count"]!! as Long,
-                statisticData["lastDate"]?.let {
-                    (it as Long).startOfDayUTC
-                }
-            )
-        } else {
-            Statistics.StreakStatistic()
-        }
 
     override fun toDatabaseObject(entity: Player) =
         RoomPlayer(
@@ -604,7 +592,10 @@ class AndroidPlayerRepository(
     private fun createDbStatistics(stats: Statistics) =
         mutableMapOf<String, Any?>(
             "questCompletedCount" to stats.questCompletedCount,
-            "questCompletedCountForToday" to stats.questCompletedCountForToday,
+            "questCompletedCountForDay" to stats.questCompletedCountForDay.db,
+            "habitCompletedCountForDay" to stats.habitCompletedCountForDay.db,
+            "challengeCompletedCountForDay" to stats.challengeCompletedCountForDay.db,
+            "gemConvertedCountForMonth" to stats.gemConvertedCountForMonth.db,
             "questCompletedStreak" to stats.questCompletedStreak.db,
             "dailyChallengeCompleteStreak" to stats.dailyChallengeCompleteStreak.db,
             "dailyChallengeBestStreak" to stats.dailyChallengeBestStreak,
@@ -636,15 +627,6 @@ class AndroidPlayerRepository(
             "wellBeingStatusIndex" to stats.wellBeingStatusIndex,
             "willpowerStatusIndex" to stats.willpowerStatusIndex
         )
-
-    private fun createDbStreakStatistic(stat: Statistics.StreakStatistic) =
-        mapOf(
-            "count" to stat.count,
-            "lastDate" to stat.lastDate?.startOfDayUTC()
-        )
-
-    private val Statistics.StreakStatistic.db
-        get() = createDbStreakStatistic(this)
 
     private val usernamesReference get() = database.collection("usernames")
 
@@ -686,6 +668,79 @@ class AndroidPlayerRepository(
         Tasks.await(usernamesReference.document(username).delete())
     }
 }
+
+private fun createCountStatistic(
+    statisticKey: String,
+    stats: Map<String, Any?>,
+    defaultValue: Long = 0
+) =
+    stats[statisticKey]?.let { it as Long } ?: defaultValue
+
+private fun createStreakStatistic(
+    statisticKey: String,
+    stats: Map<String, Any?>
+) =
+    if (stats.containsKey(statisticKey)) {
+        @Suppress("UNCHECKED_CAST")
+        val statisticData = stats[statisticKey]!! as Map<String, Any>
+        Statistics.StreakStatistic(
+            statisticData["count"]!! as Long,
+            statisticData["lastDate"]?.let {
+                (it as Long).startOfDayUTC
+            }
+        )
+    } else {
+        Statistics.StreakStatistic()
+    }
+
+private fun createDayStatistic(
+    statisticKey: String,
+    stats: Map<String, Any?>
+) =
+    if (stats.containsKey(statisticKey)) {
+        @Suppress("UNCHECKED_CAST")
+        val statisticData = stats[statisticKey]!! as Map<String, Any>
+        Statistics.DayStatistic(
+            statisticData["count"]!! as Long,
+            (statisticData["day"] as Long).startOfDayUTC
+        )
+    } else {
+        Statistics.DayStatistic()
+    }
+
+private fun createMonthStatistic(
+    statisticKey: String,
+    stats: Map<String, Any?>
+) =
+    if (stats.containsKey(statisticKey)) {
+        @Suppress("UNCHECKED_CAST")
+        val statisticData = stats[statisticKey]!! as Map<String, Any>
+        val date = (statisticData["month"] as Long).startOfDayUTC
+        Statistics.MonthStatistic(
+            statisticData["count"]!! as Long,
+            YearMonth.from(date)
+        )
+    } else {
+        Statistics.MonthStatistic()
+    }
+
+private val Statistics.StreakStatistic.db
+    get() = mapOf(
+        "count" to count,
+        "lastDate" to lastDate?.startOfDayUTC()
+    )
+
+private val Statistics.DayStatistic.db
+    get() = mapOf(
+        "count" to count,
+        "day" to day.startOfDayUTC()
+    )
+
+private val Statistics.MonthStatistic.db
+    get() = mapOf(
+        "count" to count,
+        "month" to month.atDay(1).startOfDayUTC()
+    )
 
 class FirestorePlayerRepository(
     database: FirebaseFirestore
@@ -811,7 +866,7 @@ class FirestorePlayerRepository(
         )
 
         val iData = cp.inventory
-        if(!iData.containsKey("presetChallengeIds")) {
+        if (!iData.containsKey("presetChallengeIds")) {
             iData["presetChallengeIds"] = emptyList<String>()
         }
 
@@ -969,10 +1024,19 @@ class FirestorePlayerRepository(
         )
         return Statistics(
             questCompletedCount = createCountStatistic("questCompletedCount", stats),
-            questCompletedCountForToday = createCountStatistic(
-                "questCompletedCountForToday",
+            questCompletedCountForDay = createDayStatistic(
+                "questCompletedCountForDay",
                 stats
             ),
+            habitCompletedCountForDay = createDayStatistic(
+                "habitCompletedCountForDay",
+                stats
+            ),
+            challengeCompletedCountForDay = createDayStatistic(
+                "challengeCompletedCountForDay",
+                stats
+            ),
+            gemConvertedCountForMonth = createMonthStatistic("gemConvertedCountForMonth", stats),
             questCompletedStreak = createStreakStatistic("questCompletedStreak", stats),
             dailyChallengeCompleteStreak = dailyChallengeCompleteStreak,
             dailyChallengeBestStreak = createCountStatistic(
@@ -1027,30 +1091,6 @@ class FirestorePlayerRepository(
             )
         )
     }
-
-    private fun createCountStatistic(
-        statisticKey: String,
-        stats: Map<String, Any?>,
-        defaultValue: Long = 0
-    ) =
-        stats[statisticKey]?.let { it as Long } ?: defaultValue
-
-    private fun createStreakStatistic(
-        statisticKey: String,
-        stats: Map<String, Any?>
-    ) =
-        if (stats.containsKey(statisticKey)) {
-            @Suppress("UNCHECKED_CAST")
-            val statisticData = stats[statisticKey]!! as Map<String, Any>
-            Statistics.StreakStatistic(
-                statisticData["count"]!! as Long,
-                statisticData["lastDate"]?.let {
-                    (it as Long).startOfDayUTC
-                }
-            )
-        } else {
-            Statistics.StreakStatistic()
-        }
 
     override fun toDatabaseObject(entity: Player) =
         DbPlayer().also {
@@ -1198,7 +1238,10 @@ class FirestorePlayerRepository(
     private fun createDbStatistics(stats: Statistics) =
         mutableMapOf<String, Any?>(
             "questCompletedCount" to stats.questCompletedCount,
-            "questCompletedCountForToday" to stats.questCompletedCountForToday,
+            "questCompletedCountForDay" to stats.questCompletedCountForDay.db,
+            "habitCompletedCountForDay" to stats.habitCompletedCountForDay.db,
+            "challengeCompletedCountForDay" to stats.challengeCompletedCountForDay.db,
+            "gemConvertedCountForMonth" to stats.gemConvertedCountForMonth.db,
             "questCompletedStreak" to stats.questCompletedStreak.db,
             "dailyChallengeCompleteStreak" to stats.dailyChallengeCompleteStreak.db,
             "dailyChallengeBestStreak" to stats.dailyChallengeBestStreak,
@@ -1231,12 +1274,6 @@ class FirestorePlayerRepository(
             "willpowerStatusIndex" to stats.willpowerStatusIndex
         )
 
-    private fun createDbStreakStatistic(stat: Statistics.StreakStatistic) =
-        mapOf(
-            "count" to stat.count,
-            "lastDate" to stat.lastDate?.startOfDayUTC()
-        )
-
     fun findFriend(friendId: String): Player =
         extractDocument(collectionReference.document(friendId))!!
 
@@ -1257,7 +1294,4 @@ class FirestorePlayerRepository(
             }
         }
     }
-
-    private val Statistics.StreakStatistic.db
-        get() = createDbStreakStatistic(this)
 }

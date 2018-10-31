@@ -218,7 +218,7 @@
     <string name="power_up_bought">Enjoy %s for 30 days</string>
     <string name="power_up_too_expensive">Not enough coins to buy this</string>
     <string name="power_up_dialog_title">You\'ve discovered %s</string>
-    <string name="go_premium">Go premium</string>
+    <string name="go_premium">Join now</string>
     <string name="unlock_all">Unlock all</string>
     <string name="membership_store_title">Premium membership</string>
     <string name="life_coins_title">Life Coins</string>
@@ -324,7 +324,7 @@
     <string name="short_bio_hint">Enter a short bio</string>
 
     <string name="membership">Membership</string>
-    <string name="membership_benefit_free_trial">%d days FREE trial</string>
+    <string name="membership_benefit_free_trial">%d days FREE trial (cancel at any time)</string>
     <string name="membership_benefit_cancellation">Cancel at any time</string>
     <string name="quarterly_plan_disadvantage1">Expensive option - billed every 3 months</string>
     <string name="monthly_plan_disadvantage1">Most expensive option - billed monthly</string>
@@ -669,7 +669,7 @@
     <string name="predefined_rq_take_walk">Take a walk</string>
     <string name="predefined_rq_learn_new_language">Learn new language</string>
     <string name="predefined_rq_date_night">Plan date night</string>
-    <string name="trial_membership_message">FREE PowerUps for %d days on us (new members only)</string>
+    <string name="trial_membership_message">PRO membership unlocks all PowerUps &amp; more (%d day FREE trial)</string>
     <string name="pet_name_hint">Pet name</string>
     <string name="pet_name_format_hint">Choose your pet name</string>
     <string name="pet_name_error">Don\'t leave your pet nameless</string>
@@ -1051,6 +1051,8 @@ The **yellow bar** is your **level** and **experience** progress.
 You can change your **avatar** or edit your **display name** and **short bio**.
         This is how your friends will see your profile. \n\n
 You can also manage your **shared posts**, **friends** and **shared challenges**.\n\n
+        **High Reward Quests &amp; Habits per day** show how much of each you have left to complete
+        and get high rewards for. You can still complete more if you want to, but the rewards will be significantly smaller.\n\n
 **Average focus hours per day** is formed by how much time
         you\'ve tracked with the **timer** (both pomodoro and countdown).
     </string>
@@ -1239,4 +1241,13 @@ These are your physical and mental characteristics.\n\n
     <string name="followers">Followers</string>
     <string name="share_post">Share Post</string>
     <string name="empty_post_comments_message">No comments yet. Be the first to add one!</string>
+    <string name="membership_benefit_convert_gems_count">Convert up to %d Gems per month</string>
+    <string name="membership_benefit_quests_habits_reward">Completing up to %d Quests &amp; Habits per day gives you high rewards</string>
+    <string name="membership_benefit_convert_unlimited_gems">Convert Unlimited Gems per month</string>
+    <string name="unlimited">Unlimited</string>
+    <string name="converter_no_more_gems_message">You have no gems left to convert this month</string>
+    <string name="converter_remaining_gems_message">You have %d gems left to convert this month</string>
+    <string name="gems_converted_this_month">Gems converted\nthis month</string>
+    <string name="rewarded_habits_today">High Reward Habits today</string>
+    <string name="rewarded_quests_today">High Reward Quests today</string>
 </resources>

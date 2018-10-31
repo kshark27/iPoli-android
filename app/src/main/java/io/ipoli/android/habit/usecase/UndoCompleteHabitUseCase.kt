@@ -37,7 +37,12 @@ class UndoCompleteHabitUseCase(
             if (history[date]!!.reward == null) {
                 ErrorLogger.log(IllegalStateException("Illegal undo habit: ${habit.history}, $date"))
             } else {
-                removeRewardFromPlayerUseCase.execute(RemoveRewardFromPlayerUseCase.Params(history[date]!!.reward!!))
+                removeRewardFromPlayerUseCase.execute(
+                    RemoveRewardFromPlayerUseCase.Params(
+                        rewardType = RemoveRewardFromPlayerUseCase.Params.RewardType.GOOD_HABIT,
+                        reward = history[date]!!.reward!!
+                    )
+                )
             }
         }
 

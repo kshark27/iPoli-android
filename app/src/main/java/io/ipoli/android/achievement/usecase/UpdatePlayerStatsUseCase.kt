@@ -17,29 +17,6 @@ class UpdatePlayerStatsUseCase(
         val currentDate = parameters.currentDate
 
         val newStats = when (parameters.eventType) {
-            QuestCompleted -> {
-
-                val questCompletedStreak = stats.questCompletedStreak
-                stats.copy(
-                    questCompletedCount = stats.questCompletedCount + 1,
-                    questCompletedCountForToday = stats.questCompletedCountForToday + 1,
-                    questCompletedStreak = if (currentDate != questCompletedStreak.lastDate) {
-                        questCompletedStreak.copy(
-                            count = questCompletedStreak.count + 1,
-                            lastDate = currentDate
-                        )
-                    } else {
-                        questCompletedStreak
-                    }
-
-                )
-            }
-
-            QuestUncompleted ->
-                stats.copy(
-                    questCompletedCountForToday = stats.questCompletedCountForToday - 1,
-                    questCompletedCount = stats.questCompletedCount - 1
-                )
 
             DailyChallengeCompleted -> {
                 val dcCompleteStreak = stats.dailyChallengeCompleteStreak
@@ -175,8 +152,6 @@ class UpdatePlayerStatsUseCase(
         val currentDate: LocalDate = LocalDate.now()
     ) {
         sealed class EventType(val count: Int = 1) {
-            object QuestCompleted : EventType()
-            object QuestUncompleted : EventType()
             object DailyChallengeCompleted : EventType()
             object RepeatingQuestCreated : EventType()
             object ChallengeCompleted : EventType()

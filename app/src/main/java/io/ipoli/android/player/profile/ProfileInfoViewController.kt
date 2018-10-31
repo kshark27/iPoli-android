@@ -18,6 +18,7 @@ import io.ipoli.android.common.view.recyclerview.RecyclerViewViewModel
 import io.ipoli.android.common.view.recyclerview.SimpleViewHolder
 import io.ipoli.android.common.view.stringRes
 import io.ipoli.android.common.view.visible
+import io.ipoli.android.player.data.Membership
 import io.ipoli.android.player.profile.ProfileViewState.StateType.PROFILE_DATA_LOADED
 import io.ipoli.android.player.profile.ProfileViewState.StateType.PROFILE_INFO_LOADED
 import kotlinx.android.synthetic.main.controller_profile_info.view.*
@@ -64,12 +65,19 @@ class ProfileInfoViewController(args: Bundle? = null) :
             PROFILE_INFO_LOADED,
             PROFILE_DATA_LOADED -> {
                 renderPlayerStats(state, view)
-                renderAchievements(view, state)
+                renderPlayerMembershipStats(state, view)
+                renderAchievements(state, view)
             }
 
             else -> {
             }
         }
+    }
+
+    private fun renderPlayerMembershipStats(state: ProfileViewState, view: View) {
+        view.completedQuests.text = state.todayCompletedQuestsText
+        view.completedHabits.text = state.todayCompletedHabitsText
+        view.convertedGems.text = state.convertedGemsText
     }
 
     private fun renderPlayerStats(state: ProfileViewState, view: View) {
@@ -78,8 +86,8 @@ class ProfileInfoViewController(args: Bundle? = null) :
     }
 
     private fun renderAchievements(
-        view: View,
-        state: ProfileViewState
+        state: ProfileViewState,
+        view: View
     ) {
         (view.achievementList.adapter as AchievementAdapter).updateAll(state.achievementViewModels)
         if (state.unlockedAchievements.isEmpty()) {
@@ -143,4 +151,25 @@ class ProfileInfoViewController(args: Bundle? = null) :
                     starsCount = starsToShow
                 )
             }
+
+    private val ProfileViewState.todayCompletedQuestsText
+        get() = "${Math.min(
+            todayCompletedQuests!!,
+            membership!!.dailyHighRewardQuestCap
+        )}/${membership.dailyHighRewardQuestCap}"
+
+    private val ProfileViewState.todayCompletedHabitsText
+        get() = "${Math.min(
+            todayCompletedHabits!!,
+            membership!!.dailyHighRewardHabitCap
+        )}/${membership.dailyHighRewardHabitCap}"
+
+    @Suppress("IMPLICIT_CAST_TO_ANY")
+    private val ProfileViewState.convertedGemsText
+        get() = "$thisMonthConvertedGems/" +
+            "${if (membership!!.monthlyConvertedGemCap == Membership.UNLIMITED)
+                stringRes(R.string.unlimited)
+            else
+                membership.monthlyConvertedGemCap
+            }"
 }

@@ -28,6 +28,7 @@ import io.ipoli.android.common.redux.BaseViewState
 import io.ipoli.android.common.view.CurrencyConverterViewState.Type.*
 import io.ipoli.android.pet.AndroidPetAvatar
 import io.ipoli.android.pet.PetAvatar
+import io.ipoli.android.player.data.Membership
 import io.ipoli.android.player.data.Player
 import io.ipoli.android.player.usecase.ConvertCoinsToGemsUseCase
 import io.ipoli.android.store.gem.GemPack
@@ -61,7 +62,8 @@ data class CurrencyConverterViewState(
     val convertGems: Int = 0,
     val enableConvert: Boolean = false,
     val exchangeRateCoins: Int = 0,
-    val gemPacks: List<GemPack> = listOf()
+    val gemPacks: List<GemPack> = listOf(),
+    val remainingMonthlyGems: Int = 0
 ) : BaseViewState() {
     enum class Type {
         LOADING,
@@ -124,7 +126,17 @@ object CurrencyConverterReducer : BaseViewStateReducer<CurrencyConverterViewStat
         player: Player
     ): CurrencyConverterViewState {
 
-        val maxGemsToBuy = player.coins / Constants.GEM_COINS_PRICE
+        val membership = player.membership
+        val affordableGems = player.coins / Constants.GEM_COINS_PRICE
+        val remainingGems: Int =
+            if (membership.monthlyConvertedGemCap == Membership.UNLIMITED) Membership.UNLIMITED
+            else (membership.monthlyConvertedGemCap - player.statistics.gemConvertedCountForThisMonth).toInt()
+
+        val maxGemsToBuy = if (membership.monthlyConvertedGemCap == Membership.UNLIMITED) {
+            affordableGems
+        } else {
+            Math.min(remainingGems, affordableGems)
+        }
 
         return subState.copy(
             type = DATA_CHANGED,
@@ -135,7 +147,8 @@ object CurrencyConverterReducer : BaseViewStateReducer<CurrencyConverterViewStat
             convertCoins = maxGemsToBuy * Constants.GEM_COINS_PRICE,
             convertGems = maxGemsToBuy,
             enableConvert = maxGemsToBuy > 0,
-            exchangeRateCoins = Constants.GEM_COINS_PRICE
+            exchangeRateCoins = Constants.GEM_COINS_PRICE,
+            remainingMonthlyGems = remainingGems
         )
     }
 
@@ -251,6 +264,14 @@ class CurrencyConverterDialogController :
                 dialog.findViewById<TextView>(R.id.headerCoins)!!.text =
                     state.playerCoins.toString()
                 dialog.findViewById<TextView>(R.id.headerGems)!!.text = state.playerGems.toString()
+
+                if (state.remainingMonthlyGems == Membership.UNLIMITED) {
+                    view.leftGemsToConvertMessage.gone()
+                } else {
+                    view.leftGemsToConvertMessage.visible()
+                    view.leftGemsToConvertMessage.text = state.remainingGemsText
+                }
+
                 view.coins.text = state.convertCoins.toString()
                 view.gems.text = state.convertGems.toString()
                 view.exchangeRateCoins.text = state.exchangeRateCoins.toString()
@@ -428,4 +449,11 @@ class CurrencyConverterDialogController :
     private fun BillingClient.execute(request: (BillingClient) -> Unit) {
         billingRequestExecutor.execute(this, request)
     }
+
+    private val CurrencyConverterViewState.remainingGemsText
+        get() = if (remainingMonthlyGems == 0) {
+            stringRes(R.string.converter_no_more_gems_message)
+        } else if (remainingMonthlyGems > 0) {
+            stringRes(R.string.converter_remaining_gems_message, remainingMonthlyGems)
+        } else ""
 }

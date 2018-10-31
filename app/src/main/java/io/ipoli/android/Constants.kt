@@ -4,6 +4,7 @@ import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.common.datetime.TimeOfDay
 import io.ipoli.android.pet.PetAvatar
 import io.ipoli.android.player.Theme
+import io.ipoli.android.player.data.Membership
 import io.ipoli.android.player.data.Player.Preferences.*
 import io.ipoli.android.store.gem.GemPackType
 import org.threeten.bp.DayOfWeek
@@ -217,7 +218,7 @@ interface Constants {
         val PROFILES_FIRST_SCHEMA_VERSION = 7
 
         val POWER_UP_GRACE_PERIOD_DAYS = 7
-        const val POWER_UPS_TRIAL_PERIOD_DAYS = 7
+        const val MEMBERSHIP_TRIAL_PERIOD_DAYS = 7
         const val POWER_UP_PURCHASE_DURATION_DAYS = 30
 
         val SKU_SUBSCRIPTION_MONTHLY = "monthly_plan_70_percent"

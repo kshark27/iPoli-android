@@ -82,7 +82,6 @@ class UpdateAchievementProgressUseCase(
 
         val newStats = stats.copy(
             friendInvitedCount = friendCount,
-            questCompletedCountForToday = 0,
             questCompletedStreak = newQuestCompleteStreak,
             dailyChallengeCompleteStreak = newDailyChallengeCompleteStreak,
             petHappyStateStreak = petHappyStreak,

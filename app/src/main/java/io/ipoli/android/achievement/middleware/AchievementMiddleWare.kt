@@ -20,14 +20,10 @@ import io.ipoli.android.planday.PlanDayAction
 import io.ipoli.android.player.attribute.AttributeRank
 import io.ipoli.android.player.data.Player
 import io.ipoli.android.player.usecase.RewardPlayerUseCase
-import io.ipoli.android.quest.bucketlist.BucketListAction
-import io.ipoli.android.quest.schedule.agenda.view.AgendaAction
-import io.ipoli.android.quest.schedule.calendar.dayview.view.DayViewAction
 import io.ipoli.android.repeatingquest.add.EditRepeatingQuestAction
 import io.ipoli.android.store.avatar.AvatarStoreAction
 import io.ipoli.android.store.membership.MembershipAction
 import io.ipoli.android.store.powerup.PowerUpStoreAction
-import io.ipoli.android.tag.show.TagAction
 import org.threeten.bp.LocalDate
 import space.traversal.kapsule.Injects
 import space.traversal.kapsule.inject
@@ -60,20 +56,6 @@ object AchievementProgressMiddleWare : MiddleWare<AppState>, Injects<BackgroundM
         val a = (action as? NamespaceAction)?.source ?: action
 
         val eventType = when (a) {
-
-            is PlanDayAction.CompleteYesterdayQuest,
-            is BucketListAction.CompleteQuest,
-            is TagAction.CompleteQuest,
-            is AgendaAction.CompleteQuest,
-            is DayViewAction.CompleteQuest ->
-                QuestCompleted
-
-            is PlanDayAction.UndoCompleteQuest,
-            is BucketListAction.UndoCompleteQuest,
-            is TagAction.UndoCompleteQuest,
-            is AgendaAction.UndoCompleteQuest,
-            is DayViewAction.UndoCompleteQuest ->
-                QuestUncompleted
 
             is PlanDayAction.StartDay -> {
                 val p = playerRepository.find()!!

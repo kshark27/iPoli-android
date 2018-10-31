@@ -1,6 +1,7 @@
 package io.ipoli.android.player.data
 
 import org.threeten.bp.LocalDate
+import org.threeten.bp.YearMonth
 
 /**
  * Created by Polina Zhelyazkova <polina@mypoli.fun>
@@ -8,7 +9,10 @@ import org.threeten.bp.LocalDate
  */
 data class Statistics(
     val questCompletedCount: Long = 0,
-    val questCompletedCountForToday: Long = 0,
+    val questCompletedCountForDay: DayStatistic = DayStatistic(),
+    val habitCompletedCountForDay: DayStatistic = DayStatistic(),
+    val challengeCompletedCountForDay: DayStatistic = DayStatistic(),
+    val gemConvertedCountForMonth: MonthStatistic = MonthStatistic(),
     val questCompletedStreak: StreakStatistic = StreakStatistic(),
     val dailyChallengeCompleteStreak: StreakStatistic = StreakStatistic(),
     val dailyChallengeBestStreak: Long = 0,
@@ -41,4 +45,60 @@ data class Statistics(
     val willpowerStatusIndex: Long = 0
 ) {
     data class StreakStatistic(val count: Long = 0, val lastDate: LocalDate? = null)
+
+    data class DayStatistic(val count: Long = 0, val day: LocalDate = LocalDate.now()) {
+
+        fun addValue(value: Long): DayStatistic {
+            return if (LocalDate.now() == day) {
+                copy(
+                    count = count + value
+                )
+            } else {
+                DayStatistic(value)
+            }
+        }
+
+        fun removeValue(value: Long): DayStatistic {
+            return if (LocalDate.now() == day) {
+                copy(
+                    count = Math.max(count - value, 0)
+                )
+            } else {
+                DayStatistic(Math.max(value, 0))
+            }
+        }
+    }
+
+    data class MonthStatistic(val count: Long = 0, val month: YearMonth = YearMonth.now()) {
+
+        fun addValue(value: Long): MonthStatistic {
+            return if (YearMonth.now() == month) {
+                copy(
+                    count = count + value
+                )
+            } else {
+                MonthStatistic(value)
+            }
+        }
+    }
+
+    val questCompletedCountForToday
+        get() = if (questCompletedCountForDay.day == LocalDate.now()) {
+            questCompletedCountForDay.count
+        } else 0
+
+    val habitCompletedCountForToday
+        get() = if (habitCompletedCountForDay.day == LocalDate.now()) {
+            habitCompletedCountForDay.count
+        } else 0
+
+    val challengeCompletedCountForToday
+        get() = if (challengeCompletedCountForDay.day == LocalDate.now()) {
+            challengeCompletedCountForDay.count
+        } else 0
+
+    val gemConvertedCountForThisMonth
+        get() = if (gemConvertedCountForMonth.month == YearMonth.now()) {
+            gemConvertedCountForMonth.count
+        } else 0
 }

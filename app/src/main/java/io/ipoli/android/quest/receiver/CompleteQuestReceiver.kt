@@ -4,8 +4,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import io.ipoli.android.Constants
-import io.ipoli.android.achievement.usecase.UnlockAchievementsUseCase
-import io.ipoli.android.achievement.usecase.UpdatePlayerStatsUseCase
 import io.ipoli.android.common.AsyncBroadcastReceiver
 import io.ipoli.android.common.notification.QuickDoNotificationUtil
 import io.ipoli.android.common.view.AppWidgetUtil
@@ -23,23 +21,12 @@ import space.traversal.kapsule.required
 class CompleteQuestReceiver : AsyncBroadcastReceiver() {
 
     private val completeTimeRangeUseCase by required { completeTimeRangeUseCase }
-    private val unlockAchievementsUseCase by required { unlockAchievementsUseCase }
     private val questRepository by required { questRepository }
     private val sharedPreferences by required { sharedPreferences }
-    private val playerRepository by required { playerRepository }
 
     override suspend fun onReceiveAsync(context: Context, intent: Intent) {
         val questId = intent.getStringExtra(Constants.QUEST_ID_EXTRA_KEY)
-        val newQuest = completeTimeRangeUseCase.execute(CompleteTimeRangeUseCase.Params(questId))
-
-        if (newQuest.isCompleted) {
-            unlockAchievementsUseCase.execute(
-                UnlockAchievementsUseCase.Params(
-                    player = playerRepository.find()!!,
-                    eventType = UpdatePlayerStatsUseCase.Params.EventType.QuestCompleted
-                )
-            )
-        }
+        completeTimeRangeUseCase.execute(CompleteTimeRangeUseCase.Params(questId))
 
         if (sharedPreferences.getBoolean(
                 Constants.KEY_QUICK_DO_NOTIFICATION_ENABLED,

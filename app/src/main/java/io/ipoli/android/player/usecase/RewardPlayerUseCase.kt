@@ -44,8 +44,8 @@ open class RewardPlayerUseCase(
         val HABIT_COINS_BASE_REWARDS = intArrayOf(1, 2)
         val HABIT_ATTRIBUTE_BASE_REWARDS = intArrayOf(0, 1, 2)
 
-        val DC_XP_BASE_REWARDS = QUEST_XP_BASE_REWARDS.map { it * 2 }.toIntArray()
-        val DC_COINS_BASE_REWARDS = QUEST_COINS_BASE_REWARDS.map { it * 2 }.toIntArray()
+        val DC_XP_BASE_REWARDS = intArrayOf(10, 12, 15, 20)
+        val DC_COINS_BASE_REWARDS = intArrayOf(5, 7, 9, 10)
 
         val CHALLENGE_XP_BASE_REWARDS = intArrayOf(20, 30, 40, 50, 60)
         val CHALLENGE_COINS_BASE_REWARDS = intArrayOf(10, 15, 25, 40)
@@ -57,17 +57,25 @@ open class RewardPlayerUseCase(
 
         val reward = when (parameters) {
             is Params.ForQuest -> {
-                val quest = parameters.quest
-                quest.reward ?: createRewardForQuest(quest, player, player.rank)
+                if (player.statistics.questCompletedCountForToday >= player.membership.dailyHighRewardQuestCap) {
+                    Reward.Low
+                } else {
+                    val quest = parameters.quest
+                    quest.reward ?: createRewardForQuest(quest, player, player.rank)
+                }
             }
 
             is Params.ForHabit -> {
 
-                val habit = parameters.habit
+                if (player.statistics.habitCompletedCountForToday >= player.membership.dailyHighRewardHabitCap) {
+                    Reward.Low
+                } else {
+                    val habit = parameters.habit
 
-                val entry = habit.history[parameters.playerDate]!!
+                    val entry = habit.history[parameters.playerDate]!!
 
-                entry.reward ?: createRewardForHabit(habit, player, player.rank)
+                    entry.reward ?: createRewardForHabit(habit, player, player.rank)
+                }
             }
 
             is Params.ForBadHabit -> {
@@ -86,8 +94,12 @@ open class RewardPlayerUseCase(
             }
 
             is Params.ForChallenge -> {
-                val c = parameters.challenge
-                c.reward ?: createRewardForChallenge(c, player, player.rank)
+                if (player.statistics.challengeCompletedCountForToday >= player.membership.dailyRewardedChallengeCap) {
+                    Reward.Empty
+                } else {
+                    val c = parameters.challenge
+                    c.reward ?: createRewardForChallenge(c, player, player.rank)
+                }
             }
 
             is Params.ForPlanDay ->
@@ -100,18 +112,20 @@ open class RewardPlayerUseCase(
         if (parameters is Params.ForBadHabit) {
             val newPlayer = removeRewardFromPlayerUseCase.execute(
                 RemoveRewardFromPlayerUseCase.Params(
-                    reward,
-                    player
+                    rewardType = RemoveRewardFromPlayerUseCase.Params.RewardType.BAD_HABIT,
+                    reward = reward,
+                    player = player
                 )
             )
             return Result(newPlayer, reward)
         }
 
-        val newPlayer = player.addReward(reward)
+        val newPlayer = addRewardAndUpdateStats(player, reward, parameters)
 
         if (newPlayer.level != player.level) {
             levelUpScheduler.schedule(newPlayer.level)
         }
+
         val p = playerRepository.save(
             checkForOneTimeBoostUseCase.execute(
                 CheckForOneTimeBoostUseCase.Params(
@@ -128,6 +142,47 @@ open class RewardPlayerUseCase(
             )
         )
         return Result(p, reward)
+    }
+
+    private fun addRewardAndUpdateStats(
+        player: Player,
+        reward: Reward,
+        parameters: Params
+    ): Player {
+        val newPlayer = player.addReward(reward)
+
+        val stats = newPlayer.statistics
+        val newStats = when (parameters) {
+            is Params.ForQuest -> stats.copy(
+                questCompletedCountForDay = stats.questCompletedCountForDay.addValue(
+                    1
+                ),
+                questCompletedCount = stats.questCompletedCount + 1,
+                questCompletedStreak = if (LocalDate.now() != stats.questCompletedStreak.lastDate) {
+                    stats.questCompletedStreak.copy(
+                        count = stats.questCompletedStreak.count + 1,
+                        lastDate = LocalDate.now()
+                    )
+                } else {
+                    stats.questCompletedStreak
+                }
+            )
+            is Params.ForHabit -> stats.copy(
+                habitCompletedCountForDay = stats.habitCompletedCountForDay.addValue(
+                    1
+                )
+            )
+            is Params.ForChallenge -> stats.copy(
+                challengeCompletedCountForDay = stats.challengeCompletedCountForDay.addValue(
+                    1
+                )
+            )
+            else -> stats
+        }
+
+        return newPlayer.copy(
+            statistics = newStats
+        )
     }
 
     private fun createRewardForPlanDay() =
@@ -158,6 +213,7 @@ open class RewardPlayerUseCase(
         player: Player,
         rank: Player.Rank
     ): Reward {
+
         val booster = TotalBonusBooster.forChallenge(challenge, player, rank)
         val xp = experience(booster.experiencePercentage, CHALLENGE_XP_BASE_REWARDS)
         val coins = coins(booster.coinsPercentage, CHALLENGE_COINS_BASE_REWARDS)

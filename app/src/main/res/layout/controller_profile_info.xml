@@ -9,8 +9,8 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:paddingBottom="16dp"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp">
 
         <android.support.constraint.Guideline
             android:id="@+id/middle"
@@ -48,8 +48,8 @@
             android:id="@+id/playerStat1Title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/daily_challenge_streak"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
@@ -86,8 +86,8 @@
             android:id="@+id/playerStat2Title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
             android:text="@string/avg_focus_hours_per_day"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
@@ -97,41 +97,126 @@
             app:layout_constraintTop_toTopOf="@id/focusTimeIcon" />
 
         <TextView
+            android:id="@+id/completedQuestsLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/rewarded_quests_today"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textColor="?android:textColorSecondary"
+            app:layout_constraintEnd_toStartOf="@+id/completedHabitsLabel"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/completedQuests" />
+
+        <TextView
+            android:id="@+id/completedQuests"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="?android:textColorPrimary"
+            app:layout_constraintEnd_toEndOf="@+id/completedQuestsLabel"
+            app:layout_constraintStart_toStartOf="@+id/completedQuestsLabel"
+            app:layout_constraintTop_toBottomOf="@id/statsBarrier"
+            tools:text="12" />
+
+        <TextView
+            android:id="@+id/completedHabitsLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/rewarded_habits_today"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textColor="?android:textColorSecondary"
+            app:layout_constraintEnd_toStartOf="@+id/convertedGemsLabel"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/completedQuestsLabel"
+            app:layout_constraintTop_toTopOf="@+id/completedQuestsLabel" />
+
+        <TextView
+            android:id="@+id/completedHabits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="?android:textColorPrimary"
+            app:layout_constraintEnd_toEndOf="@+id/completedHabitsLabel"
+            app:layout_constraintStart_toStartOf="@+id/completedHabitsLabel"
+            app:layout_constraintTop_toTopOf="@+id/completedQuests"
+            tools:text="12" />
+
+        <TextView
+            android:id="@+id/convertedGemsLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/gems_converted_this_month"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textColor="?android:textColorSecondary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/completedHabitsLabel"
+            app:layout_constraintTop_toTopOf="@+id/completedQuestsLabel" />
+
+        <TextView
+            android:id="@+id/convertedGems"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="?android:textColorPrimary"
+            app:layout_constraintEnd_toEndOf="@+id/convertedGemsLabel"
+            app:layout_constraintStart_toStartOf="@+id/convertedGemsLabel"
+            app:layout_constraintTop_toTopOf="@+id/completedQuests"
+            tools:text="12" />
+
+        <android.support.constraint.Barrier
+            android:id="@+id/membershipStatsBarrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="completedHabitsLabel, completedQuestsLabel, convertedGemsLabel" />
+
+        <TextView
             android:id="@+id/achievementsTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
             android:text="@string/achievements"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/statsBarrier" />
+            app:layout_constraintTop_toBottomOf="@id/membershipStatsBarrier" />
 
 
         <TextView
             android:id="@+id/emptyAchievements"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             android:padding="16dp"
             android:text="@string/empty_achievements"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/achievementsTitle" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/achievementList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -143,236 +228,6 @@
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
             app:constraint_referenced_ids="playerStat1Title,focusTimeIcon,playerStat1,dcIcon,playerStat2,playerStat2Title" />
-
-
-        <!--<View-->
-        <!--android:id="@+id/petBackground"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:layout_marginEnd="16dp"-->
-        <!--android:layout_marginStart="16dp"-->
-        <!--android:layout_marginTop="16dp"-->
-        <!--android:background="@drawable/rounded_rectangle_white_background"-->
-        <!--android:elevation="2dp"-->
-        <!--app:layout_constraintBottom_toBottomOf="@id/dummy"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toBottomOf="@+id/achievementsBarrier" />-->
-
-        <!--<ImageView-->
-        <!--android:id="@+id/pet"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginBottom="16dp"-->
-        <!--android:layout_marginEnd="8dp"-->
-        <!--android:layout_marginStart="8dp"-->
-        <!--android:layout_marginTop="32dp"-->
-        <!--android:adjustViewBounds="true"-->
-        <!--android:elevation="2dp"-->
-        <!--android:scaleType="fitCenter"-->
-        <!--app:layout_constraintEnd_toEndOf="@id/middle"-->
-        <!--app:layout_constraintStart_toStartOf="@+id/petBackground"-->
-        <!--app:layout_constraintTop_toBottomOf="@id/achievementsBarrier"-->
-        <!--tools:src="@drawable/pet_11" />-->
-
-        <!--<ImageView-->
-        <!--android:id="@+id/petState"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:adjustViewBounds="true"-->
-        <!--android:elevation="2dp"-->
-        <!--android:scaleType="fitEnd"-->
-        <!--app:layout_constraintBottom_toBottomOf="@id/pet"-->
-        <!--app:layout_constraintEnd_toEndOf="@id/pet"-->
-        <!--app:layout_constraintStart_toStartOf="@id/pet"-->
-        <!--app:layout_constraintTop_toTopOf="@id/pet"-->
-        <!--tools:src="@drawable/pet_11_awesome" />-->
-
-        <!--<ImageView-->
-        <!--android:id="@+id/petBody"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:adjustViewBounds="true"-->
-        <!--android:elevation="2dp"-->
-        <!--android:scaleType="fitEnd"-->
-        <!--android:visibility="gone"-->
-        <!--app:layout_constraintBottom_toBottomOf="@id/pet"-->
-        <!--app:layout_constraintEnd_toEndOf="@id/pet"-->
-        <!--app:layout_constraintStart_toStartOf="@id/pet"-->
-        <!--app:layout_constraintTop_toTopOf="@id/pet"-->
-        <!--tools:src="@drawable/pet_11_item_sweater_red_deer" />-->
-
-        <!--<ImageView-->
-        <!--android:id="@+id/petMask"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:adjustViewBounds="true"-->
-        <!--android:elevation="2dp"-->
-        <!--android:scaleType="fitEnd"-->
-        <!--android:visibility="gone"-->
-        <!--app:layout_constraintBottom_toBottomOf="@id/pet"-->
-        <!--app:layout_constraintEnd_toEndOf="@id/pet"-->
-        <!--app:layout_constraintStart_toStartOf="@id/pet"-->
-        <!--app:layout_constraintTop_toTopOf="@id/pet"-->
-        <!--tools:src="@drawable/pet_11_item_face_glasses" />-->
-
-        <!--<ImageView-->
-        <!--android:id="@+id/petHat"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:layout_marginBottom="8dp"-->
-        <!--android:adjustViewBounds="true"-->
-        <!--android:elevation="2dp"-->
-        <!--android:scaleType="fitXY"-->
-        <!--android:visibility="gone"-->
-        <!--app:layout_constraintBottom_toTopOf="@id/petName"-->
-        <!--app:layout_constraintEnd_toEndOf="@id/middle"-->
-        <!--app:layout_constraintStart_toStartOf="@id/petBackground"-->
-        <!--app:layout_constraintTop_toTopOf="@id/petBackground"-->
-        <!--tools:src="@drawable/pet_11_item_head_christmas_horns" />-->
-
-        <!--<TextView-->
-        <!--android:id="@+id/petName"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginTop="16dp"-->
-        <!--android:elevation="2dp"-->
-        <!--android:textAlignment="center"-->
-        <!--android:textAppearance="@style/TextAppearance.AppCompat.Body1"-->
-        <!--app:layout_constraintEnd_toEndOf="@id/middle"-->
-        <!--app:layout_constraintStart_toStartOf="@id/petBackground"-->
-        <!--app:layout_constraintTop_toBottomOf="@id/pet"-->
-        <!--tools:text="Ciganche" />-->
-
-        <!--<View-->
-        <!--android:id="@+id/dummy"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="1dp"-->
-        <!--android:layout_marginTop="16dp"-->
-        <!--android:layout_marginBottom="16dp"-->
-        <!--android:visibility="invisible"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toBottomOf="@id/petName" />-->
-
-        <!--<ImageView-->
-        <!--android:id="@+id/healthIcon"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginStart="16dp"-->
-        <!--android:layout_marginTop="16dp"-->
-        <!--android:elevation="2dp"-->
-        <!--app:layout_constraintStart_toStartOf="@+id/middle"-->
-        <!--app:layout_constraintTop_toTopOf="@id/pet"-->
-        <!--app:srcCompat="@drawable/ic_heart_red_24dp" />-->
-
-        <!--<ProgressBar-->
-        <!--android:id="@+id/healthProgress"-->
-        <!--style="?android:attr/progressBarStyleHorizontal"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="8dp"-->
-        <!--android:layout_marginEnd="16dp"-->
-        <!--android:layout_marginStart="16dp"-->
-        <!--android:elevation="2dp"-->
-        <!--android:max="100"-->
-        <!--android:progress="50"-->
-        <!--android:progressDrawable="@drawable/pet_health_progress_bar"-->
-        <!--app:layout_constraintBottom_toBottomOf="@+id/healthIcon"-->
-        <!--app:layout_constraintEnd_toEndOf="@id/petBackground"-->
-        <!--app:layout_constraintStart_toEndOf="@+id/healthIcon"-->
-        <!--app:layout_constraintTop_toTopOf="@+id/healthIcon" />-->
-
-        <!--<ImageView-->
-        <!--android:id="@+id/moodIcon"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginStart="16dp"-->
-        <!--android:layout_marginTop="16dp"-->
-        <!--android:elevation="2dp"-->
-        <!--app:layout_constraintStart_toStartOf="@+id/middle"-->
-        <!--app:layout_constraintTop_toBottomOf="@+id/healthIcon"-->
-        <!--app:srcCompat="@drawable/ic_mood_yellow_24dp" />-->
-
-        <!--<ProgressBar-->
-        <!--android:id="@+id/moodProgress"-->
-        <!--style="?android:attr/progressBarStyleHorizontal"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="8dp"-->
-        <!--android:layout_marginEnd="16dp"-->
-        <!--android:layout_marginStart="16dp"-->
-        <!--android:elevation="2dp"-->
-        <!--android:max="100"-->
-        <!--android:progress="40"-->
-        <!--android:progressDrawable="@drawable/pet_mood_progress_bar"-->
-        <!--app:layout_constraintBottom_toBottomOf="@+id/moodIcon"-->
-        <!--app:layout_constraintEnd_toEndOf="@id/petBackground"-->
-        <!--app:layout_constraintStart_toEndOf="@+id/moodIcon"-->
-        <!--app:layout_constraintTop_toTopOf="@+id/moodIcon" />-->
-
-
-        <!--<TextView-->
-        <!--android:id="@+id/petStateName"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:elevation="2dp"-->
-        <!--android:textAppearance="@style/TextAppearance.AppCompat.Caption"-->
-        <!--android:visibility="visible"-->
-        <!--app:layout_constraintEnd_toEndOf="@+id/moodIcon"-->
-        <!--app:layout_constraintStart_toStartOf="@+id/moodIcon"-->
-        <!--app:layout_constraintTop_toBottomOf="@+id/moodIcon"-->
-        <!--tools:text="Happy" />-->
-
-        <!--<TextView-->
-        <!--android:id="@+id/coinBonus"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginBottom="16dp"-->
-        <!--android:layout_marginTop="16dp"-->
-        <!--android:drawablePadding="4dp"-->
-        <!--android:drawableTop="@drawable/ic_life_coin_20dp"-->
-        <!--android:elevation="2dp"-->
-        <!--android:gravity="center_vertical"-->
-        <!--android:textAppearance="@style/TextAppearance.AppCompat.Caption"-->
-        <!--app:layout_constraintBottom_toBottomOf="@+id/petName"-->
-        <!--app:layout_constraintEnd_toStartOf="@+id/xpBonus"-->
-        <!--app:layout_constraintHorizontal_bias="0.5"-->
-        <!--app:layout_constraintStart_toEndOf="@+id/middle"-->
-        <!--app:layout_constraintTop_toBottomOf="@+id/petStateName"-->
-        <!--tools:text="+5%" />-->
-
-
-        <!--<TextView-->
-        <!--android:id="@+id/xpBonus"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:drawablePadding="4dp"-->
-        <!--android:drawableTop="@drawable/ic_star_yellow_20dp"-->
-        <!--android:elevation="2dp"-->
-        <!--android:gravity="center_vertical"-->
-        <!--android:textAppearance="@style/TextAppearance.AppCompat.Caption"-->
-        <!--app:layout_constraintBottom_toBottomOf="@+id/coinBonus"-->
-        <!--app:layout_constraintEnd_toStartOf="@+id/itemDropBonus"-->
-        <!--app:layout_constraintHorizontal_bias="0.5"-->
-        <!--app:layout_constraintStart_toEndOf="@+id/coinBonus"-->
-        <!--app:layout_constraintTop_toTopOf="@+id/coinBonus"-->
-        <!--tools:text="+7%" />-->
-
-        <!--<TextView-->
-        <!--android:id="@+id/itemDropBonus"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:drawablePadding="4dp"-->
-        <!--android:drawableTop="@drawable/ic_four_leaf_clover_20dp"-->
-        <!--android:elevation="2dp"-->
-        <!--android:gravity="center_vertical"-->
-        <!--android:textAppearance="@style/TextAppearance.AppCompat.Caption"-->
-        <!--app:layout_constraintBottom_toBottomOf="@+id/coinBonus"-->
-        <!--app:layout_constraintEnd_toEndOf="@id/petBackground"-->
-        <!--app:layout_constraintHorizontal_bias="0.5"-->
-        <!--app:layout_constraintStart_toEndOf="@+id/xpBonus"-->
-        <!--app:layout_constraintTop_toTopOf="@+id/coinBonus"-->
-        <!--tools:text="+3%" />-->
 
     </android.support.constraint.ConstraintLayout>
 </android.support.v4.widget.NestedScrollView>

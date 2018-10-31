@@ -28,9 +28,8 @@
             android:id="@+id/membershipHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="32dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
             app:cardBackgroundColor="@color/md_blue_500"
             app:cardCornerRadius="8dp"
             app:cardElevation="0dp"
@@ -41,10 +40,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="16dp"
-                android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -63,15 +62,38 @@
                     android:orientation="vertical"
                     android:visibility="gone">
 
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:drawablePadding="8dp"
                         android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
                         android:gravity="center_vertical"
                         android:text="@string/membership_benefit_enable_all_power_ups"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/md_white" />
+
+                    <TextView
+                        android:id="@+id/membershipMonthlyConvertGems"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/membership_benefit_convert_gems_count"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/md_white" />
+
+                    <TextView
+                        android:id="@+id/membershipMonthlyQuestsHabitsReward"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/membership_benefit_quests_habits_reward"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/md_white" />
 
@@ -80,34 +102,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
                         android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
                         android:gravity="center_vertical"
                         android:text="@string/membership_benefit_free_trial"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/md_white" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
-                        android:drawableStart="@drawable/ic_done_white_24dp"
-                        android:gravity="center_vertical"
-                        android:text="@string/membership_benefit_cancellation"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:textColor="@color/md_white" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
-                        android:drawableStart="@drawable/ic_remove_white_24dp"
-                        android:gravity="center_vertical"
-                        android:text="@string/monthly_plan_disadvantage1"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:textColor="@color/md_white" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -120,10 +121,33 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:drawablePadding="8dp"
                         android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
                         android:gravity="center_vertical"
                         android:text="@string/membership_benefit_enable_all_power_ups"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/md_white" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/membership_benefit_convert_unlimited_gems"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/md_white" />
+
+                    <TextView
+                        android:id="@+id/membershipYearlyQuestsHabitsReward"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/membership_benefit_quests_habits_reward"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/md_white" />
 
@@ -132,34 +156,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
                         android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
                         android:gravity="center_vertical"
                         android:text="@string/membership_benefit_free_trial"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/md_white" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
-                        android:drawableStart="@drawable/ic_done_white_24dp"
-                        android:gravity="center_vertical"
-                        android:text="@string/membership_benefit_cancellation"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:textColor="@color/md_white" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
-                        android:drawableStart="@drawable/ic_done_white_24dp"
-                        android:gravity="center_vertical"
-                        android:text="@string/yearly_plan_benefit3"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:textColor="@color/md_white" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -173,10 +176,34 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:drawablePadding="8dp"
                         android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
                         android:gravity="center_vertical"
                         android:text="@string/membership_benefit_enable_all_power_ups"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/md_white" />
+
+                    <TextView
+                        android:id="@+id/membershipQuarterlyConvertGems"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/membership_benefit_convert_gems_count"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/md_white" />
+
+                    <TextView
+                        android:id="@+id/membershipQuarterlyQuestsHabitsReward"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/membership_benefit_quests_habits_reward"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/md_white" />
 
@@ -185,32 +212,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
                         android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
                         android:gravity="center_vertical"
                         android:text="@string/membership_benefit_free_trial"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:textColor="@color/md_white" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
-                        android:drawableStart="@drawable/ic_done_white_24dp"
-                        android:gravity="center_vertical"
-                        android:text="@string/membership_benefit_cancellation"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:textColor="@color/md_white" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawablePadding="8dp"
-                        android:drawableStart="@drawable/ic_remove_white_24dp"
-                        android:gravity="center_vertical"
-                        android:text="@string/quarterly_plan_disadvantage1"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/md_white" />
                 </LinearLayout>
@@ -237,10 +242,10 @@
                 android:id="@+id/monthlyPlanLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="16dp"
-                android:layout_marginEnd="4dp"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="16dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -281,10 +286,10 @@
             android:id="@+id/yearlyPlanContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:foreground="?android:selectableItemBackground"
             app:cardCornerRadius="4dp"
             app:cardElevation="6dp"
@@ -298,10 +303,10 @@
                 android:id="@+id/yearlyPlanLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="24dp"
-                android:layout_marginEnd="4dp"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="24dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="24dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -356,10 +361,10 @@
                 android:id="@+id/quarterlyPlanLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="16dp"
-                android:layout_marginEnd="4dp"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="16dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -408,14 +413,14 @@
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
             android:backgroundTint="@color/md_blue_500"
-            android:paddingBottom="16dp"
-            android:paddingEnd="32dp"
             android:paddingStart="32dp"
             android:paddingTop="16dp"
+            android:paddingEnd="32dp"
+            android:paddingBottom="16dp"
             android:text="@string/go_premium"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -440,9 +445,9 @@
             android:id="@+id/membershipMostPopular"
             android:layout_width="wrap_content"
             android:layout_height="22dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/most_popular"
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
@@ -458,8 +463,8 @@
             android:id="@+id/membershipCurrentPlan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/current_plan"
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"

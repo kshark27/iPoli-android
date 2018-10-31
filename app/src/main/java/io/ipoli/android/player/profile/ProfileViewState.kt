@@ -244,7 +244,11 @@ class ProfileReducer(reducerKey: String) : BaseViewStateReducer<ProfileViewState
             maxHealth = player.health.max,
             rank = player.rank,
             nextRank = player.nextRank,
-            isCurrentPlayerGuest = !player.isLoggedIn()
+            isCurrentPlayerGuest = !player.isLoggedIn(),
+            membership = player.membership,
+            todayCompletedQuests = player.statistics.questCompletedCountForToday.toInt(),
+            todayCompletedHabits = player.statistics.habitCompletedCountForToday.toInt(),
+            thisMonthConvertedGems = player.statistics.gemConvertedCountForThisMonth.toInt()
         )
         return if (hasProfileDataLoaded(newState)) {
             newState.copy(
@@ -287,7 +291,11 @@ class ProfileReducer(reducerKey: String) : BaseViewStateReducer<ProfileViewState
             nextRank = null,
             isFollowing = null,
             isFollower = null,
-            isCurrentPlayerGuest = null
+            isCurrentPlayerGuest = null,
+            membership = null,
+            todayCompletedQuests = null,
+            todayCompletedHabits = null,
+            thisMonthConvertedGems = null
         )
 
     override val stateKey = reducerKey
@@ -329,7 +337,11 @@ data class ProfileViewState(
     val isMember: Boolean?,
     val isFollowing: Boolean?,
     val isFollower: Boolean?,
-    val isCurrentPlayerGuest: Boolean?
+    val isCurrentPlayerGuest: Boolean?,
+    val membership: Membership?,
+    val todayCompletedQuests: Int?,
+    val todayCompletedHabits: Int?,
+    val thisMonthConvertedGems: Int?
 ) : BaseViewState() {
 
     enum class StateType {

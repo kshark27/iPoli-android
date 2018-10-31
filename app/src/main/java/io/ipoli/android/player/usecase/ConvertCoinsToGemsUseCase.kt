@@ -22,9 +22,14 @@ class ConvertCoinsToGemsUseCase(private val playerRepository: PlayerRepository) 
             return Result.TooExpensive
         }
 
+        val stats = player.statistics
+
         val newPlayer = player.copy(
             coins = player.coins - gemsPrice,
-            gems = player.gems + gems
+            gems = player.gems + gems,
+            statistics = stats.copy(
+                gemConvertedCountForMonth = stats.gemConvertedCountForMonth.addValue(gems.toLong())
+            )
         )
 
         return Result.GemsConverted(playerRepository.save(newPlayer))

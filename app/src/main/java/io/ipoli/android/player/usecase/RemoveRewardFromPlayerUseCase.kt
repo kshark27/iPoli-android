@@ -21,7 +21,8 @@ open class RemoveRewardFromPlayerUseCase(
         val player = parameters.player ?: playerRepository.find()
         requireNotNull(player)
         val reward = parameters.reward
-        val newPlayer = playerRepository.save(player!!.removeReward(reward))
+        val p = removeRewardAndUpdateStats(player!!, reward, parameters.rewardType)
+        val newPlayer = playerRepository.save(p)
         if (player.level != newPlayer.level) {
             levelDownScheduler.schedule()
         }
@@ -34,6 +35,37 @@ open class RemoveRewardFromPlayerUseCase(
         return newPlayer
     }
 
-    data class Params(val reward: Reward, val player: Player? = null)
+    private fun removeRewardAndUpdateStats(
+        player: Player,
+        reward: Reward,
+        rewardType: Params.RewardType
+    ): Player {
+        val newPlayer = player.removeReward(reward)
+
+        val newStats = when (rewardType) {
+            Params.RewardType.GOOD_HABIT -> newPlayer.statistics.copy(
+                questCompletedCountForDay = newPlayer.statistics.questCompletedCountForDay.removeValue(
+                    1
+                )
+            )
+            Params.RewardType.QUEST -> newPlayer.statistics.copy(
+                habitCompletedCountForDay = newPlayer.statistics.habitCompletedCountForDay.removeValue(
+                    1
+                ),
+                questCompletedCount = Math.max(newPlayer.statistics.questCompletedCount - 1, 0)
+            )
+            else -> newPlayer.statistics
+        }
+
+        return newPlayer.copy(
+            statistics = newStats
+        )
+    }
+
+    data class Params(val rewardType: RewardType, val reward: Reward, val player: Player? = null) {
+        enum class RewardType {
+            BAD_HABIT, GOOD_HABIT, QUEST
+        }
+    }
 
 }

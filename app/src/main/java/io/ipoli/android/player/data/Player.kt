@@ -641,8 +641,20 @@ sealed class AuthProvider {
     ) : AuthProvider()
 }
 
-enum class Membership {
-    NONE, MONTHLY, QUARTERLY, YEARLY
+enum class Membership(
+    val dailyHighRewardQuestCap: Int,
+    val dailyHighRewardHabitCap: Int,
+    val dailyRewardedChallengeCap: Int,
+    val monthlyConvertedGemCap: Int
+) {
+    NONE(6, 6, 2, 5),
+    MONTHLY(8, 8, 2, 8),
+    QUARTERLY(10, 10, 2, 12),
+    YEARLY(15, 15, 2, Membership.UNLIMITED);
+
+    companion object {
+        const val UNLIMITED = -1
+    }
 }
 
 enum class AndroidAttribute(

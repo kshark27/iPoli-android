@@ -20,6 +20,7 @@ import io.ipoli.android.R
 import io.ipoli.android.common.billing.BillingResponseHandler
 import io.ipoli.android.common.redux.android.ReduxViewController
 import io.ipoli.android.common.view.*
+import io.ipoli.android.player.data.Membership
 import io.ipoli.android.store.membership.MembershipPlan.*
 import io.ipoli.android.store.membership.MembershipViewState.StateType.*
 import kotlinx.android.synthetic.main.controller_membership.view.*
@@ -257,17 +258,45 @@ class MembershipViewController(args: Bundle? = null) :
         view.membershipMonthlyReasons.visibleOrGone(plan == AndroidMembershipPlan.MONTHLY)
         view.membershipYearlyReasons.visibleOrGone(plan == AndroidMembershipPlan.YEARLY)
         view.membershipQuarterlyReasons.visibleOrGone(plan == AndroidMembershipPlan.QUARTERLY)
+
         view.membershipMonthlyFreeTrial.text = stringRes(
             R.string.membership_benefit_free_trial,
-            Constants.POWER_UPS_TRIAL_PERIOD_DAYS
+            Constants.MEMBERSHIP_TRIAL_PERIOD_DAYS
         )
+
+        view.membershipMonthlyConvertGems.text = stringRes(
+            R.string.membership_benefit_convert_gems_count,
+            Membership.MONTHLY.monthlyConvertedGemCap
+        )
+
+        view.membershipMonthlyQuestsHabitsReward.text = stringRes(
+            R.string.membership_benefit_quests_habits_reward,
+            Membership.MONTHLY.dailyHighRewardQuestCap
+        )
+
         view.membershipYearlyFreeTrial.text = stringRes(
             R.string.membership_benefit_free_trial,
-            Constants.POWER_UPS_TRIAL_PERIOD_DAYS
+            Constants.MEMBERSHIP_TRIAL_PERIOD_DAYS
         )
+
+        view.membershipYearlyQuestsHabitsReward.text = stringRes(
+            R.string.membership_benefit_quests_habits_reward,
+            Membership.YEARLY.dailyHighRewardQuestCap
+        )
+
         view.membershipQuarterlyFreeTrial.text = stringRes(
             R.string.membership_benefit_free_trial,
-            Constants.POWER_UPS_TRIAL_PERIOD_DAYS
+            Constants.MEMBERSHIP_TRIAL_PERIOD_DAYS
+        )
+
+        view.membershipQuarterlyConvertGems.text = stringRes(
+            R.string.membership_benefit_convert_gems_count,
+            Membership.QUARTERLY.monthlyConvertedGemCap
+        )
+
+        view.membershipQuarterlyQuestsHabitsReward.text = stringRes(
+            R.string.membership_benefit_quests_habits_reward,
+            Membership.QUARTERLY.dailyHighRewardQuestCap
         )
     }
 
