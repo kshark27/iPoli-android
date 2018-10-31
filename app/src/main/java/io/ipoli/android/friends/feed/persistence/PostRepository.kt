@@ -12,7 +12,6 @@ import io.ipoli.android.common.datetime.minutes
 import io.ipoli.android.common.datetime.startOfDayUTC
 import io.ipoli.android.common.persistence.documents
 import io.ipoli.android.common.persistence.getAsync
-import io.ipoli.android.common.persistence.getSync
 import io.ipoli.android.friends.feed.data.Post
 import io.ipoli.android.player.data.Avatar
 import io.ipoli.android.player.persistence.model.DbPlayer
@@ -79,11 +78,7 @@ class AndroidPostRepository(
             val playerIds = dbPosts.map { it.playerId }.toSet()
 
             GlobalScope.launch(Dispatchers.IO) {
-                val dbPlayers = playerIds.map {
-                    GlobalScope.async(Dispatchers.IO) {
-                        it to DbPlayer(playerRef(it).getAsync().data!!)
-                    }.await()
-                }.toMap()
+                val dbPlayers = getStringToPlayerMap(playerIds)
 
                 val entities = dbPosts.map {
                     val dbPlayer = dbPlayers[it.playerId]!!
@@ -105,6 +100,16 @@ class AndroidPostRepository(
         return channel
     }
 
+    private suspend fun getStringToPlayerMap(playerIds: Set<String>): Map<String, DbPlayer> {
+        val dbJobs = playerIds.map {
+            GlobalScope.async(Dispatchers.IO) {
+                it to DbPlayer(playerRef(it).getAsync().data!!)
+            }
+        }
+
+        return dbJobs.map { it.await() }.toMap()
+    }
+
     override fun listenForPlayer(playerId: String, limit: Int): Channel<List<Post>> {
         val currentPlayerId = FirebaseAuth.getInstance().currentUser?.uid
 
@@ -123,9 +128,8 @@ class AndroidPostRepository(
             val playerIds = dbPosts.map { it.playerId }.toSet()
 
             GlobalScope.launch(Dispatchers.IO) {
-                val dbPlayers = playerIds.map {
-                    it to DbPlayer(playerRef(it).getSync().data!!)
-                }.toMap()
+
+                val dbPlayers = getStringToPlayerMap(playerIds)
 
                 val entities = dbPosts.map {
                     val dbPlayer = dbPlayers[it.playerId]!!
@@ -175,9 +179,7 @@ class AndroidPostRepository(
             val playerIds = setOf(dbPost.playerId) + commentPlayerIds
 
             GlobalScope.launch(Dispatchers.IO) {
-                val dbPlayers = playerIds.map {
-                    it to DbPlayer(playerRef(it).getSync().data!!)
-                }.toMap()
+                val dbPlayers = getStringToPlayerMap(playerIds)
 
                 val dbPlayer = dbPlayers[dbPost.playerId]!!
 
