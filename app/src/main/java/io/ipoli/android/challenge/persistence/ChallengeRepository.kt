@@ -31,7 +31,7 @@ import java.util.*
  */
 interface ChallengeRepository : CollectionRepository<Challenge> {
     fun findForFriend(friendId: String): List<Challenge>
-    fun hasActivePresetCHallenge(presetChallengeId: String): Boolean
+    fun hasActivePresetChallenge(presetChallengeId: String): Boolean
 }
 
 @Dao
@@ -67,7 +67,7 @@ abstract class ChallengeDao : BaseDao<RoomChallenge>() {
     @Query("SELECT * FROM challenges $FIND_SYNC_QUERY")
     abstract fun findAllForSync(lastSync: Long): List<RoomChallenge>
 
-    @Query("SELECT EXISTS(SELECT * FROM challenges WHERE presetChallengeId = :presetChallengeId AND removedAt IS NULL AND completedAtDate IS NULL AND endDate <= :currentDate)")
+    @Query("SELECT EXISTS(SELECT * FROM challenges WHERE presetChallengeId = :presetChallengeId AND removedAt IS NULL AND completedAtDate IS NULL AND endDate >= :currentDate)")
     abstract fun hasActivePresetChallenge(presetChallengeId: String, currentDate: Long): Boolean
 }
 
@@ -121,7 +121,7 @@ class RoomChallengeRepository(
         dao.undoRemove(id)
     }
 
-    override fun hasActivePresetCHallenge(presetChallengeId: String) =
+    override fun hasActivePresetChallenge(presetChallengeId: String) =
         dao.hasActivePresetChallenge(presetChallengeId, LocalDate.now().startOfDayUTC())
 
     override fun toEntityObject(dbObject: RoomChallenge) =

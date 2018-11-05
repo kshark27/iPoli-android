@@ -46,7 +46,7 @@ object PresetChallengeSideEffectHandler : AppSideEffectHandler() {
 
             is PresetChallengeAction.Accept -> {
 
-                if (challengeRepository.hasActivePresetCHallenge(action.challenge.id)) {
+                if (challengeRepository.hasActivePresetChallenge(action.challenge.id)) {
                     dispatch(PresetChallengeAction.ChallengeAlreadyAccepted)
                     return
                 }
