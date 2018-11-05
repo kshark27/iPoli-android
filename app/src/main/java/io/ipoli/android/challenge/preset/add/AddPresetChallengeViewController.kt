@@ -3,6 +3,7 @@ package io.ipoli.android.challenge.preset.add
 import android.os.Bundle
 import android.view.*
 import com.bluelinelabs.conductor.RouterTransaction
+import com.bluelinelabs.conductor.changehandler.FadeChangeHandler
 import io.ipoli.android.R
 import io.ipoli.android.challenge.preset.PresetChallenge
 import io.ipoli.android.challenge.preset.add.AddPresetChallengeViewState.StateType.*
@@ -28,6 +29,7 @@ class AddPresetChallengeViewController(args: Bundle? = null) :
 
     private var isLastPage = false
     private var isLoading = false
+    private var isExiting = false
 
     constructor(category: PresetChallenge.Category?, color: Color?) : this() {
         this.category = category
@@ -87,6 +89,10 @@ class AddPresetChallengeViewController(args: Bundle? = null) :
         }
 
     override fun handleBack(): Boolean {
+        if (isExiting) {
+            return super.handleBack()
+        }
+
         dispatch(AddPresetChallengeAction.Back)
         return true
     }
@@ -109,10 +115,15 @@ class AddPresetChallengeViewController(args: Bundle? = null) :
             }
 
             PAGE_CHANGED -> {
+                val fadeChangeHandler = FadeChangeHandler()
                 if (state.page == AddPresetChallengeViewState.Page.ITEMS) {
                     isLastPage = true
                     val childRouter = getChildRouter(view.contentContainer)
-                    childRouter.setRoot(RouterTransaction.with(AddPresetChallengeItemsViewController()))
+                    childRouter.setRoot(
+                        RouterTransaction.with(AddPresetChallengeItemsViewController())
+                            .pushChangeHandler(fadeChangeHandler)
+                            .popChangeHandler(fadeChangeHandler)
+                    )
                     activity?.invalidateOptionsMenu()
                 } else {
                     isLastPage = false
@@ -120,14 +131,18 @@ class AddPresetChallengeViewController(args: Bundle? = null) :
                     childRouter.setRoot(
                         RouterTransaction.with(
                             AddPresetChallengeInfoViewController()
-                        )
+                        ).pushChangeHandler(fadeChangeHandler)
+                            .popChangeHandler(fadeChangeHandler)
+
                     )
                     activity?.invalidateOptionsMenu()
                 }
             }
 
-            EXIT ->
+            EXIT -> {
+                isExiting = true
                 router.handleBack()
+            }
 
             SAVING -> {
                 isLoading = true
@@ -161,6 +176,7 @@ class AddPresetChallengeViewController(args: Bundle? = null) :
 
             DONE -> {
                 showLongToast(R.string.add_preset_challenge_done)
+                isExiting = true
                 router.handleBack()
             }
 
