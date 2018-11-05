@@ -49,8 +49,23 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@color/md_white"
         app:layout_constraintBottom_toBottomOf="@+id/challengeBackgroundImage"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/challengeParticipants"
         app:layout_constraintStart_toStartOf="parent"
+        tools:text="Coding ninja" />
+
+    <TextView
+        android:id="@+id/challengeParticipants"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:paddingTop="8dp"
+        android:drawablePadding="4dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textColor="@color/md_white"
+        app:layout_constraintBottom_toBottomOf="@+id/challengeBackgroundImage"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:text="Coding ninja" />
 
 

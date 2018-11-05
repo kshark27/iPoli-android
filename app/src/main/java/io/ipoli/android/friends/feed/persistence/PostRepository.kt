@@ -333,10 +333,8 @@ class AndroidPostRepository(
 
         val playerId = FirebaseAuth.getInstance().currentUser!!.uid
 
-        val coroutineDispatcher = executorService.asCoroutineDispatcher()
-
         val postJobs = questIds.map {
-            GlobalScope.async(coroutineDispatcher) {
+            GlobalScope.async(Dispatchers.IO) {
                 postsReference
                     .whereEqualTo("playerId", playerId)
                     .whereEqualTo("questId", it)
@@ -345,7 +343,7 @@ class AndroidPostRepository(
             }
         }
 
-        return runBlocking(coroutineDispatcher) {
+        return runBlocking(Dispatchers.IO) {
             postJobs.forEach {
                 val docs = it.await()
                 if (docs.isNotEmpty()) {
@@ -366,10 +364,8 @@ class AndroidPostRepository(
 
         val playerId = FirebaseAuth.getInstance().currentUser!!.uid
 
-        val coroutineDispatcher = executorService.asCoroutineDispatcher()
-
         val postJobs = habitIds.map {
-            GlobalScope.async(coroutineDispatcher) {
+            GlobalScope.async(Dispatchers.IO) {
                 postsReference
                     .whereEqualTo("playerId", playerId)
                     .whereEqualTo("habitId", it)
@@ -379,7 +375,7 @@ class AndroidPostRepository(
             }
         }
 
-        return runBlocking(coroutineDispatcher) {
+        return runBlocking(Dispatchers.IO) {
             postJobs.forEach {
                 val docs = it.await()
                 if (docs.isNotEmpty()) {
@@ -524,16 +520,7 @@ class AndroidPostRepository(
             dbPost.comments.map {
                 val dbComment = DbPost.Comment(it.value.toMutableMap())
                 val dbCommentPlayer = commentDbPlayers[dbComment.playerId]!!
-                Post.Comment(
-                    id = it.key,
-                    playerId = dbComment.playerId,
-                    playerAvatar = Avatar.valueOf(dbCommentPlayer.avatar),
-                    playerDisplayName = if (dbCommentPlayer.displayName.isNullOrBlank()) "Unknown Hero" else dbCommentPlayer.displayName!!,
-                    playerUsername = dbCommentPlayer.username!!,
-                    playerLevel = dbPost.playerLevel.toInt(),
-                    text = dbComment.text,
-                    createdAt = dbComment.createdAt.instant
-                )
+                createComment(dbComment, dbCommentPlayer)
             }
         }
 
@@ -566,6 +553,21 @@ class AndroidPostRepository(
             updatedAt = dbPost.updatedAt.instant
         )
     }
+
+    private fun createComment(
+        dbComment: DbPost.Comment,
+        dbCommentPlayer: DbPlayer
+    ) =
+        Post.Comment(
+            id = dbComment.id,
+            playerId = dbComment.playerId,
+            playerAvatar = Avatar.valueOf(dbCommentPlayer.avatar),
+            playerDisplayName = if (dbCommentPlayer.displayName.isNullOrBlank()) "Unknown Hero" else dbCommentPlayer.displayName!!,
+            playerUsername = dbCommentPlayer.username!!,
+            playerLevel = dbCommentPlayer.level.toInt(),
+            text = dbComment.text,
+            createdAt = dbComment.createdAt.instant
+        )
 
     private fun createData(dbPost: DbPost) =
         with(dbPost) {

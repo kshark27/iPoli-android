@@ -51,11 +51,14 @@ sealed class PresetChallengeAction : Action {
     object Validate : PresetChallengeAction()
     object Unlocked : PresetChallengeAction()
     object ChallengeTooExpensive : PresetChallengeAction()
+    object ChallengeAlreadyAccepted : PresetChallengeAction()
 
     data class Unlock(val challenge: PresetChallenge) : PresetChallengeAction()
     data class PhysicalCharacteristicsPicked(
         val physicalCharacteristics: CreateChallengeFromPresetUseCase.PhysicalCharacteristics?
     ) : PresetChallengeAction()
+
+    data class Accepted(val challengeId: String) : PresetChallengeAction()
 }
 
 object PresetChallengeReducer : BaseViewStateReducer<PresetChallengeViewState>() {
@@ -87,7 +90,9 @@ object PresetChallengeReducer : BaseViewStateReducer<PresetChallengeViewState>()
                 challengeTags = emptyList(),
                 tags = state.dataState.tags,
                 gemPrice = c.gemPrice,
-                isUnlocked = c.gemPrice == 0 || state.dataState.player!!.hasChallenge(c)
+                isUnlocked = c.gemPrice == 0 || state.dataState.player!!.hasChallenge(c),
+                author = c.author,
+                participantCount = c.participantCount
             )
         }
 
@@ -181,6 +186,22 @@ object PresetChallengeReducer : BaseViewStateReducer<PresetChallengeViewState>()
                 physicalCharacteristics = action.physicalCharacteristics
             )
 
+        is PresetChallengeAction.ChallengeAlreadyAccepted ->
+            subState.copy(
+                type = ALREADY_ACCEPTED
+            )
+
+        is PresetChallengeAction.Accept ->
+            subState.copy(
+                type = LOADING
+            )
+
+        is PresetChallengeAction.Accepted ->
+            subState.copy(
+                type = ACCEPTED,
+                challengeId = action.challengeId
+            )
+
         else -> subState
     }
 
@@ -203,7 +224,10 @@ object PresetChallengeReducer : BaseViewStateReducer<PresetChallengeViewState>()
         tags = null,
         gemPrice = null,
         isUnlocked = false,
-        physicalCharacteristics = null
+        physicalCharacteristics = null,
+        challengeId = null,
+        author = null,
+        participantCount = 0
     )
 
 }
@@ -227,7 +251,10 @@ data class PresetChallengeViewState(
     val tags: List<Tag>?,
     val gemPrice: Int?,
     val isUnlocked: Boolean?,
-    val physicalCharacteristics: CreateChallengeFromPresetUseCase.PhysicalCharacteristics?
+    val physicalCharacteristics: CreateChallengeFromPresetUseCase.PhysicalCharacteristics?,
+    val challengeId: String?,
+    val author: PresetChallenge.Author?,
+    val participantCount: Int
 ) : BaseViewState(
 
 ) {
@@ -243,6 +270,8 @@ data class PresetChallengeViewState(
         UNLOCKED,
         TOO_EXPENSIVE,
         SHOW_CHARACTERISTICS_PICKER,
-        CHARACTERISTICS_PICKER_CANCELED
+        CHARACTERISTICS_PICKER_CANCELED,
+        ALREADY_ACCEPTED,
+        ACCEPTED
     }
 }

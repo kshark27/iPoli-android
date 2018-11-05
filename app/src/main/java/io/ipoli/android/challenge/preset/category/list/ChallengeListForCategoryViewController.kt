@@ -17,6 +17,8 @@ import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.util.FixedPreloadSizeProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import io.ipoli.android.GlideApp
 import io.ipoli.android.GlideRequest
 import io.ipoli.android.R
@@ -87,6 +89,15 @@ class ChallengeListForCategoryViewController :
 
         setChildController(view.playerGems, InventoryViewController())
 
+
+        view.addChallenge.onDebounceClick {
+            if (FirebaseAuth.getInstance().currentUser == null) {
+                showLongToast(R.string.add_preset_challenge_sign_in_required)
+                return@onDebounceClick
+            }
+            navigateFromRoot().toAddPresetChallenge(category, category.color)
+        }
+
         return view
     }
 
@@ -156,6 +167,7 @@ class ChallengeListForCategoryViewController :
         val difficulty: String,
         val level: String?,
         @DrawableRes val levelIcon: Int?,
+        val participantCount: Int,
         val challenge: PresetChallenge
     ) : RecyclerViewViewModel
 
@@ -203,6 +215,20 @@ class ChallengeListForCategoryViewController :
                 view.challengeLevel.gone()
             }
 
+            if (vm.participantCount > 0) {
+                view.challengeParticipants.visible()
+                view.challengeParticipants.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    listItemIcon(GoogleMaterial.Icon.gmd_group).colorRes(R.color.md_white),
+                    null,
+                    null,
+                    null
+                )
+
+                view.challengeParticipants.text = vm.participantCount.toString()
+            } else {
+                view.challengeParticipants.gone()
+            }
+
             view.onDebounceClick {
                 navigateFromRoot().toPresetChallenge(vm.challenge)
             }
@@ -227,6 +253,7 @@ class ChallengeListForCategoryViewController :
                         else -> R.drawable.ic_challenge_level3_text_secondary_24dp
                     }
                 } else null,
+                participantCount = it.participantCount,
                 challenge = it
             )
         }

@@ -6,6 +6,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import com.bluelinelabs.conductor.RestoreViewOnCreateController
+import com.google.firebase.auth.FirebaseAuth
 import io.ipoli.android.R
 import io.ipoli.android.challenge.preset.PresetChallenge
 import io.ipoli.android.common.navigation.Navigator
@@ -35,6 +36,14 @@ class ChallengeCategoryListViewController(args: Bundle? = null) :
         view.learning.setOnClickListener { showChallengeList(PresetChallenge.Category.LEARNING) }
         view.adventure.setOnClickListener { showChallengeList(PresetChallenge.Category.ADVENTURE) }
         view.organizeLife.setOnClickListener { showChallengeList(PresetChallenge.Category.ORGANIZE) }
+
+        view.addChallenge.setOnClickListener(Debounce.clickListener {
+            if(FirebaseAuth.getInstance().currentUser == null) {
+                showLongToast(R.string.add_preset_challenge_sign_in_required)
+                return@clickListener
+            }
+            Navigator(rootRouter).toAddPresetChallenge()
+        })
 
         return view
     }

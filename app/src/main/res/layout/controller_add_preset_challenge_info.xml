@@ -1,0 +1,301 @@
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <ImageView
+            android:id="@+id/challengeSelectedIcon"
+            android:layout_width="92dp"
+            android:layout_height="92dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bordered_circle_white_background"
+            android:padding="16dp"
+            app:srcCompat="@drawable/ic_icon_white_24dp" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/challengeNameLayout"
+            style="@style/TextAppearance.myPoli.EditName.TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:hint="@string/name_hint"
+            android:textColorHint="@color/md_light_text_50">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/challengeName"
+                style="@style/TextAppearance.myPoli.EditName.TextInputEditText"
+                android:maxLength="50" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/challengeShortDescriptionLayout"
+            style="@style/TextAppearance.myPoli.EditName.TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="16dp"
+            android:hint="@string/short_desc_hint"
+            android:textColorHint="@color/md_light_text_50">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/challengeShortDescription"
+                style="@style/TextAppearance.myPoli.EditName.TextInputEditText"
+                android:maxLength="80" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:id="@+id/challengeColor"
+            style="@style/EditSimpleTextViewRow"
+            android:drawableStart="@drawable/ic_color_palette_white_24dp"
+            android:text="@string/color" />
+
+        <View style="@style/EditSimpleDivider" />
+
+        <TextView
+            android:id="@+id/challengeIcon"
+            style="@style/EditSimpleTextViewRow"
+            android:drawableStart="@drawable/ic_icon_white_24dp"
+            android:text="@string/icon" />
+
+        <View style="@style/EditSimpleDivider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                app:srcCompat="@drawable/ic_tags_white_24dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="16dp"
+                android:text="Category"
+                android:textColor="@color/md_white" />
+
+            <Spinner
+                android:id="@+id/challengeCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:backgroundTint="@color/md_white"
+                android:dropDownWidth="wrap_content"
+                android:paddingStart="32dp"
+                android:paddingEnd="0dp" />
+
+        </LinearLayout>
+
+        <View
+            style="@style/EditSimpleDivider"
+            android:layout_marginTop="60dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                app:srcCompat="@drawable/ic_event_busy_white_24dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="16dp"
+                android:text="Duration"
+                android:textColor="@color/md_white" />
+
+            <Spinner
+                android:id="@+id/challengeDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:backgroundTint="@color/md_white"
+                android:dropDownWidth="wrap_content"
+                android:paddingStart="32dp"
+                android:paddingEnd="0dp"
+                android:spinnerMode="dropdown" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:text="days"
+                android:textColor="@color/md_white" />
+
+
+        </LinearLayout>
+
+        <View style="@style/EditSimpleDivider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                app:srcCompat="@drawable/ic_dumbbell_white_24dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="16dp"
+                android:text="Difficulty"
+                android:textColor="@color/md_white" />
+
+            <Spinner
+                android:id="@+id/challengeDifficulty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:backgroundTint="@color/md_white"
+                android:paddingStart="32dp"
+                android:paddingEnd="0dp" />
+
+        </LinearLayout>
+
+        <View style="@style/EditSimpleDivider" />
+
+        <View
+            style="@style/EditSimpleDivider"
+            android:layout_marginTop="60dp" />
+
+        <TextView
+            style="@style/EditSimpleTextViewRow"
+            android:layout_height="48dp"
+            android:background="@null"
+            android:drawableStart="@drawable/ic_playlist_add_white_24dp"
+            android:text="Expected results" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="56dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/challengeExpectedResultList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <io.ipoli.android.common.view.EditTextBackEvent
+                android:id="@+id/expectedResultName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="Result (e.g. lose weight)"
+                android:imeOptions="actionDone"
+                android:inputType="textCapSentences"
+                android:maxLines="1"
+                android:textColor="@color/md_light_text_100"
+                android:textColorHint="@color/md_light_text_70" />
+
+            <TextView
+                android:id="@+id/challengeAddExpectedResult"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/add"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="@color/md_light_text_100"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <View style="@style/EditSimpleDivider" />
+
+        <TextView
+            style="@style/EditSimpleTextViewRow"
+            android:layout_height="48dp"
+            android:background="@null"
+            android:drawableStart="@drawable/ic_playlist_add_white_24dp"
+            android:text="Requirements" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="56dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/challengeRequirementList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <io.ipoli.android.common.view.EditTextBackEvent
+                android:id="@+id/requirementName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="Requirement (e.g. calorie tracker)"
+                android:imeOptions="actionDone"
+                android:inputType="textCapSentences"
+                android:maxLines="1"
+                android:textColor="@color/md_light_text_100"
+                android:textColorHint="@color/md_light_text_70" />
+
+            <TextView
+                android:id="@+id/challengeAddRequirement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/add"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="@color/md_light_text_100"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <View style="@style/EditSimpleDivider" />
+
+        <TextView
+            android:id="@+id/challengeDescription"
+            style="@style/EditSimpleTextViewRow"
+            android:drawableStart="@drawable/ic_edit_white_24dp"
+            android:ellipsize="end"
+            android:maxLines="3" />
+
+        <View style="@style/EditSimpleDivider" />
+
+
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

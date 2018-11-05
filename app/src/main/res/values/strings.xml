@@ -147,6 +147,7 @@
     <string name="sub_quests">Sub Quests</string>
     <string name="notes">Notes</string>
     <string name="tap_to_add_note">Tap to add a note</string>
+    <string name="tap_to_add_description">Tap to add a description</string>
     <string name="player_level">Level %1$d: %2$s</string>
 
     <string name="inbox_overdue_by">Overdue by %1$d %2$s</string>
@@ -418,6 +419,7 @@
     <string name="back">Back</string>
     <string name="unlock_icon_pack_title">Buy the Icon Pack</string>
     <string name="icon_picker_title">Choose icon</string>
+    <string name="quest_for_preset_challenge_title">Add Quest</string>
     <string name="no_icon">No icon</string>
     <string name="icon_pack_not_enough_coins">Icon Pack too expensive</string>
     <string name="iconvert_gems_not_enough_coins">Gems too expensive</string>
@@ -627,6 +629,7 @@
     <string name="challenge_picker_title">Add to challenge</string>
     <string name="add_sub_quest">+ Add Sub Quest</string>
     <string name="think_of_a_name">Think of a name</string>
+    <string name="error_empty_short_description">Describe your Challenge</string>
     <string name="title_add_tag">Add Tag</string>
     <string name="title_edit_tag">Edit Tag</string>
     <string name="empty_tag_quest_list_title">This Tag is lonely</string>
@@ -1250,4 +1253,19 @@ These are your physical and mental characteristics.\n\n
     <string name="gems_converted_this_month">Gems converted\nthis month</string>
     <string name="rewarded_habits_today">High Reward Habits today</string>
     <string name="rewarded_quests_today">High Reward Quests today</string>
+    <string name="short_desc_hint">Short Description</string>
+    <string name="description_hint">Description</string>
+    <string name="preset_challenge_already_accepted">This Challenge is already active</string>
+    <string name="add_preset_challenge_sign_in_required">Sign in is required to add Preset Challenge</string>
+    <string name="author">Author</string>
+    <string name="preset_challenge_participants">%d Players have joined this Challenge</string>
+    <string name="habit_for_preset_challenge_title">Add Habit</string>
+    <string name="error_empty_challenge_description">Please, describe your Challenge</string>
+    <string name="preset_challenge_description_hint">Tap to describe your Challenge</string>
+    <string name="error_empty_challenge_expected_results">Please, set at least 1 expected result</string>
+    <string name="error_preset_challenge_empty_items">At least 1 Habit or Quest is required</string>
+    <string name="add_preset_challenge_done">Your Challenge will be available after approval</string>
+    <string name="add_preset_challenge_save_error">Something went wrong, check your connection</string>
+    <string name="add_preset_challenge_items_title">Create Schedule</string>
+    <string name="add_preset_challenge_info_title">New Preset Challenge</string>
 </resources>

@@ -5,11 +5,13 @@ import io.ipoli.android.common.datetime.Day
 import io.ipoli.android.common.datetime.Duration
 import io.ipoli.android.common.datetime.Minute
 import io.ipoli.android.common.datetime.Time
+import io.ipoli.android.friends.feed.data.Post
+import io.ipoli.android.player.data.Avatar
 import io.ipoli.android.quest.Color
 import io.ipoli.android.quest.Icon
 
 data class PresetChallenge(
-    val id: String,
+    val id: String = "",
     val name: String,
     val color: Color,
     val icon: Icon,
@@ -27,11 +29,26 @@ data class PresetChallenge(
     val gemPrice: Int,
     val note: String,
     val config: Config,
-    val schedule: Schedule
+    val schedule: Schedule,
+    val status: Post.Status,
+    val participantCount: Int,
+    val author: Author?
 ) {
 
-    enum class Category {
-        FITNESS, HEALTH, LEARNING, ORGANIZE, ADVENTURE
+    data class Author(
+        val id: String,
+        val displayName: String,
+        val username: String,
+        val avatar: Avatar,
+        val level: Int
+    )
+
+    enum class Category(val color: Color) {
+        FITNESS(Color.GREEN),
+        HEALTH(Color.ORANGE),
+        LEARNING(Color.BLUE),
+        ORGANIZE(Color.TEAL),
+        ADVENTURE(Color.PURPLE)
     }
 
     data class Config(

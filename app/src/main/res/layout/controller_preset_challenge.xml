@@ -92,16 +92,18 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:id="@+id/presetDurationLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:text="@string/duration_in_days"
                     android:textAlignment="center"
                     android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/presetParticipantCount"
                     app:layout_constraintEnd_toEndOf="@id/presetDurationText"
                     app:layout_constraintStart_toStartOf="@id/presetDurationText"
-                    app:layout_constraintTop_toBottomOf="@id/presetDurationText" />
+                    app:layout_constraintTop_toBottomOf="@id/presetDurationText"
+                    app:layout_goneMarginBottom="16dp" />
 
 
                 <TextView
@@ -119,14 +121,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:text="@string/busyness_per_week"
                     android:textAlignment="center"
                     android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/presetDurationLabel"
                     app:layout_constraintEnd_toEndOf="@id/presetBusynessText"
                     app:layout_constraintStart_toStartOf="@id/presetBusynessText"
-                    app:layout_constraintTop_toBottomOf="@id/presetBusynessText" />
+                    app:layout_constraintTop_toTopOf="@id/presetDurationLabel" />
 
                 <TextView
                     android:id="@+id/presetDifficultyText"
@@ -144,13 +145,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:text="@string/difficulty"
                     android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/presetDurationLabel"
                     app:layout_constraintEnd_toEndOf="@id/presetDifficultyText"
                     app:layout_constraintStart_toStartOf="@id/presetDifficultyText"
-                    app:layout_constraintTop_toBottomOf="@id/presetDifficultyText" />
+                    app:layout_constraintTop_toTopOf="@id/presetDurationLabel" />
 
                 <TextView
                     android:id="@+id/presetLevelText"
@@ -170,14 +170,13 @@
                     android:id="@+id/textView4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:text="@string/level"
                     android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/presetDurationLabel"
                     app:layout_constraintEnd_toEndOf="@id/presetLevelText"
                     app:layout_constraintStart_toStartOf="@id/presetLevelText"
-                    app:layout_constraintTop_toBottomOf="@id/presetLevelText" />
+                    app:layout_constraintTop_toTopOf="@id/presetDurationLabel" />
 
                 <android.support.constraint.Group
                     android:id="@+id/levelGroup"
@@ -185,6 +184,142 @@
                     android:layout_height="wrap_content"
                     app:constraint_referenced_ids="presetLevelText,textView4" />
 
+
+                <TextView
+                    android:id="@+id/presetParticipantCount"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:includeFontPadding="false"
+                    android:layout_marginTop="16dp"
+                    android:drawablePadding="4dp"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            </android.support.constraint.ConstraintLayout>
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/authorContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/rounded_rectangle_surface_background"
+                android:foreground="?android:selectableItemBackground">
+
+                <TextView
+                    android:id="@+id/authorTitle"
+                    style="@style/SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/author"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <ImageView
+                    android:id="@+id/authorAvatar"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/white_circular_background"
+                    android:scaleType="fitCenter"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/authorTitle"
+                    tools:src="@drawable/avatar_07" />
+
+                <TextView
+                    android:id="@+id/authorName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    android:textColor="?attr/colorPrimary"
+                    app:layout_constraintEnd_toStartOf="@+id/authorLevel"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/authorAvatar"
+                    app:layout_constraintTop_toTopOf="@+id/authorAvatar"
+                    tools:text="Gorgonzola Marinatovaaaaa" />
+
+                <TextView
+                    android:id="@+id/authorLevel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="end"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="?android:textColorSecondary"
+                    app:layout_constraintBottom_toBottomOf="@+id/authorName"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/authorName"
+                    tools:text="Newbie | Lvl 3" />
+
+                <TextView
+                    android:id="@+id/authorUsername"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="?android:textColorSecondary"
+                    app:layout_constraintEnd_toStartOf="@+id/authorLevel"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="@+id/authorName"
+                    app:layout_constraintTop_toBottomOf="@+id/authorName"
+                    tools:text="\@gorgonzolata" />
+            </android.support.constraint.ConstraintLayout>
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/defaultAuthorContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/rounded_rectangle_surface_background"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:id="@+id/defaultAuthorImage"
+                    android:layout_width="42dp"
+                    android:layout_height="60dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/official_challenge_badge"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/defaultAuthorTitle"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/defaultAuthorTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="myPoli Official Challenge"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toEndOf="@id/defaultAuthorImage"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </android.support.constraint.ConstraintLayout>
 

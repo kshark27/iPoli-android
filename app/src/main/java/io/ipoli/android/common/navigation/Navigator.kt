@@ -22,6 +22,9 @@ import io.ipoli.android.challenge.entity.Challenge
 import io.ipoli.android.challenge.picker.ChallengePickerDialogController
 import io.ipoli.android.challenge.preset.PresetChallenge
 import io.ipoli.android.challenge.preset.PresetChallengeViewController
+import io.ipoli.android.challenge.preset.add.AddPresetChallengeViewController
+import io.ipoli.android.challenge.preset.add.habit.AddPresetChallengeHabitDialogController
+import io.ipoli.android.challenge.preset.add.quest.AddPresetChallengeQuestDialogController
 import io.ipoli.android.challenge.preset.category.ChallengeCategoryListViewController
 import io.ipoli.android.challenge.preset.category.list.ChallengeListForCategoryViewController
 import io.ipoli.android.challenge.preset.picker.PhysicalCharacteristicsPickerDialogController
@@ -30,6 +33,7 @@ import io.ipoli.android.challenge.usecase.CreateChallengeFromPresetUseCase
 import io.ipoli.android.common.ConfirmationDialogViewController
 import io.ipoli.android.common.HelpDialogViewController
 import io.ipoli.android.common.ShareAppDialogController
+import io.ipoli.android.common.datetime.Day
 import io.ipoli.android.common.datetime.Duration
 import io.ipoli.android.common.datetime.Minute
 import io.ipoli.android.common.feedback.WebUrlViewController
@@ -467,6 +471,13 @@ class Navigator(private val router: Router) {
         )
     }
 
+    fun toAddPresetChallenge(category: PresetChallenge.Category? = null, color: Color? = null) {
+        pushController(
+            { AddPresetChallengeViewController(category, color) },
+            VerticalChangeHandler()
+        )
+    }
+
     fun toFeedback(listener: FeedbackDialogController.FeedbackListener) {
         pushDialog { FeedbackDialogController(listener) }
     }
@@ -584,6 +595,31 @@ class Navigator(private val router: Router) {
         pushDialog { AddPostDialogController(questId, habitId, challengeId, postListener) }
     }
 
+    fun toQuestForPresetChallengePicker(
+        challengeDuration: Duration<Day>,
+        quest: PresetChallenge.Quest? = null,
+        isRepeating: Boolean = false,
+        listener: (PresetChallenge.Quest, Boolean) -> Unit
+    ) {
+        pushDialog {
+            AddPresetChallengeQuestDialogController(
+                challengeDuration,
+                quest,
+                isRepeating,
+                listener
+            )
+        }
+    }
+
+    fun toHabitForPresetChallengePicker(
+        habit: PresetChallenge.Habit? = null,
+        listener: (PresetChallenge.Habit) -> Unit
+    ) {
+        pushDialog {
+            AddPresetChallengeHabitDialogController(habit, listener)
+        }
+    }
+
     private inline fun <reified C : Controller> pushDialog(createDialogController: () -> C) {
         val t = tag<C>()
         val c = router.getControllerWithTag(t)
@@ -676,7 +712,7 @@ class Navigator(private val router: Router) {
     }
 
     fun replaceWithAgenda() {
-        replaceTopController({AgendaViewController() }, FadeChangeHandler())
+        replaceTopController({ AgendaViewController() }, FadeChangeHandler())
     }
 
     fun replaceWithHome(changeHandler: ControllerChangeHandler? = null) {

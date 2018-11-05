@@ -240,7 +240,6 @@ class HomeViewController(args: Bundle? = null) :
         super.onAttach(view)
         view.navigationView.bringToFront()
 
-
         val childRouter = getChildRouter(view.childControllerContainer, null)
         if (!childRouter.hasRootController()) {
             childRouter.setRoot(

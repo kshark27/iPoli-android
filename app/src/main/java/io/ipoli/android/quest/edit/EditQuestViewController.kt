@@ -139,9 +139,9 @@ class EditQuestViewController(args: Bundle? = null) :
     }
 
     override fun onAttach(view: View) {
-        super.onAttach(view)
-        showBackButton()
-        exitFullScreen()
+            super.onAttach(view)
+            showBackButton()
+            exitFullScreen()
     }
 
     private fun addSubQuest(view: View) {

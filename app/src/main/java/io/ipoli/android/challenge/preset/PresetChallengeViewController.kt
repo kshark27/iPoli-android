@@ -15,6 +15,8 @@ import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.IIcon
 import io.ipoli.android.R
@@ -27,6 +29,7 @@ import io.ipoli.android.common.view.*
 import io.ipoli.android.common.view.recyclerview.BaseRecyclerViewAdapter
 import io.ipoli.android.common.view.recyclerview.RecyclerViewViewModel
 import io.ipoli.android.common.view.recyclerview.SimpleViewHolder
+import io.ipoli.android.player.data.AndroidAvatar
 import io.ipoli.android.tag.Tag
 import kotlinx.android.synthetic.main.controller_preset_challenge.view.*
 import kotlinx.android.synthetic.main.item_preset_challenge_day.view.*
@@ -145,6 +148,8 @@ class PresetChallengeViewController(args: Bundle? = null) :
                         PresetChallengeAction.Unlock(state.challenge)
                     }
                 }
+
+                renderAuthor(state, view)
             }
 
             START_TIME_CHANGED ->
@@ -167,7 +172,6 @@ class PresetChallengeViewController(args: Bundle? = null) :
                     )
                 )
                 showShortToast(R.string.challenge_accepted)
-                router.popCurrentController()
             }
 
             EMPTY_TAGS -> {
@@ -194,8 +198,52 @@ class PresetChallengeViewController(args: Bundle? = null) :
                     dispatch(PresetChallengeAction.PhysicalCharacteristicsPicked(c))
                 }
 
+            ALREADY_ACCEPTED ->
+                showLongToast(R.string.preset_challenge_already_accepted)
+
+            ACCEPTED -> {
+                navigateFromRoot().toChallenge(state.challengeId!!)
+                navigateFromRoot().toAddPost(
+                    challengeId = state.challengeId,
+                    questId = null,
+                    habitId = null
+                )
+            }
+
             else -> {
             }
+        }
+    }
+
+    private fun renderAuthor(
+        state: PresetChallengeViewState,
+        view: View
+    ) {
+        val author = state.author
+
+        if (author != null) {
+            view.authorContainer.visible()
+            view.defaultAuthorContainer.gone()
+
+            view.authorName.text = author.displayName
+            val androidAvatar = AndroidAvatar.valueOf(author.avatar.name)
+            Glide.with(view.context).load(androidAvatar.image)
+                .apply(RequestOptions.circleCropTransform())
+                .into(view.authorAvatar)
+
+            val gradientDrawable = view.authorAvatar.background as GradientDrawable
+            gradientDrawable.mutate()
+            gradientDrawable.setColor(view.context.colorRes(androidAvatar.backgroundColor))
+
+            view.authorUsername.text = "@${author.username}"
+            view.authorLevel.text = "Level ${author.level}"
+
+            view.authorContainer.onDebounceClick {
+                navigateFromRoot().toProfile(author.id)
+            }
+        } else {
+            view.authorContainer.gone()
+            view.defaultAuthorContainer.visible()
         }
     }
 
@@ -333,6 +381,21 @@ class PresetChallengeViewController(args: Bundle? = null) :
             view.presetLevelText.text = state.level.toString()
         } else {
             view.levelGroup.gone()
+        }
+
+        if (state.participantCount > 0) {
+            view.presetParticipantCount.visible()
+            view.presetParticipantCount.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                listItemIcon(GoogleMaterial.Icon.gmd_group).colorRes(colorTextSecondaryResource),
+                null,
+                null,
+                null
+            )
+
+            view.presetParticipantCount.text =
+                stringRes(R.string.preset_challenge_participants, state.participantCount)
+        } else {
+            view.presetParticipantCount.gone()
         }
     }
 

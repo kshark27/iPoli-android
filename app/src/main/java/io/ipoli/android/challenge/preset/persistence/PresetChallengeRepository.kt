@@ -1,5 +1,7 @@
 package io.ipoli.android.challenge.preset.persistence
 
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import io.ipoli.android.challenge.entity.Challenge
@@ -8,15 +10,24 @@ import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.common.datetime.days
 import io.ipoli.android.common.datetime.minutes
 import io.ipoli.android.common.persistence.documents
-import io.ipoli.android.common.persistence.getSync
+import io.ipoli.android.common.persistence.getAsync
+import io.ipoli.android.friends.feed.data.Post
+import io.ipoli.android.player.data.Avatar
+import io.ipoli.android.player.persistence.model.DbPlayer
 import io.ipoli.android.quest.Color
 import io.ipoli.android.quest.Icon
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.runBlocking
 import org.threeten.bp.LocalDate
 import java.util.*
 
 interface PresetChallengeRepository {
     fun findForCategory(category: PresetChallenge.Category): List<PresetChallenge>
     fun findById(id: String): PresetChallenge
+    fun join(presetChallengeId: String)
+    fun save(presetChallenge: PresetChallenge)
 }
 
 class FirestorePresetChallengeRepository(private val database: FirebaseFirestore) :
@@ -25,18 +36,172 @@ class FirestorePresetChallengeRepository(private val database: FirebaseFirestore
     private val collectionReference: CollectionReference
         get() = database.collection("presetChallenges")
 
-    override fun findForCategory(category: PresetChallenge.Category) =
-        collectionReference
+    override fun findForCategory(category: PresetChallenge.Category): List<PresetChallenge> {
+        val cDocs = collectionReference
             .whereEqualTo("category", category.name)
-            .documents
-            .map {
-                toEntityObject(it.data!!)
+            .whereEqualTo("status", Post.Status.APPROVED.name)
+            .documents.map { it.data!! }
+
+        val playerIds = cDocs.mapNotNull {
+            playerIdFromDocumentData(it)
+        }.toSet()
+
+        return runBlocking(Dispatchers.IO) {
+            val dbPlayers = getStringToPlayerMap(playerIds)
+            cDocs.map {
+                toEntityObject(it, dbPlayers)
             }
+        }
+    }
+
+    private fun playerIdFromDocumentData(presetChallengeDoc: Map<String, Any>): String? {
+        val playerId = presetChallengeDoc["playerId"]
+        return if (playerId != null) {
+            playerId as String
+        } else null
+    }
 
     override fun findById(id: String) =
-        toEntityObject(collectionReference.document(id).getSync().data!!)
+        runBlocking(Dispatchers.IO) {
+            val doc = collectionReference.document(id).getAsync().data!!
+            val dbPlayers = playerIdFromDocumentData(doc)?.let {
+                getStringToPlayerMap(setOf(it))
+            } ?: emptyMap()
+            toEntityObject(doc, dbPlayers)
+        }
 
-    fun toEntityObject(dataMap: MutableMap<String, Any?>): PresetChallenge {
+    private suspend fun getStringToPlayerMap(playerIds: Set<String>): Map<String, DbPlayer> {
+        val dbJobs = playerIds.map {
+            GlobalScope.async(Dispatchers.IO) {
+                it to DbPlayer(playerRef(it).getAsync().data!!)
+            }
+        }
+
+        return dbJobs.map { it.await() }.toMap()
+    }
+
+    override fun join(presetChallengeId: String) {
+        val currentUser = FirebaseAuth.getInstance().currentUser ?: return
+        val playerId = currentUser.uid
+        Tasks.await(
+            collectionReference.document(presetChallengeId).update(
+                mapOf(
+                    "participants.$playerId" to true
+                )
+            )
+        )
+    }
+
+    override fun save(presetChallenge: PresetChallenge) {
+        val docRef = collectionReference.document(presetChallenge.id)
+        Tasks.await(docRef.set(toDatabaseObject(presetChallenge).map))
+    }
+
+    private fun toDatabaseObject(presetChallenge: PresetChallenge): DbPresetChallenge {
+
+        val dbConfig = DbPresetChallenge.Config().apply {
+            defaultStartMinute = presetChallenge.config.defaultStartTime?.toMinuteOfDay()?.toLong()
+            nutritionMacros = null
+        }
+
+        val dbTrackedValues = presetChallenge.trackedValues.map {
+            when (it) {
+                is Challenge.TrackedValue.Progress -> {
+                    DbPresetChallenge.TrackedValue().apply {
+                        id = it.id
+                        type = DbPresetChallenge.TrackedValue.Type.PROGRESS.name
+                    }.map
+                }
+
+                is Challenge.TrackedValue.Target -> {
+                    DbPresetChallenge.TrackedValue().apply {
+                        id = it.id
+                        type = DbPresetChallenge.TrackedValue.Type.TARGET.name
+                        name = it.name
+                        units = it.units
+                        startValue = it.startValue.toFloat()
+                        targetValue = it.targetValue.toFloat()
+                        isCumulative = it.isCumulative
+                    }.map
+                }
+
+                is Challenge.TrackedValue.Average -> {
+                    DbPresetChallenge.TrackedValue().apply {
+                        id = it.id
+                        type = DbPresetChallenge.TrackedValue.Type.AVERAGE.name
+                        name = it.name
+                        units = it.units
+                        targetValue = it.targetValue.toFloat()
+                        lowerBound = it.lowerBound.toFloat()
+                        upperBound = it.upperBound.toFloat()
+                    }.map
+                }
+            }
+        }
+
+        val dbQuests = presetChallenge.schedule.quests.map {
+            DbPresetChallenge.Schedule.Quest().apply {
+                name = it.name
+                color = it.color.name
+                icon = it.icon.name
+                day = it.day.toLong()
+                duration = it.duration.longValue
+                subQuests = it.subQuests
+                note = it.note
+            }.map
+        }
+
+        val dbHabits = presetChallenge.schedule.habits.map {
+            DbPresetChallenge.Schedule.Habit().apply {
+                name = it.name
+                color = it.color.name
+                icon = it.icon.name
+                isGood = it.isGood
+                timesADay = it.timesADay.toLong()
+            }.map
+        }
+
+
+        val dbSchedule = DbPresetChallenge.Schedule().apply {
+            quests = dbQuests
+            habits = dbHabits
+        }
+
+        return DbPresetChallenge().apply {
+            id = presetChallenge.id
+            playerId = presetChallenge.author!!.id
+            name = presetChallenge.name
+            color = presetChallenge.color.name
+            icon = presetChallenge.icon.name
+            category = presetChallenge.category.name
+            imageUrl = presetChallenge.imageUrl
+            shortDescription = presetChallenge.shortDescription
+            description = presetChallenge.description
+            difficulty = presetChallenge.difficulty.name
+            requirements = presetChallenge.requirements
+            expectedResults = presetChallenge.expectedResults
+            duration = presetChallenge.duration.longValue
+            busynessPerWeek = presetChallenge.busynessPerWeek.longValue
+            level = presetChallenge.level?.toLong()
+            gemPrice = presetChallenge.gemPrice.toLong()
+            status = presetChallenge.status.name
+            participants = emptyMap()
+            config = dbConfig.map
+            note = presetChallenge.note
+            trackedValues = dbTrackedValues
+            schedule = dbSchedule.map
+        }
+    }
+
+    private fun playerRef(playerId: String) =
+        database
+            .collection("players")
+            .document(playerId)
+
+    fun toEntityObject(
+        dataMap: MutableMap<String, Any?>,
+        dbPlayers: Map<String, DbPlayer>
+    ): PresetChallenge {
 
         val c = DbPresetChallenge(dataMap.withDefault {
             null
@@ -143,6 +308,17 @@ class FirestorePresetChallengeRepository(private val database: FirebaseFirestore
             }
         }
 
+        val author = c.playerId?.let {
+            val a = dbPlayers[it]!!
+            PresetChallenge.Author(
+                id = a.id,
+                displayName = a.displayName ?: "Unknown Hero",
+                username = a.username!!,
+                avatar = Avatar.valueOf(a.avatar),
+                level = a.level.toInt()
+            )
+        }
+
         return PresetChallenge(
             id = c.id,
             name = c.name,
@@ -162,12 +338,16 @@ class FirestorePresetChallengeRepository(private val database: FirebaseFirestore
             note = c.note,
             trackedValues = trackedValues,
             config = config,
-            schedule = schedule
+            schedule = schedule,
+            status = Post.Status.valueOf(c.status),
+            participantCount = c.participants.size,
+            author = author
         )
     }
 
     data class DbPresetChallenge(val map: MutableMap<String, Any?> = mutableMapOf()) {
         var id: String by map
+        var playerId: String? by map
         var name: String by map
         var color: String by map
         var icon: String by map
@@ -186,6 +366,8 @@ class FirestorePresetChallengeRepository(private val database: FirebaseFirestore
         var note: String by map
         var config: MutableMap<String, Any?> by map
         var schedule: MutableMap<String, Any?> by map
+        var status: String by map
+        var participants: Map<String, Any?> by map
 
         data class TrackedValue(val map: MutableMap<String, Any?> = mutableMapOf()) {
             var id: String by map

@@ -434,7 +434,8 @@ interface UseCaseModule {
     val createChallengeFromPresetUseCase: CreateChallengeFromPresetUseCase
     val createHabitHistoryItemsUseCase: CreateHabitHistoryItemsUseCase
     val createChallengeProgressItemsUseCase: CreateChallengeProgressItemsUseCase
-    val createAgendaPreviewItemsUseCase : CreateAgendaPreviewItemsUseCase
+    val createAgendaPreviewItemsUseCase: CreateAgendaPreviewItemsUseCase
+    val createPresetChallengeUseCase: CreatePresetChallengeUseCase
 }
 
 class MainUseCaseModule(private val context: Context) : UseCaseModule {
@@ -1028,6 +1029,9 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
 
     override val createAgendaPreviewItemsUseCase
         get() = CreateAgendaPreviewItemsUseCase()
+
+    override val createPresetChallengeUseCase
+        get() = CreatePresetChallengeUseCase(presetChallengeRepository)
 }
 
 interface StateStoreModule {
