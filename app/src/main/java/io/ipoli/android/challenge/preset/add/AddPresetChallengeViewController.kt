@@ -86,6 +86,10 @@ class AddPresetChallengeViewController(args: Bundle? = null) :
             else -> super.onOptionsItemSelected(item)
         }
 
+    override fun handleBack(): Boolean {
+        dispatch(AddPresetChallengeAction.Back)
+        return true
+    }
 
     override fun render(state: AddPresetChallengeViewState, view: View) {
         when (state.type) {
