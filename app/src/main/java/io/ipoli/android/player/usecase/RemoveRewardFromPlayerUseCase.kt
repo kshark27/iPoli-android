@@ -44,12 +44,12 @@ open class RemoveRewardFromPlayerUseCase(
 
         val newStats = when (rewardType) {
             Params.RewardType.GOOD_HABIT -> newPlayer.statistics.copy(
-                questCompletedCountForDay = newPlayer.statistics.questCompletedCountForDay.removeValue(
+                habitCompletedCountForDay = newPlayer.statistics.habitCompletedCountForDay.removeValue(
                     1
                 )
             )
             Params.RewardType.QUEST -> newPlayer.statistics.copy(
-                habitCompletedCountForDay = newPlayer.statistics.habitCompletedCountForDay.removeValue(
+                questCompletedCountForDay = newPlayer.statistics.questCompletedCountForDay.removeValue(
                     1
                 ),
                 questCompletedCount = Math.max(newPlayer.statistics.questCompletedCount - 1, 0)
