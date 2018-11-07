@@ -649,14 +649,14 @@ class DayViewController :
         }
 
         private fun showQuest(
-            view: View,
+            v: View,
             vm: ScheduledEventViewModel.Quest
         ) {
 
-            view.checkBox.visible()
-            view.questColorIndicator.setBackgroundColor(colorRes(vm.backgroundColor.color500))
+            v.checkBox.visible()
+            v.questColorIndicator.setBackgroundColor(colorRes(vm.backgroundColor.color500))
 
-            view.setOnLongClickListener {
+            v.setOnLongClickListener {
 
                 if (vm.isStarted) {
                     showShortToast(R.string.validation_timer_running)
@@ -668,9 +668,9 @@ class DayViewController :
             }
 
             @SuppressLint("SetTextI18n")
-            view.questSchedule.text = "${vm.startTime} - ${vm.endTime}"
+            v.questSchedule.text = "${vm.startTime} - ${vm.endTime}"
 
-            view.backgroundView.setBackgroundColor(
+            v.backgroundView.setBackgroundColor(
                 ColorUtil.lightenColor(
                     ColorUtil.getColorWithAlpha(
                         colorRes(vm.backgroundColor.color700),
@@ -680,100 +680,100 @@ class DayViewController :
             )
 
             if (vm.isCompleted) {
-                view.questColorIndicator.setBackgroundColor(colorRes(R.color.md_grey_700))
+                v.questColorIndicator.setBackgroundColor(colorRes(R.color.md_grey_700))
                 val color = colorRes(R.color.md_dark_text_54)
 
                 val span = SpannableString(vm.name)
                 span.setSpan(StrikethroughSpan(), 0, vm.name.length, 0)
-                view.questName.text = span
-                view.questName.setTextColor(color)
-                view.questSchedule.setTextColor(color)
-                view.questTags.setTextColor(color)
+                v.questName.text = span
+                v.questName.setTextColor(color)
+                v.questSchedule.setTextColor(color)
+                v.questTags.setTextColor(color)
 
-                val indicator = view.questTags.compoundDrawablesRelative[0] as VectorDrawable
+                val indicator = v.questTags.compoundDrawablesRelative[0] as VectorDrawable
                 indicator.mutate()
                 val indicatorColor = colorRes(R.color.md_grey_700)
                 indicator.setColorFilter(indicatorColor, PorterDuff.Mode.SRC_ATOP)
 
-                view.checkBox.isChecked = true
-                (view.checkBox as TintableCompoundButton).supportButtonTintList =
+                v.checkBox.isChecked = true
+                (v.checkBox as TintableCompoundButton).supportButtonTintList =
                     tintList(R.color.md_grey_700)
-                view.completedBackgroundView.visible()
+                v.completedBackgroundView.visible()
 
                 vm.icon?.let {
                     val icon = IconicsDrawable(context)
                         .icon(it.icon)
                         .colorRes(R.color.md_dark_text_38)
                         .sizeDp(24)
-                    view.questIcon.visible()
-                    view.questIcon.setImageDrawable(icon)
+                    v.questIcon.visible()
+                    v.questIcon.setImageDrawable(icon)
                 }
 
-                view.setOnClickListener {
+                v.setOnClickListener {
                     showCompletedQuest(vm.id)
                 }
             } else {
 
-                view.questSchedule.setTextColor(colorRes(vm.backgroundColor.color700))
-                view.questTags.setTextColor(colorRes(vm.backgroundColor.color700))
+                v.questSchedule.setTextColor(colorRes(vm.backgroundColor.color700))
+                v.questTags.setTextColor(colorRes(vm.backgroundColor.color700))
 
-                val indicator = view.questTags.compoundDrawablesRelative[0] as VectorDrawable
+                val indicator = v.questTags.compoundDrawablesRelative[0] as VectorDrawable
                 indicator.mutate()
                 val indicatorColor = colorRes(vm.backgroundColor.color700)
                 indicator.setColorFilter(indicatorColor, PorterDuff.Mode.SRC_ATOP)
 
-                view.questName.text = vm.name
-                view.questName.setTextColor(colorRes(vm.backgroundColor.color800))
+                v.questName.text = vm.name
+                v.questName.setTextColor(colorRes(vm.backgroundColor.color800))
 
                 vm.icon?.let {
                     val icon = IconicsDrawable(context)
                         .icon(it.icon)
                         .colorRes(vm.backgroundColor.color500)
                         .sizeDp(24)
-                    view.questIcon.visible()
-                    view.questIcon.setImageDrawable(icon)
+                    v.questIcon.visible()
+                    v.questIcon.setImageDrawable(icon)
                 }
 
-                (view.checkBox as TintableCompoundButton).supportButtonTintList =
+                (v.checkBox as TintableCompoundButton).supportButtonTintList =
                     tintList(vm.backgroundColor.color700)
-                view.completedBackgroundView.invisible()
+                v.completedBackgroundView.invisible()
 
                 if (vm.isPlaceholder) {
-                    view.setOnClickListener(null)
-                    view.checkBox.invisible()
+                    v.setOnClickListener(null)
+                    v.checkBox.invisible()
                 } else {
 
-                    view.checkBox.visible()
-                    view.setOnClickListener {
+                    v.checkBox.visible()
+                    v.setOnClickListener {
                         showQuest(vm.id)
                     }
                 }
 
-                view.repeatIndicator.setColorFilter(indicatorColor)
-                view.challengeIndicator.setColorFilter(indicatorColor)
+                v.repeatIndicator.setColorFilter(indicatorColor)
+                v.challengeIndicator.setColorFilter(indicatorColor)
 
             }
 
-            view.repeatIndicator.visibility = if (vm.isRepeating) View.VISIBLE else View.GONE
-            view.challengeIndicator.visibility = if (vm.isFromChallenge) View.VISIBLE else View.GONE
-            view.repeatIndicator.tag = vm.isRepeating
-            view.challengeIndicator.tag = vm.isFromChallenge
-            view.questTags.tag = vm.tags.isNotEmpty()
+            v.repeatIndicator.visibility = if (vm.isRepeating) View.VISIBLE else View.GONE
+            v.challengeIndicator.visibility = if (vm.isFromChallenge) View.VISIBLE else View.GONE
+            v.repeatIndicator.tag = vm.isRepeating
+            v.challengeIndicator.tag = vm.isFromChallenge
+            v.questTags.tag = vm.tags.isNotEmpty()
             if (vm.tags.isEmpty()) {
-                view.questTags.gone()
+                v.questTags.gone()
             } else {
-                view.questTags.text = vm.tags.joinToString { it.name }
-                view.questTags.visible()
+                v.questTags.text = vm.tags.joinToString { it.name }
+                v.questTags.visible()
             }
 
-            view.checkBox.setOnCheckedChangeListener { cb, checked ->
+            v.checkBox.setOnCheckedChangeListener { cb, checked ->
                 if (checked) {
-                    (view.checkBox as TintableCompoundButton).supportButtonTintList =
+                    (v.checkBox as TintableCompoundButton).supportButtonTintList =
                         tintList(R.color.md_grey_700)
-                    val anim = RevealAnimator().create(view.completedBackgroundView, cb)
+                    val anim = RevealAnimator().create(v.completedBackgroundView, cb)
                     anim.addListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationStart(animation: Animator?) {
-                            view.completedBackgroundView.visible()
+                            v.completedBackgroundView.visible()
                         }
 
                         override fun onAnimationEnd(animation: Animator?) {
@@ -785,7 +785,7 @@ class DayViewController :
                 } else {
 
                     val anim = RevealAnimator().create(
-                        view.completedBackgroundView,
+                        v.completedBackgroundView,
                         cb,
                         reverse = true
                     )
@@ -793,7 +793,7 @@ class DayViewController :
                     anim.addListener(object : AnimatorListenerAdapter() {
 
                         override fun onAnimationEnd(animation: Animator?) {
-                            view.completedBackgroundView.invisible()
+                            v.completedBackgroundView.invisible()
                             dispatch(DayViewAction.UndoCompleteQuest(vm.id))
                         }
                     })
@@ -803,22 +803,25 @@ class DayViewController :
             }
 
             TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-                view.questName,
+                v.questName,
                 8,
                 16,
                 1,
                 TypedValue.COMPLEX_UNIT_SP
             )
             TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-                view.questSchedule,
+                v.questSchedule,
                 8,
                 14,
                 1,
                 TypedValue.COMPLEX_UNIT_SP
             )
 
-            view.post {
-                adaptViewForHeight(view, ViewUtils.pxToDp(view.height, context))
+            v.post {
+                view?.let {
+                    adaptViewForHeight(v, ViewUtils.pxToDp(v.height, context))
+                    v.bringToFront()
+                }
             }
         }
 
