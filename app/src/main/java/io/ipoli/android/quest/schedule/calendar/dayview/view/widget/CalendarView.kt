@@ -89,6 +89,14 @@ class CalendarView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+        canvas.drawRect(
+            hourLineStartMargin,
+            0f,
+            hourLineStartMargin + hourLineHeight / 2,
+            height.toFloat(),
+            hourLinePaint
+        )
+
         val halfHourHeight = hourHeight / 2f
 
         (0..23).forEach {

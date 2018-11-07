@@ -384,7 +384,7 @@ class DayViewController :
         icon: AndroidIcon? = null
     ) {
         dragView.dragName.setText(name)
-        dragView.setBackgroundColor(ContextCompat.getColor(dragView.context, color.color400))
+        dragView.setBackgroundColor(ContextCompat.getColor(dragView.context, color.color500))
         if (icon != null) {
             dragView.dragIcon.setImageDrawable(
                 IconicsDrawable(dragView.context)
@@ -654,7 +654,7 @@ class DayViewController :
         ) {
 
             v.checkBox.visible()
-            v.questColorIndicator.setBackgroundColor(colorRes(vm.backgroundColor.color500))
+            v.questColorIndicator.gone()
 
             v.setOnLongClickListener {
 
@@ -670,14 +670,7 @@ class DayViewController :
             @SuppressLint("SetTextI18n")
             v.questSchedule.text = "${vm.startTime} - ${vm.endTime}"
 
-            v.backgroundView.setBackgroundColor(
-                ColorUtil.lightenColor(
-                    ColorUtil.getColorWithAlpha(
-                        colorRes(vm.backgroundColor.color700),
-                        0.95f
-                    ), 0.7f
-                )
-            )
+            v.backgroundView.setBackgroundColor(colorRes(vm.backgroundColor.color500))
 
             if (vm.isCompleted) {
                 v.questColorIndicator.setBackgroundColor(colorRes(R.color.md_grey_700))
@@ -714,28 +707,28 @@ class DayViewController :
                 }
             } else {
 
-                v.questSchedule.setTextColor(colorRes(vm.backgroundColor.color700))
-                v.questTags.setTextColor(colorRes(vm.backgroundColor.color700))
+                v.questSchedule.setTextColor(colorRes(R.color.md_light_text_70))
+                v.questTags.setTextColor(colorRes(R.color.md_light_text_70))
 
                 val indicator = v.questTags.compoundDrawablesRelative[0] as VectorDrawable
                 indicator.mutate()
-                val indicatorColor = colorRes(vm.backgroundColor.color700)
+                val indicatorColor = colorRes(R.color.md_white)
                 indicator.setColorFilter(indicatorColor, PorterDuff.Mode.SRC_ATOP)
 
                 v.questName.text = vm.name
-                v.questName.setTextColor(colorRes(vm.backgroundColor.color800))
+                v.questName.setTextColor(colorRes(R.color.md_white))
 
                 vm.icon?.let {
                     val icon = IconicsDrawable(context)
                         .icon(it.icon)
-                        .colorRes(vm.backgroundColor.color500)
+                        .colorRes(vm.backgroundColor.color200)
                         .sizeDp(24)
                     v.questIcon.visible()
                     v.questIcon.setImageDrawable(icon)
                 }
 
                 (v.checkBox as TintableCompoundButton).supportButtonTintList =
-                    tintList(vm.backgroundColor.color700)
+                    tintList(vm.backgroundColor.color200)
                 v.completedBackgroundView.invisible()
 
                 if (vm.isPlaceholder) {
