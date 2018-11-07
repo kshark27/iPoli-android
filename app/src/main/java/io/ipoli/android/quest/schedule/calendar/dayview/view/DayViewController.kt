@@ -1129,7 +1129,10 @@ class DayViewController :
                     nameColor = ColorUtil.darkenColor(e.color),
                     timeColor = ColorUtil.darkenColor(e.color),
                     indicatorColor = e.color,
-                    backgroundColor = ColorUtil.lightenColor(e.color, 0.6f),
+                    backgroundColor = ColorUtil.lightenColor(
+                        ColorUtil.getColorWithAlpha(e.color, 0.8f),
+                        0.6f
+                    ),
                     isRepeating = e.isRepeating
                 )
             }
