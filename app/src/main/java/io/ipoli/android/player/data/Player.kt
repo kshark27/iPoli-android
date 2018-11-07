@@ -199,7 +199,7 @@ data class Player(
         }
 
         enum class AgendaScreen {
-            CALENDAR, AGENDA
+            DAY, AGENDA
         }
 
         data class SyncCalendar(val id: String, val name: String)

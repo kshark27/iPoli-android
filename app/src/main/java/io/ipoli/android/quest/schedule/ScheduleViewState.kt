@@ -101,7 +101,10 @@ object ScheduleReducer : BaseViewStateReducer<ScheduleViewState>() {
             is ScheduleAction.ToggleViewMode -> {
                 state.copy(
                     type = ScheduleViewState.StateType.VIEW_MODE_CHANGED,
-                    viewMode = if (state.viewMode == Player.Preferences.AgendaScreen.CALENDAR) Player.Preferences.AgendaScreen.AGENDA else Player.Preferences.AgendaScreen.CALENDAR
+                    viewMode = if (state.viewMode == Player.Preferences.AgendaScreen.DAY)
+                        Player.Preferences.AgendaScreen.AGENDA
+                    else
+                        Player.Preferences.AgendaScreen.DAY
                 )
             }
 
@@ -135,7 +138,7 @@ data class ScheduleViewState(
 
 
 val ScheduleViewState.viewModeTitle
-    get() = if (viewMode == Player.Preferences.AgendaScreen.CALENDAR) "Agenda" else "Calendar"
+    get() = if (viewMode == Player.Preferences.AgendaScreen.DAY) "Agenda" else "Calendar"
 
 fun ScheduleViewState.dayText(context: Context) =
     CalendarFormatter(context).day(currentDate)

@@ -344,7 +344,7 @@ class SettingsViewController(args: Bundle? = null) :
 
     private val SettingsViewState.agendaStartText: String
         get() = when (agendaStartScreen) {
-            Player.Preferences.AgendaScreen.CALENDAR -> stringRes(R.string.calendar)
+            Player.Preferences.AgendaScreen.DAY -> stringRes(R.string.day)
             Player.Preferences.AgendaScreen.AGENDA -> stringRes(R.string.agenda)
         }
 

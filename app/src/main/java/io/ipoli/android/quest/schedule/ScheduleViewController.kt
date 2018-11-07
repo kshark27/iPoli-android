@@ -69,7 +69,7 @@ class ScheduleViewController(args: Bundle? = null) :
             }
         }
 
-        if (startView == Player.Preferences.AgendaScreen.CALENDAR) {
+        if (startView == Player.Preferences.AgendaScreen.DAY) {
             viewModeIcon = GoogleMaterial.Icon.gmd_format_list_bulleted
             viewModeTitle = stringRes(R.string.agenda)
             setChildController(
@@ -181,7 +181,7 @@ class ScheduleViewController(args: Bundle? = null) :
 
             INITIAL -> {
                 renderNewDate(state)
-                if (state.viewMode == Player.Preferences.AgendaScreen.CALENDAR) {
+                if (state.viewMode == Player.Preferences.AgendaScreen.DAY) {
                     disableToolbarCalendar()
                 } else {
                     enableToolbarCalendar()
@@ -205,7 +205,7 @@ class ScheduleViewController(args: Bundle? = null) :
 
                 val childRouter = getChildRouter(view.contentContainer, null)
                 val n = Navigator(childRouter)
-                if (state.viewMode == Player.Preferences.AgendaScreen.CALENDAR) {
+                if (state.viewMode == Player.Preferences.AgendaScreen.DAY) {
                     n.replaceWithCalendar()
                     disableToolbarCalendar()
                 } else {
@@ -270,7 +270,7 @@ class ScheduleViewController(args: Bundle? = null) :
     }
 
     private val ScheduleViewState.viewModeIcon: IIcon
-        get() = if (viewMode == Player.Preferences.AgendaScreen.CALENDAR)
+        get() = if (viewMode == Player.Preferences.AgendaScreen.DAY)
             GoogleMaterial.Icon.gmd_format_list_bulleted
         else
             CommunityMaterial.Icon.cmd_calendar_blank

@@ -67,7 +67,7 @@ object DayViewSideEffectHandler : AppSideEffectHandler() {
             is ScheduleAction.ToggleViewMode -> {
                 val scheduleState = state.stateFor(ScheduleViewState::class.java)
 
-                if (scheduleState.viewMode == Player.Preferences.AgendaScreen.CALENDAR) {
+                if (scheduleState.viewMode == Player.Preferences.AgendaScreen.DAY) {
                     startListenForCalendarQuests(scheduleState.currentDate)
                 }
             }
