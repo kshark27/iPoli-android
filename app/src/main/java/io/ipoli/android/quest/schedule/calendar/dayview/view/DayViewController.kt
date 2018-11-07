@@ -723,7 +723,7 @@ class DayViewController :
                 indicator.setColorFilter(indicatorColor, PorterDuff.Mode.SRC_ATOP)
 
                 view.questName.text = vm.name
-                view.questName.setTextColor(colorRes(vm.backgroundColor.color700))
+                view.questName.setTextColor(colorRes(vm.backgroundColor.color800))
 
                 vm.icon?.let {
                     val icon = IconicsDrawable(context)
