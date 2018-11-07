@@ -1,7 +1,9 @@
 package io.ipoli.android.common.view.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.GestureDetector
 import android.view.MotionEvent
 import android.widget.ScrollView
 
@@ -11,6 +13,16 @@ import android.widget.ScrollView
  */
 class LockableScrollView : ScrollView {
     var isLocked = false
+    var scrollChangedListener: (Int) -> Unit = { _ -> }
+    var singleTapListener: () -> Unit = {}
+
+    private val gestureDetector =
+        GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onSingleTapUp(e: MotionEvent): Boolean {
+                singleTapListener()
+                return super.onSingleTapUp(e)
+            }
+        })
 
     constructor(context: Context) : super(context)
 
@@ -20,13 +32,23 @@ class LockableScrollView : ScrollView {
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int)
         : super(context, attrs, defStyleAttr)
 
-    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean =
-        if (isLocked) false else super.onInterceptTouchEvent(ev)
+    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+        gestureDetector.onTouchEvent(ev)
+        return if (isLocked) false else super.onInterceptTouchEvent(ev)
+    }
 
-    override fun onTouchEvent(ev: MotionEvent): Boolean =
-        if (isLocked) {
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(ev: MotionEvent) =
+        if (isLocked)
             false
-        } else {
+        else
             super.onTouchEvent(ev)
+
+
+    override fun onScrollChanged(x: Int, y: Int, oldX: Int, oldY: Int) {
+        if (!isLocked) {
+            scrollChangedListener(y - oldY)
         }
+        super.onScrollChanged(x, y, oldX, oldY)
+    }
 }

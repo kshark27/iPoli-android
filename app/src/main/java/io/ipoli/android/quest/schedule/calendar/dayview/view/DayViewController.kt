@@ -7,8 +7,10 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.Dialog
 import android.content.Context
+import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.VectorDrawable
 import android.os.Bundle
 import android.support.annotation.ColorInt
 import android.support.annotation.ColorRes
@@ -44,7 +46,6 @@ import io.ipoli.android.quest.schedule.calendar.CalendarViewController
 import io.ipoli.android.quest.schedule.calendar.dayview.view.DayViewState.StateType.*
 import io.ipoli.android.quest.schedule.calendar.dayview.view.widget.*
 import io.ipoli.android.tag.Tag
-import kotlinx.android.synthetic.main.calendar_hour_cell.view.*
 import kotlinx.android.synthetic.main.controller_day_view.view.*
 import kotlinx.android.synthetic.main.item_calendar_drag.view.*
 import kotlinx.android.synthetic.main.item_calendar_quest.view.*
@@ -107,14 +108,8 @@ class DayViewController :
 
         calendarDayView = view.calendar
         calendarDayView.setCalendarChangeListener(this)
-        calendarDayView.setHourAdapter(object : CalendarDayView.HourCellAdapter {
-            override fun bind(view: View, hour: Int) {
-                if (hour > 0) {
-                    view.timeLabel.text = Time.atHours(hour).toString(shouldUse24HourFormat)
-                }
-            }
-        })
-        calendarDayView.invisible()
+
+        calendarDayView.scrollToNow()
 
         return view
     }
@@ -175,6 +170,7 @@ class DayViewController :
                 dragView.dragEndTime.visibility = View.VISIBLE
                 startEditScheduledEvent(dragView, state.startTime!!, state.endTime!!)
                 setupDragViewUI(dragView, state.name, color!!, icon)
+                ViewUtils.showKeyboard(dragView.context, dragView.dragName)
             }
 
             START_EDIT_SCHEDULED_QUEST -> {
@@ -377,11 +373,6 @@ class DayViewController :
         )
     }
 
-    override fun onCalendarReady() {
-        calendarDayView.scrollToNow()
-        calendarDayView.visible()
-    }
-
     override fun onStartEditNewScheduledEvent(startTime: Time, duration: Int) {
         dispatch(DayViewAction.AddNewScheduledQuest(startTime, duration))
     }
@@ -393,7 +384,7 @@ class DayViewController :
         icon: AndroidIcon? = null
     ) {
         dragView.dragName.setText(name)
-        dragView.setBackgroundColor(ContextCompat.getColor(dragView.context, color.color500))
+        dragView.setBackgroundColor(ContextCompat.getColor(dragView.context, color.color400))
         if (icon != null) {
             dragView.dragIcon.setImageDrawable(
                 IconicsDrawable(dragView.context)
@@ -405,6 +396,8 @@ class DayViewController :
         } else {
             dragView.dragIcon.setImageDrawable(null)
         }
+
+        dragView.dragName.requestFocus()
         dragView.dragName.setOnFocusChangeListener { _, isFocused ->
             if (isFocused) {
                 calendarDayView.startEditDragEventName()
@@ -434,6 +427,9 @@ class DayViewController :
 
     override fun onEventValidationError(dragView: View) {
         dragView.dragName.error = stringRes(R.string.think_of_a_name)
+        dragView.dragName.requestFocus()
+        ViewUtils.showKeyboard(dragView.context, dragView)
+
     }
 
     override fun onRemoveEvent(eventId: String) {
@@ -636,7 +632,6 @@ class DayViewController :
             vm: ScheduledEventViewModel.Event
         ) {
             view.checkBox.gone()
-            view.questColorIndicator.visible()
             view.questColorIndicator.setBackgroundColor(vm.indicatorColor)
 
             @SuppressLint("SetTextI18n")
@@ -650,6 +645,7 @@ class DayViewController :
 
             view.repeatIndicator.visible = vm.isRepeating
             view.challengeIndicator.gone()
+            view.questTags.gone()
         }
 
         private fun showQuest(
@@ -658,7 +654,7 @@ class DayViewController :
         ) {
 
             view.checkBox.visible()
-            view.questColorIndicator.gone()
+            view.questColorIndicator.setBackgroundColor(colorRes(vm.backgroundColor.color500))
 
             view.setOnLongClickListener {
 
@@ -674,9 +670,17 @@ class DayViewController :
             @SuppressLint("SetTextI18n")
             view.questSchedule.text = "${vm.startTime} - ${vm.endTime}"
 
-            view.backgroundView.setBackgroundColor(colorRes(vm.backgroundColor.color600))
+            view.backgroundView.setBackgroundColor(
+                ColorUtil.lightenColor(
+                    ColorUtil.getColorWithAlpha(
+                        colorRes(vm.backgroundColor.color700),
+                        0.95f
+                    ), 0.7f
+                )
+            )
 
             if (vm.isCompleted) {
+                view.questColorIndicator.setBackgroundColor(colorRes(R.color.md_grey_700))
                 val color = colorRes(R.color.md_dark_text_54)
 
                 val span = SpannableString(vm.name)
@@ -685,12 +689,11 @@ class DayViewController :
                 view.questName.setTextColor(color)
                 view.questSchedule.setTextColor(color)
                 view.questTags.setTextColor(color)
-                view.questTags.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    R.drawable.ic_tag_black_16dp,
-                    0,
-                    0,
-                    0
-                )
+
+                val indicator = view.questTags.compoundDrawablesRelative[0] as VectorDrawable
+                indicator.mutate()
+                val indicatorColor = colorRes(R.color.md_grey_700)
+                indicator.setColorFilter(indicatorColor, PorterDuff.Mode.SRC_ATOP)
 
                 view.checkBox.isChecked = true
                 (view.checkBox as TintableCompoundButton).supportButtonTintList =
@@ -706,38 +709,33 @@ class DayViewController :
                     view.questIcon.setImageDrawable(icon)
                 }
 
-                view.repeatIndicator.setColorFilter(color)
-                view.challengeIndicator.setColorFilter(color)
-
                 view.setOnClickListener {
                     showCompletedQuest(vm.id)
                 }
             } else {
 
-                view.questSchedule.setTextColor(colorRes(R.color.md_light_text_70))
-                view.questTags.setTextColor(colorRes(R.color.md_light_text_70))
-                view.questTags.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    R.drawable.ic_tag_white_16dp,
-                    0,
-                    0,
-                    0
-                )
+                view.questSchedule.setTextColor(colorRes(vm.backgroundColor.color700))
+                view.questTags.setTextColor(colorRes(vm.backgroundColor.color700))
+
+                val indicator = view.questTags.compoundDrawablesRelative[0] as VectorDrawable
+                indicator.mutate()
+                val indicatorColor = colorRes(vm.backgroundColor.color700)
+                indicator.setColorFilter(indicatorColor, PorterDuff.Mode.SRC_ATOP)
 
                 view.questName.text = vm.name
-                val white = colorRes(R.color.md_white)
-                view.questName.setTextColor(white)
+                view.questName.setTextColor(colorRes(vm.backgroundColor.color700))
 
                 vm.icon?.let {
                     val icon = IconicsDrawable(context)
                         .icon(it.icon)
-                        .colorRes(vm.backgroundColor.color200)
+                        .colorRes(vm.backgroundColor.color500)
                         .sizeDp(24)
                     view.questIcon.visible()
                     view.questIcon.setImageDrawable(icon)
                 }
 
                 (view.checkBox as TintableCompoundButton).supportButtonTintList =
-                    tintList(vm.backgroundColor.color200)
+                    tintList(vm.backgroundColor.color700)
                 view.completedBackgroundView.invisible()
 
                 if (vm.isPlaceholder) {
@@ -751,8 +749,9 @@ class DayViewController :
                     }
                 }
 
-                view.repeatIndicator.setColorFilter(white)
-                view.challengeIndicator.setColorFilter(white)
+                view.repeatIndicator.setColorFilter(indicatorColor)
+                view.challengeIndicator.setColorFilter(indicatorColor)
+
             }
 
             view.repeatIndicator.visibility = if (vm.isRepeating) View.VISIBLE else View.GONE

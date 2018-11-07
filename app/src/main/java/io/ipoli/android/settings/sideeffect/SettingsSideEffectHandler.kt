@@ -19,6 +19,7 @@ object SettingsSideEffectHandler : AppSideEffectHandler() {
     private val savePlanDayTimeUseCase by required { savePlanDayTimeUseCase }
     private val savePlanDaysUseCase by required { savePlanDaysUseCase }
     private val saveTimeFormatUseCase by required { saveTimeFormatUseCase }
+    private val saveAgendaStartScreenUseCase by required { saveAgendaStartScreenUseCase }
     private val saveTemperatureUnitUseCase by required { saveTemperatureUnitUseCase }
     private val saveResetDayTimeUseCase by required { saveResetDayTimeUseCase }
     private val saveReminderNotificationStyleUseCase by required { saveReminderNotificationStyleUseCase }
@@ -37,6 +38,12 @@ object SettingsSideEffectHandler : AppSideEffectHandler() {
 
             is SettingsAction.TimeFormatChanged ->
                 saveTimeFormatUseCase.execute(SaveTimeFormatUseCase.Params(action.format))
+
+            is SettingsAction.AgendaStartScreenChanged -> {
+                saveAgendaStartScreenUseCase.execute(SaveAgendaStartScreenUseCase.Params(action.startScreen))
+                sharedPreferences.edit()
+                    .putString(Constants.KEY_AGENDA_START_SCREEN, action.startScreen.name).apply()
+            }
 
             is SettingsAction.TemperatureUnitChanged ->
                 saveTemperatureUnitUseCase.execute(SaveTemperatureUnitUseCase.Params(action.unit))

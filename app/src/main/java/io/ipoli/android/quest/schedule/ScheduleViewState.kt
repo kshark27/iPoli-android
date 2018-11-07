@@ -7,6 +7,7 @@ import io.ipoli.android.common.BaseViewStateReducer
 import io.ipoli.android.common.redux.Action
 import io.ipoli.android.common.redux.BaseViewState
 import io.ipoli.android.common.text.CalendarFormatter
+import io.ipoli.android.player.data.Player
 import io.ipoli.android.quest.schedule.agenda.view.AgendaAction
 import io.ipoli.android.quest.schedule.calendar.CalendarAction
 import org.threeten.bp.LocalDate
@@ -21,7 +22,7 @@ sealed class ScheduleAction : Action {
     object ToggleViewMode : ScheduleAction()
     object ToggleAgendaPreviewMode : ScheduleAction()
 
-    object Load : ScheduleAction()
+    data class Load(val viewMode: Player.Preferences.AgendaScreen) : ScheduleAction()
     object GoToToday : ScheduleAction()
     object ResetAgendaDate : ScheduleAction()
 }
@@ -34,7 +35,7 @@ object ScheduleReducer : BaseViewStateReducer<ScheduleViewState>() {
         ScheduleViewState(
             type = ScheduleViewState.StateType.LOADING,
             currentDate = LocalDate.now(),
-            viewMode = ScheduleViewState.ViewMode.AGENDA
+            viewMode = Player.Preferences.AgendaScreen.AGENDA
         )
 
     override fun reduce(state: AppState, subState: ScheduleViewState, action: Action) =
@@ -91,6 +92,7 @@ object ScheduleReducer : BaseViewStateReducer<ScheduleViewState>() {
                 } else {
                     state.copy(
                         type = ScheduleViewState.StateType.INITIAL,
+                        viewMode = action.viewMode,
                         currentDate = dataState.agendaDate
                     )
                 }
@@ -99,7 +101,7 @@ object ScheduleReducer : BaseViewStateReducer<ScheduleViewState>() {
             is ScheduleAction.ToggleViewMode -> {
                 state.copy(
                     type = ScheduleViewState.StateType.VIEW_MODE_CHANGED,
-                    viewMode = if (state.viewMode == ScheduleViewState.ViewMode.CALENDAR) ScheduleViewState.ViewMode.AGENDA else ScheduleViewState.ViewMode.CALENDAR
+                    viewMode = if (state.viewMode == Player.Preferences.AgendaScreen.CALENDAR) Player.Preferences.AgendaScreen.AGENDA else Player.Preferences.AgendaScreen.CALENDAR
                 )
             }
 
@@ -118,7 +120,7 @@ object ScheduleReducer : BaseViewStateReducer<ScheduleViewState>() {
 data class ScheduleViewState(
     val type: StateType,
     val currentDate: LocalDate,
-    val viewMode: ViewMode
+    val viewMode: Player.Preferences.AgendaScreen
 ) : BaseViewState() {
 
     enum class StateType {
@@ -129,15 +131,11 @@ data class ScheduleViewState(
         VIEW_MODE_CHANGED,
         DATE_AUTO_CHANGED
     }
-
-    enum class ViewMode {
-        CALENDAR, AGENDA
-    }
 }
 
 
 val ScheduleViewState.viewModeTitle
-    get() = if (viewMode == ScheduleViewState.ViewMode.CALENDAR) "Agenda" else "Calendar"
+    get() = if (viewMode == Player.Preferences.AgendaScreen.CALENDAR) "Agenda" else "Calendar"
 
 fun ScheduleViewState.dayText(context: Context) =
     CalendarFormatter(context).day(currentDate)

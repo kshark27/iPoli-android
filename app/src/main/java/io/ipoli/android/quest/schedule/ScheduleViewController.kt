@@ -7,21 +7,27 @@ import com.mikepenz.community_material_typeface_library.CommunityMaterial
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.IIcon
+import io.ipoli.android.Constants
 import io.ipoli.android.R
 import io.ipoli.android.common.ViewUtils
 import io.ipoli.android.common.navigation.Navigator
 import io.ipoli.android.common.redux.android.ReduxViewController
 import io.ipoli.android.common.view.*
+import io.ipoli.android.player.data.Player
 import io.ipoli.android.quest.schedule.ScheduleViewState.StateType.*
 import io.ipoli.android.quest.schedule.addquest.AddQuestAnimationHelper
 import io.ipoli.android.quest.schedule.agenda.view.AgendaViewController
+import io.ipoli.android.quest.schedule.calendar.CalendarViewController
 import kotlinx.android.synthetic.main.controller_schedule.view.*
 import kotlinx.android.synthetic.main.view_calendar_toolbar.view.*
+import space.traversal.kapsule.required
 
 class ScheduleViewController(args: Bundle? = null) :
     ReduxViewController<ScheduleAction, ScheduleViewState, ScheduleReducer>(args) {
 
     override val reducer = ScheduleReducer
+
+    private val sharedPreferences by required { sharedPreferences }
 
     private var calendarToolbar: ViewGroup? = null
 
@@ -29,7 +35,16 @@ class ScheduleViewController(args: Bundle? = null) :
 
     private var viewModeIcon: IIcon = CommunityMaterial.Icon.cmd_calendar_blank
 
-    private var viewModeTitle = "Calendar"
+    private var viewModeTitle = ""
+
+    private val startView by lazy {
+        Player.Preferences.AgendaScreen.valueOf(
+            sharedPreferences.getString(
+                Constants.KEY_AGENDA_START_SCREEN,
+                Constants.DEFAULT_AGENDA_START_SCREEN.name
+            )
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,14 +69,27 @@ class ScheduleViewController(args: Bundle? = null) :
             }
         }
 
-        setChildController(
-            view.contentContainer,
-            AgendaViewController()
-        )
+        if (startView == Player.Preferences.AgendaScreen.CALENDAR) {
+            viewModeIcon = GoogleMaterial.Icon.gmd_format_list_bulleted
+            viewModeTitle = stringRes(R.string.agenda)
+            setChildController(
+                view.contentContainer,
+                CalendarViewController()
+            )
+        } else {
+            viewModeIcon = CommunityMaterial.Icon.cmd_calendar_blank
+            viewModeTitle = stringRes(R.string.calendar)
+            setChildController(
+                view.contentContainer,
+                AgendaViewController()
+            )
+        }
+
+
         return view
     }
 
-    override fun onCreateLoadAction() = ScheduleAction.Load
+    override fun onCreateLoadAction() = ScheduleAction.Load(startView)
 
     override fun onDestroyView(view: View) {
         calendarToolbar?.let { removeToolbarView(it) }
@@ -153,7 +181,7 @@ class ScheduleViewController(args: Bundle? = null) :
 
             INITIAL -> {
                 renderNewDate(state)
-                if (state.viewMode == ScheduleViewState.ViewMode.CALENDAR) {
+                if (state.viewMode == Player.Preferences.AgendaScreen.CALENDAR) {
                     disableToolbarCalendar()
                 } else {
                     enableToolbarCalendar()
@@ -177,7 +205,7 @@ class ScheduleViewController(args: Bundle? = null) :
 
                 val childRouter = getChildRouter(view.contentContainer, null)
                 val n = Navigator(childRouter)
-                if (state.viewMode == ScheduleViewState.ViewMode.CALENDAR) {
+                if (state.viewMode == Player.Preferences.AgendaScreen.CALENDAR) {
                     n.replaceWithCalendar()
                     disableToolbarCalendar()
                 } else {
@@ -242,7 +270,7 @@ class ScheduleViewController(args: Bundle? = null) :
     }
 
     private val ScheduleViewState.viewModeIcon: IIcon
-        get() = if (viewMode == ScheduleViewState.ViewMode.CALENDAR)
+        get() = if (viewMode == Player.Preferences.AgendaScreen.CALENDAR)
             GoogleMaterial.Icon.gmd_format_list_bulleted
         else
             CommunityMaterial.Icon.cmd_calendar_blank

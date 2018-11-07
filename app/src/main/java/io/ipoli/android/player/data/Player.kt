@@ -178,7 +178,7 @@ data class Player(
         val planDayTime: Time = Time.of(Constants.DEFAULT_PLAN_DAY_REMINDER_START_MINUTE),
         val isQuickDoNotificationEnabled: Boolean = Constants.DEFAULT_QUICK_DO_NOTIFICATION_ENABLED,
         val resetDayTime: Time = Constants.RESET_DAY_TIME,
-        val startView: StartView = Constants.DEFAULT_START_VIEW,
+        val agendaStartScreen: AgendaScreen = Constants.DEFAULT_AGENDA_START_SCREEN,
         val reminderNotificationStyle: NotificationStyle = Constants.DEFAULT_REMINDER_NOTIFICATION_STYLE,
         val planDayNotificationStyle: NotificationStyle = Constants.DEFAULT_PLAN_DAY_NOTIFICATION_STYLE,
         val isAutoPostingEnabled: Boolean = Constants.DEFAULT_AUTO_POSTING_ENABLED
@@ -198,8 +198,8 @@ data class Player(
             NOTIFICATION, POPUP, ALL
         }
 
-        enum class StartView {
-            CALENDAR, AGENDA, TODAY
+        enum class AgendaScreen {
+            CALENDAR, AGENDA
         }
 
         data class SyncCalendar(val id: String, val name: String)

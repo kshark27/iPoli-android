@@ -17,7 +17,7 @@
             android:checked="false"
             android:icon="@drawable/ic_event_white_24dp"
             android:orderInCategory="0"
-            android:title="@string/agenda" />
+            android:title="@string/calendar" />
 
         <item
             android:id="@+id/habits"
@@ -121,6 +121,14 @@
             android:icon="@drawable/ic_question_outline_white_24dp"
             android:orderInCategory="1"
             android:title="@string/help" />
+
+        <item
+            android:id="@+id/requestFeature"
+            android:checkable="false"
+            android:checked="false"
+            android:icon="@drawable/ic_light_bulb_black_24dp"
+            android:orderInCategory="1"
+            android:title="@string/request_feature" />
 
         <item
             android:id="@+id/reportBug"

@@ -4,6 +4,7 @@ import io.ipoli.android.Constants
 import io.ipoli.android.common.*
 import io.ipoli.android.common.redux.Action
 import io.ipoli.android.event.usecase.FindEventsBetweenDatesUseCase
+import io.ipoli.android.player.data.Player
 import io.ipoli.android.quest.Quest
 import io.ipoli.android.quest.Reminder
 import io.ipoli.android.quest.schedule.ScheduleAction
@@ -66,7 +67,7 @@ object DayViewSideEffectHandler : AppSideEffectHandler() {
             is ScheduleAction.ToggleViewMode -> {
                 val scheduleState = state.stateFor(ScheduleViewState::class.java)
 
-                if (scheduleState.viewMode == ScheduleViewState.ViewMode.CALENDAR) {
+                if (scheduleState.viewMode == Player.Preferences.AgendaScreen.CALENDAR) {
                     startListenForCalendarQuests(scheduleState.currentDate)
                 }
             }

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.arch.persistence.room.Transaction
 import android.content.Context
 import android.support.annotation.WorkerThread
-import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
@@ -88,6 +87,7 @@ class DataImporter(private val appContext: Context) : Injects<BackgroundModule> 
         }
 
         sharedPreferences.edit()
+            .putString(Constants.KEY_AGENDA_START_SCREEN, pref.agendaStartScreen.name)
             .putString(Constants.KEY_PLAYER_ID, remotePlayerId)
             .putBoolean(Constants.KEY_PLAYER_DATA_IMPORTED, true)
             .putInt(Constants.KEY_SCHEMA_VERSION, remoteSchemaVersion.toInt())

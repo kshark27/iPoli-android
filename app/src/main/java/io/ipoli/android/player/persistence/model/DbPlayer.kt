@@ -103,7 +103,7 @@ data class DbPreferences(val map: MutableMap<String, Any?> = mutableMapOf()) {
     var planDayStartMinute: Long by map
     var resetDayStartMinute: Long by map
     var isQuickDoNotificationEnabled: Boolean by map
-    var startView: String by map
+    var agendaStartScreen: String by map
     var reminderNotificationStyle: String by map
     var planDayNotificationStyle: String by map
     var isAutoPostingEnabled: Boolean by map

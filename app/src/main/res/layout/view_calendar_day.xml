@@ -13,15 +13,15 @@
         android:id="@+id/unscheduledEventsDivider"
         android:layout_width="match_parent"
         android:layout_height="1.5dp"
-        android:visibility="gone"
-        android:background="?attr/colorPrimary" />
+        android:background="?attr/colorPrimary"
+        android:visibility="gone" />
 
     <io.ipoli.android.common.view.widget.LockableScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <FrameLayout
+        <io.ipoli.android.quest.schedule.calendar.dayview.view.widget.CalendarView
             android:id="@+id/eventContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

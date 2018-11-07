@@ -4,35 +4,35 @@
 
     <item
         android:id="@+id/chooseDate"
-        android:icon="@drawable/ic_event_text_secondary_24dp"
+        android:icon="@drawable/ic_event_white_24dp"
         android:orderInCategory="100"
         android:title="@string/date"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/chooseReminder"
-        android:icon="@drawable/ic_reminder_text_secondary_24dp"
+        android:icon="@drawable/ic_reminder_white_24dp"
         android:orderInCategory="100"
         android:title="@string/reminder"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/chooseTags"
-        android:icon="@drawable/ic_tag_text_secondary_24dp"
+        android:icon="@drawable/ic_tag_white_24dp"
         android:orderInCategory="100"
         android:title="@string/tags"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/chooseIcon"
-        android:icon="@drawable/ic_icon_text_secondary_24dp"
+        android:icon="@drawable/ic_icon_white_24dp"
         android:orderInCategory="100"
         android:title="@string/icon"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/chooseColor"
-        android:icon="@drawable/ic_color_palette_text_secondary_24dp"
+        android:icon="@drawable/ic_color_palette_white_24dp"
         android:orderInCategory="100"
         android:title="@string/color"
         app:showAsAction="always" />

@@ -12,7 +12,6 @@ import android.graphics.drawable.Drawable
 import android.support.annotation.LayoutRes
 import android.support.transition.AutoTransition
 import android.support.transition.TransitionManager
-import android.support.v4.view.AsyncLayoutInflater
 import android.support.v7.widget.LinearLayoutManager
 import android.util.AttributeSet
 import android.util.DisplayMetrics
@@ -27,6 +26,7 @@ import io.ipoli.android.common.view.visible
 import io.ipoli.android.quest.schedule.calendar.dayview.view.widget.util.PositionToTimeMapper
 import kotlinx.android.synthetic.main.view_calendar_day.view.*
 import java.lang.Math.*
+import kotlin.math.max
 import kotlin.reflect.KClass
 
 /**
@@ -87,6 +87,7 @@ class CalendarDayView : FrameLayout, StateChangeListener {
         object Up : Event()
         object LayoutChange : Event()
         data class StartCalendarEventEdit(val view: View, val position: Int) : Event()
+        data class Scroll(val deltaY: Int) : Event()
         data class StartUnscheduledEventEdit(val view: View, val position: Int) : Event()
         data class StartCalendarEventAdd(
             val startTime: Time,
@@ -105,17 +106,14 @@ class CalendarDayView : FrameLayout, StateChangeListener {
 
         object ZoomEnd : Event()
         object RemoveEvent : Event()
-
-        object HourViewAdded : Event()
     }
 
     companion object {
-        const val DEFAULT_VISIBLE_HOURS = 7
-        const val MIN_VISIBLE_HOURS = 3
-        const val MAX_VISIBLE_HOURS = 8
+        const val DEFAULT_VISIBLE_HOURS = 10
+        const val MIN_VISIBLE_HOURS = 6
+        const val MAX_VISIBLE_HOURS = 16
         const val MIN_EVENT_DURATION = 15
         val MAX_EVENT_DURATION = Time.h2Min(4)
-        const val HOURS_IN_A_DAY = 24
         const val KEYBOARD_VISIBLE_THRESHOLD_DP = 100f
     }
 
@@ -133,9 +131,9 @@ class CalendarDayView : FrameLayout, StateChangeListener {
         val hourHeight: Float = 0f,
         val zoomDistance: Float? = null,
         val isScrollLocked: Boolean = false,
+        val isEditing: Boolean = false,
         val isKeyboardOpen: Boolean = false,
-        val keyboardHeight: Int = 0,
-        val hourViewsAdded: Int = 0
+        val keyboardHeight: Int = 0
     ) {
         enum class Type {
             VIEW, EDIT, DRAG, ZOOM
@@ -144,14 +142,21 @@ class CalendarDayView : FrameLayout, StateChangeListener {
         val minuteHeight = hourHeight / 60f
     }
 
-    private lateinit var inflater: LayoutInflater
-    private lateinit var asyncLayoutInflater: AsyncLayoutInflater
+    private val inflater by lazy {
+        LayoutInflater.from(context)
+    }
+
     private val timeChangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (Intent.ACTION_TIME_TICK == intent.action) {
                 moveTimeLineToNow()
             }
         }
+    }
+
+    private val zoomListener: (View, MotionEvent) -> Boolean = { _, e ->
+        scaleDetector.onTouchEvent(e)
+        false
     }
 
     private var dragView: View? = null
@@ -166,7 +171,6 @@ class CalendarDayView : FrameLayout, StateChangeListener {
     @LayoutRes
     private var timeLineLayout: Int = 0
 
-    private lateinit var editModeBackground: View
     private lateinit var topDragView: View
     private lateinit var bottomDragView: View
     private lateinit var scaleDetector: ScaleGestureDetector
@@ -177,7 +181,6 @@ class CalendarDayView : FrameLayout, StateChangeListener {
     private var listener: CalendarChangeListener? = null
 
     private val eventViews = mutableListOf<View>()
-    private val hourCellViews = mutableListOf<View>()
     private lateinit var timeLineView: View
 
     private val keyboardVisibleThreshold = Math.round(
@@ -196,13 +199,6 @@ class CalendarDayView : FrameLayout, StateChangeListener {
         }
     }
 
-
-    private var hourCellAdapter: HourCellAdapter = object : HourCellAdapter {
-        override fun bind(view: View, hour: Int) {
-
-        }
-    }
-
     private fun clearCalendarEvents() {
         for (v in eventViews) {
             eventContainer.removeView(v)
@@ -211,11 +207,11 @@ class CalendarDayView : FrameLayout, StateChangeListener {
     }
 
     constructor(context: Context) : super(context) {
-        initUi(context, null, 0)
+        initUi(null, 0)
     }
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        initUi(context, attrs, 0)
+        initUi(attrs, 0)
     }
 
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
@@ -223,13 +219,10 @@ class CalendarDayView : FrameLayout, StateChangeListener {
         attrs,
         defStyleAttr
     ) {
-        initUi(context, attrs, defStyleAttr)
+        initUi(attrs, defStyleAttr)
     }
 
-    private fun initUi(context: Context, attrs: AttributeSet?, defStyleAttr: Int) {
-
-        inflater = LayoutInflater.from(context)
-        asyncLayoutInflater = AsyncLayoutInflater(context)
+    private fun initUi(attrs: AttributeSet?, defStyleAttr: Int) {
 
         setMainLayout()
         fetchStyleAttributes(attrs, defStyleAttr)
@@ -237,12 +230,10 @@ class CalendarDayView : FrameLayout, StateChangeListener {
         setupFSM()
 
         setupScroll()
-        setupHourCells()
-        setupEditBackgroundView()
         setupUnscheduledEvents()
         setupTimeLine()
 
-        addEditView()
+        dragView = addEditView()
         topDragView = addDragView()
         bottomDragView = addDragView()
 
@@ -321,57 +312,14 @@ class CalendarDayView : FrameLayout, StateChangeListener {
 
         listenForZoom()
 
-        fsm.transition(State.Type.VIEW, Event.HourViewAdded::class, { s, _ ->
-            val addedHourViews = s.hourViewsAdded + 1
-            if (addedHourViews == HOURS_IN_A_DAY) {
-                listener?.onCalendarReady()
-            }
-            s.copy(
-                hourViewsAdded = addedHourViews
-            )
-        })
-
-        fsm.transition(State.Type.VIEW, Event.StartCalendarEventEdit::class, { s, e ->
-            val topPosition = startDrag(e.view)
-
-            val event = scheduledEventsAdapter!!.events[e.position]
-
-            s.copy(
-                type = State.Type.DRAG,
-                eventId = event.id,
-                topDragViewPosition = topPosition,
-                topDragIndicatorPosition = topPosition - dragImageSize / 2,
-                bottomDragIndicatorPosition = topPosition + dragView!!.height - dragImageSize / 2,
-                eventAdapterPosition = e.position,
-                height = dragView!!.height,
-                isScrollLocked = true
-            )
-        })
-
-        fsm.transition(State.Type.VIEW, Event.StartUnscheduledEventEdit::class, { s, e ->
-            val topPosition = startDrag(e.view)
-
-            val event = unscheduledEventsAdapter!!.events[e.position]
-            s.copy(
-                type = State.Type.DRAG,
-                eventId = event.id,
-                topDragViewPosition = topPosition,
-                topDragIndicatorPosition = topPosition - dragImageSize / 2,
-                bottomDragIndicatorPosition = topPosition + dragView!!.height - dragImageSize / 2,
-                unscheduledEventAdapterPosition = e.position,
-                height = dragView!!.height,
-                isScrollLocked = true
-            )
-        })
-
-        fsm.transition(State.Type.VIEW, Event.StartCalendarEventAdd::class, { s, e ->
+        fsm.transition(State.Type.VIEW, Event.StartCalendarEventAdd::class) { s, e ->
             scrollView.setOnTouchListener(null)
             setupDragViews(dragView!!)
-            editModeBackground.bringToFront()
-            setBackgroundTouchListener()
             setDragViewTouchListener()
             setTopDragViewListener()
             setBottomDragViewListener()
+
+            enableScrollEditMode()
 
             val absPos = dragView!!.topLocationOnScreen.toFloat() - topLocationOnScreen
             val topPosition = roundPositionToMinutes(absPos)
@@ -389,11 +337,62 @@ class CalendarDayView : FrameLayout, StateChangeListener {
                 topDragIndicatorPosition = topPosition - dragImageSize / 2,
                 bottomDragIndicatorPosition = topPosition + dragView!!.height - dragImageSize / 2,
                 height = dragView!!.height,
-                isScrollLocked = true
+                isScrollLocked = true,
+                isEditing = true
             )
-        })
+        }
 
-        fsm.transition(State.Type.DRAG, Event.Drag::class, { s, e ->
+        fsm.transition(State.Type.VIEW, Event.StartCalendarEventEdit::class) { s, e ->
+            val topPosition = startDrag(e.view)
+
+            val event = scheduledEventsAdapter!!.events[e.position]
+
+            s.copy(
+                type = State.Type.DRAG,
+                eventId = event.id,
+                topDragViewPosition = topPosition,
+                topDragIndicatorPosition = topPosition - dragImageSize / 2,
+                bottomDragIndicatorPosition = topPosition + dragView!!.height - dragImageSize / 2,
+                eventAdapterPosition = e.position,
+                height = dragView!!.height,
+                isScrollLocked = true,
+                isEditing = true
+            )
+        }
+
+        fsm.transition(State.Type.EDIT, Event.Scroll::class) { s, e ->
+            val absPos = dragView!!.y + e.deltaY
+
+            val maxTopPosition = (bottom - dragView!!.height).toFloat()
+            val topPosition = roundPositionToMinutes(min(max(0f, absPos), maxTopPosition))
+
+            val (startTime: Time?, endTime: Time?) = calculateStartAndEndTime(
+                topPosition,
+                s.height!!,
+                s.minuteHeight
+            )
+            listener?.onMoveEvent(startTime, endTime)
+            s
+        }
+
+        fsm.transition(State.Type.VIEW, Event.StartUnscheduledEventEdit::class) { s, e ->
+            val topPosition = startDrag(e.view)
+
+            val event = unscheduledEventsAdapter!!.events[e.position]
+            s.copy(
+                type = State.Type.DRAG,
+                eventId = event.id,
+                topDragViewPosition = topPosition,
+                topDragIndicatorPosition = topPosition - dragImageSize / 2,
+                bottomDragIndicatorPosition = topPosition + dragView!!.height - dragImageSize / 2,
+                unscheduledEventAdapterPosition = e.position,
+                height = dragView!!.height,
+                isScrollLocked = true,
+                isEditing = true
+            )
+        }
+
+        fsm.transition(State.Type.DRAG, Event.Drag::class) { s, e ->
             val topPosition = calculateTopPosition(e.y)
 
             val (startTime: Time?, endTime: Time?) = calculateStartAndEndTime(
@@ -408,13 +407,13 @@ class CalendarDayView : FrameLayout, StateChangeListener {
                 topDragIndicatorPosition = topPosition - dragImageSize / 2,
                 bottomDragIndicatorPosition = topPosition + dragView!!.height - dragImageSize / 2
             )
-        })
+        }
 
-        fsm.transition(State.Type.DRAG, Event.Up::class, { s, _ ->
-            s.copy(type = State.Type.EDIT)
-        })
+        fsm.transition(State.Type.DRAG, Event.Up::class) { s, _ ->
+            s.copy(type = State.Type.EDIT, isScrollLocked = false)
+        }
 
-        fsm.transition(State.Type.DRAG, Event.DragTopIndicator::class, { s, e ->
+        fsm.transition(State.Type.DRAG, Event.DragTopIndicator::class) { s, e ->
             val topPosition = (ceil(calculateTopPosition(e.y).toDouble())).toFloat()
             val height = (dragView!!.bottom - topPosition).toInt()
             if (!isValidHeightForEvent(height)) {
@@ -431,11 +430,12 @@ class CalendarDayView : FrameLayout, StateChangeListener {
                 topDragViewPosition = topPosition,
                 topDragIndicatorPosition = topPosition - dragImageSize / 2,
                 bottomDragIndicatorPosition = topPosition + height - dragImageSize / 2,
-                height = height
+                height = height,
+                isScrollLocked = false
             )
-        })
+        }
 
-        fsm.transition(State.Type.DRAG, Event.DragBottomIndicator::class, { s, e ->
+        fsm.transition(State.Type.DRAG, Event.DragBottomIndicator::class) { s, e ->
             val bottomPosition = calculateBottomPosition(e.y)
             val height = (bottomPosition - dragView!!.top).toInt()
             if (!isValidHeightForEvent(height)) {
@@ -452,28 +452,29 @@ class CalendarDayView : FrameLayout, StateChangeListener {
 
             s.copy(
                 bottomDragIndicatorPosition = bottomPosition - dragImageSize / 2,
-                height = height
+                height = height,
+                isScrollLocked = false
             )
-        })
+        }
 
-        fsm.transition(State.Type.EDIT, Event.Drag::class, { s, _ ->
-            s.copy(type = State.Type.DRAG)
-        })
+        fsm.transition(State.Type.EDIT, Event.Drag::class) { s, _ ->
+            s.copy(type = State.Type.DRAG, isScrollLocked = false)
+        }
 
-        fsm.transition(State.Type.EDIT, Event.DragTopIndicator::class, { s, _ ->
-            s.copy(type = State.Type.DRAG)
-        })
+        fsm.transition(State.Type.EDIT, Event.DragTopIndicator::class) { s, _ ->
+            s.copy(type = State.Type.DRAG, isScrollLocked = false)
+        }
 
-        fsm.transition(State.Type.EDIT, Event.DragBottomIndicator::class, { s, _ ->
-            s.copy(type = State.Type.DRAG)
-        })
+        fsm.transition(State.Type.EDIT, Event.DragBottomIndicator::class) { s, _ ->
+            s.copy(type = State.Type.DRAG, isScrollLocked = false)
+        }
 
-        fsm.transition(State.Type.EDIT, Event.Up::class, { s, _ ->
+        fsm.transition(State.Type.EDIT, Event.Up::class) { s, _ ->
             listener?.onDragViewClick(dragView!!)
             s
-        })
+        }
 
-        fsm.transition(State.Type.EDIT, Event.LayoutChange::class, { s, _ ->
+        fsm.transition(State.Type.EDIT, Event.LayoutChange::class) { s, _ ->
             getWindowVisibleDisplayFrame(r)
             val visibleHeight = r.height()
             val heightDiff = rootView.height - r.height()
@@ -500,9 +501,9 @@ class CalendarDayView : FrameLayout, StateChangeListener {
             }
 
             s.copy(isKeyboardOpen = isOpen)
-        })
+        }
 
-        fsm.transition(State.Type.EDIT, Event.CompleteEditRequest::class, { s, _ ->
+        fsm.transition(State.Type.EDIT, Event.CompleteEditRequest::class) { s, _ ->
             if (s.isNewEvent) {
                 listener?.onAddEvent()
             } else if (s.eventAdapterPosition != null) {
@@ -519,51 +520,54 @@ class CalendarDayView : FrameLayout, StateChangeListener {
                 }
             }
             s
-        })
+        }
 
-        fsm.transition(State.Type.EDIT, Event.CompleteEdit::class, { s, _ ->
+        fsm.transition(State.Type.EDIT, Event.CompleteEdit::class) { s, _ ->
             prepareForViewState()
             s.copy(
                 type = State.Type.VIEW,
                 isScrollLocked = false,
+                isEditing = false,
                 isNewEvent = false,
                 eventAdapterPosition = null,
                 unscheduledEventAdapterPosition = null
             )
-        })
+        }
 
-        fsm.transition(State.Type.EDIT, Event.CancelEdit::class, { s, _ ->
+        fsm.transition(State.Type.EDIT, Event.CancelEdit::class) { s, _ ->
             prepareForViewState()
             s.copy(
                 type = State.Type.VIEW,
                 isScrollLocked = false,
+                isEditing = false,
                 isNewEvent = false,
                 eventAdapterPosition = null,
                 unscheduledEventAdapterPosition = null
             )
-        })
+        }
 
-        fsm.transition(State.Type.EDIT, Event.RemoveEvent::class, { s, _ ->
+        fsm.transition(State.Type.EDIT, Event.RemoveEvent::class) { s, _ ->
             prepareForViewState()
             listener?.onRemoveEvent(s.eventId)
             s.copy(
                 type = State.Type.VIEW,
                 isScrollLocked = false,
+                isEditing = false,
                 isNewEvent = false,
                 eventAdapterPosition = null,
                 unscheduledEventAdapterPosition = null
             )
-        })
+        }
 
-        fsm.transition(State.Type.DRAG, Event.StartEditName::class, { s, _ ->
-            s.copy(type = State.Type.EDIT)
-        })
+        fsm.transition(State.Type.DRAG, Event.StartEditName::class) { s, _ ->
+            s.copy(type = State.Type.EDIT, isScrollLocked = false)
+        }
 
-        fsm.transition(State.Type.VIEW, Event.ZoomStart::class, { s, e ->
+        fsm.transition(State.Type.VIEW, Event.ZoomStart::class) { s, e ->
             s.copy(type = State.Type.ZOOM, zoomDistance = e.zoomDistance)
-        })
+        }
 
-        fsm.transition(State.Type.ZOOM, Event.Zoom::class, { s, e ->
+        fsm.transition(State.Type.ZOOM, Event.Zoom::class) { s, e ->
             if (!hasZoomedEnough(s.zoomDistance!!, e.zoomDistance)) {
                 return@transition s
             }
@@ -572,21 +576,20 @@ class CalendarDayView : FrameLayout, StateChangeListener {
             scrollToFocusPosition(s.minuteHeight, newState.minuteHeight, e.focusY)
 
             newState
-        })
+        }
 
-        fsm.transition(State.Type.ZOOM, Event.ZoomEnd::class, { s, _ ->
+        fsm.transition(State.Type.ZOOM, Event.ZoomEnd::class) { s, _ ->
             s.copy(type = State.Type.VIEW)
-        })
+        }
 
     }
 
     private fun prepareForViewState() {
         dragView?.visible = false
-
+        scrollView.scrollChangedListener = {}
+        scrollView.singleTapListener = {}
         listenForZoom()
-        hideViews(editModeBackground, topDragView, bottomDragView)
-
-        editModeBackground.setOnTouchListener(null)
+        hideViews(topDragView, bottomDragView)
     }
 
     private fun shouldScheduleUnscheduledEvent(s: State) =
@@ -618,11 +621,19 @@ class CalendarDayView : FrameLayout, StateChangeListener {
     private fun startDrag(adapterView: View): Float {
         scrollView.setOnTouchListener(null)
         setupDragViews(dragView!!)
-        editModeBackground.bringToFront()
         setAdapterViewTouchListener(adapterView)
-
+        enableScrollEditMode()
         val absPos = dragView!!.topLocationOnScreen.toFloat() - topLocationOnScreen
         return roundPositionToMinutes(absPos)
+    }
+
+    private fun enableScrollEditMode() {
+        scrollView.scrollChangedListener = { delta ->
+            fsm.fire(Event.Scroll(delta))
+        }
+        scrollView.singleTapListener = {
+            fsm.fire(Event.CompleteEditRequest)
+        }
     }
 
     private fun calculateBottomPosition(y: Float): Float {
@@ -637,10 +648,7 @@ class CalendarDayView : FrameLayout, StateChangeListener {
     }
 
     private fun listenForZoom() {
-        scrollView.setOnTouchListener { _, e ->
-            scaleDetector.onTouchEvent(e)
-            false
-        }
+        scrollView.setOnTouchListener(zoomListener)
     }
 
     private fun createNewZoomState(state: State, event: Event.Zoom): State {
@@ -688,10 +696,8 @@ class CalendarDayView : FrameLayout, StateChangeListener {
     }
 
     private fun resizeHourCells(hourHeight: Float) {
-        hourCellViews.forEachIndexed { i, hc ->
-            val topPosition = (i * hourHeight).toInt()
-            hc.setPositionAndHeight(topPosition.toFloat(), hourHeight.toInt())
-        }
+        eventContainer.hourHeight = hourHeight
+        eventContainer.invalidate()
     }
 
     private fun startResizeAnimation() {
@@ -707,8 +713,6 @@ class CalendarDayView : FrameLayout, StateChangeListener {
 
     private fun setAdapterViewTouchListener(adapterView: View) {
         val initialOffset = lastY!! - dragView!!.topLocationOnScreen
-
-        setBackgroundTouchListener()
 
         adapterView.setOnTouchListener { _, e ->
 
@@ -759,36 +763,6 @@ class CalendarDayView : FrameLayout, StateChangeListener {
                 R.layout.calendar_time_line
             )
             a.recycle()
-        }
-    }
-
-    private fun setupEditBackgroundView() {
-        editModeBackground = View(context)
-        editModeBackground.layoutParams =
-            FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        editModeBackground.setBackgroundResource(R.color.md_dark_text_38)
-        editModeBackground.visibility = View.GONE
-        addView(editModeBackground)
-    }
-
-    private fun setupHourCells() {
-        val hourHeight = fsm.state.hourHeight
-        for (hour in 0 until HOURS_IN_A_DAY) {
-
-            post {
-                asyncLayoutInflater.inflate(
-                    R.layout.calendar_hour_cell,
-                    eventContainer
-                ) { hourView, _, _ ->
-                    val layoutParams = hourView.layoutParams as MarginLayoutParams
-                    layoutParams.height = hourHeight.toInt()
-                    layoutParams.topMargin = (hour * hourHeight).toInt()
-                    hourCellAdapter.bind(hourView, hour)
-                    hourCellViews.add(hourView)
-                    eventContainer.addView(hourView)
-                    fsm.fire(Event.HourViewAdded)
-                }
-            }
         }
     }
 
@@ -864,16 +838,6 @@ class CalendarDayView : FrameLayout, StateChangeListener {
         }
     }
 
-    private fun setBackgroundTouchListener() {
-        editModeBackground.setOnTouchListener { _, ev ->
-            val action = ev.actionMasked
-            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
-                fsm.fire(Event.CompleteEditRequest)
-            }
-            true
-        }
-    }
-
     private fun positionDragView(adapterView: View, duration: Int) {
         val yPosition = adapterView.topLocationOnScreen - topLocationOnScreen.toFloat()
         return positionDragView(yPosition, (fsm.state.minuteHeight * duration).toInt())
@@ -886,12 +850,11 @@ class CalendarDayView : FrameLayout, StateChangeListener {
         )
     }
 
-    private fun addEditView() {
-        asyncLayoutInflater.inflate(R.layout.item_calendar_drag, this) { v, _, _ ->
-            v.visible = false
-            addView(v)
-            dragView = v
-        }
+    private fun addEditView(): View {
+        val v = inflater.inflate(R.layout.item_calendar_drag, this, false)
+        v.visible = false
+        addView(v)
+        return v
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
@@ -981,7 +944,7 @@ class CalendarDayView : FrameLayout, StateChangeListener {
         when (state.type) {
 
             State.Type.EDIT -> {
-                showViews(dragView!!, editModeBackground, topDragView, bottomDragView)
+                showViews(dragView!!, topDragView, bottomDragView)
 
                 dragView?.setPositionAndHeight(state.topDragViewPosition!!, state.height!!)
                 topDragView.setTopPosition(state.topDragIndicatorPosition!!)
@@ -989,7 +952,7 @@ class CalendarDayView : FrameLayout, StateChangeListener {
             }
 
             State.Type.DRAG -> {
-                showViews(dragView!!, editModeBackground, topDragView, bottomDragView)
+                showViews(dragView!!, topDragView, bottomDragView)
                 dragView?.setPositionAndHeight(state.topDragViewPosition!!, state.height!!)
                 topDragView.setTopPosition(state.topDragIndicatorPosition!!)
                 bottomDragView.setTopPosition(state.bottomDragIndicatorPosition!!)
@@ -1106,30 +1069,18 @@ class CalendarDayView : FrameLayout, StateChangeListener {
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         moveTimeLineToNow()
+        val hourHeight = fsm.state.hourHeight
+        eventContainer.hourHeight = hourHeight
+        eventContainer.invalidate()
         context.registerReceiver(timeChangeReceiver, IntentFilter(Intent.ACTION_TIME_TICK))
     }
 
     override fun onDetachedFromWindow() {
         context.unregisterReceiver(timeChangeReceiver)
         eventViews.clear()
-        hourCellViews.clear()
         dragView = null
-        hourCellAdapter = object : HourCellAdapter {
-            override fun bind(view: View, hour: Int) {}
-        }
         viewTreeObserver.removeOnGlobalLayoutListener(layoutListener)
         super.onDetachedFromWindow()
-    }
-
-    fun setHourAdapter(adapter: HourCellAdapter) {
-        hourCellAdapter = adapter
-        applyHourCellAdapter()
-    }
-
-    private fun applyHourCellAdapter() {
-        hourCellViews.forEachIndexed { h, v ->
-            hourCellAdapter.bind(v, h)
-        }
     }
 
     private fun roundMinutes(minutes: Float, roundToMinutes: Int = 5): Int {
@@ -1145,7 +1096,6 @@ class CalendarDayView : FrameLayout, StateChangeListener {
         Math.floor(roundedToMinutes.toDouble() / 2).toFloat()
 
     interface CalendarChangeListener {
-        fun onCalendarReady()
         fun onStartEditNewScheduledEvent(startTime: Time, duration: Int)
         fun onDragViewClick(dragView: View)
         fun onEventValidationError(dragView: View)
@@ -1157,10 +1107,6 @@ class CalendarDayView : FrameLayout, StateChangeListener {
         fun onEditUnscheduledCalendarEvent()
         fun onEditUnscheduledEvent()
         fun onRemoveEvent(eventId: String)
-    }
-
-    interface HourCellAdapter {
-        fun bind(view: View, hour: Int)
     }
 }
 

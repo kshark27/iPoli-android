@@ -83,10 +83,7 @@ import io.ipoli.android.repeatingquest.edit.EditRepeatingQuestViewController
 import io.ipoli.android.repeatingquest.edit.picker.RepeatPatternPickerDialogController
 import io.ipoli.android.repeatingquest.entity.RepeatPattern
 import io.ipoli.android.repeatingquest.show.RepeatingQuestViewController
-import io.ipoli.android.settings.view.DaysPickerDialogController
-import io.ipoli.android.settings.view.NotificationStylePickerDialogController
-import io.ipoli.android.settings.view.TemperatureUnitPickerDialogController
-import io.ipoli.android.settings.view.TimeFormatPickerDialogController
+import io.ipoli.android.settings.view.*
 import io.ipoli.android.store.avatar.AvatarStoreViewController
 import io.ipoli.android.store.gem.GemStoreViewController
 import io.ipoli.android.store.membership.MembershipViewController
@@ -429,6 +426,13 @@ class Navigator(private val router: Router) {
         )
     }
 
+    fun toRequestFeature() {
+        pushController(
+            { WebUrlViewController(Constants.REQUEST_FEATURE_LINK, "RequestFeature") },
+            VerticalChangeHandler()
+        )
+    }
+
     fun toBugReport() {
         pushController(
             { WebUrlViewController(Constants.BUG_REPORT_LINK, "ReportBug") },
@@ -484,7 +488,7 @@ class Navigator(private val router: Router) {
 
     fun toSuggestIdea() {
         pushController(
-            { WebUrlViewController(Constants.SUGGEST_IDEA_LINK, "SuggestIdea") },
+            { WebUrlViewController(Constants.REQUEST_FEATURE_LINK, "SuggestIdea") },
             VerticalChangeHandler()
         )
     }
@@ -577,6 +581,13 @@ class Navigator(private val router: Router) {
         listener: (Player.Preferences.TimeFormat) -> Unit
     ) {
         pushDialog { TimeFormatPickerDialogController(selectedTimeFormat, listener) }
+    }
+
+    fun toAgendaStartScreenPicker(
+        agendaScreen: Player.Preferences.AgendaScreen,
+        listener: (Player.Preferences.AgendaScreen) -> Unit
+    ) {
+        pushDialog { AgendaScreenPickerDialogController(agendaScreen, listener) }
     }
 
     fun toNotePicker(

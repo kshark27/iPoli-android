@@ -19,6 +19,7 @@ import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.common.privacy.PrivacyPolicyViewController
 import io.ipoli.android.common.redux.android.ReduxViewController
 import io.ipoli.android.common.view.*
+import io.ipoli.android.player.data.Player
 import io.ipoli.android.player.data.Player.Preferences.*
 import io.ipoli.android.settings.SettingsViewState.StateType.DATA_CHANGED
 import io.ipoli.android.settings.SettingsViewState.StateType.ENABLE_SYNC_CALENDARS
@@ -86,6 +87,7 @@ class SettingsViewController(args: Bundle? = null) :
         view: View
     ) {
         renderTimeFormat(state, view)
+        renderDefaultAgendaView(state, view)
         renderTemperatureUnit(state, view)
         renderReminderNotificationStyle(state, view)
         renderResetDay(state, view)
@@ -157,6 +159,18 @@ class SettingsViewController(args: Bundle? = null) :
                     state.timeFormat
                 ) { format ->
                     dispatch(SettingsAction.TimeFormatChanged(format))
+                }
+        }
+    }
+
+    private fun renderDefaultAgendaView(state: SettingsViewState, view: View) {
+        view.defaultAgendaView.text = state.agendaStartText
+        view.defaultAgendaViewContainer.onDebounceClick {
+            navigate()
+                .toAgendaStartScreenPicker(
+                    state.agendaStartScreen
+                ) { agendaView ->
+                    dispatch(SettingsAction.AgendaStartScreenChanged(agendaView))
                 }
         }
     }
@@ -327,6 +341,13 @@ class SettingsViewController(args: Bundle? = null) :
                 )
             )
         }
+
+    private val SettingsViewState.agendaStartText: String
+        get() = when (agendaStartScreen) {
+            Player.Preferences.AgendaScreen.CALENDAR -> stringRes(R.string.calendar)
+            Player.Preferences.AgendaScreen.AGENDA -> stringRes(R.string.agenda)
+        }
+
 
     private val SettingsViewState.reminderNotificationStyleText: String
         get() = when (reminderNotificationStyle) {

@@ -4,7 +4,7 @@ import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.common.datetime.TimeOfDay
 import io.ipoli.android.pet.PetAvatar
 import io.ipoli.android.player.Theme
-import io.ipoli.android.player.data.Membership
+import io.ipoli.android.player.data.Player
 import io.ipoli.android.player.data.Player.Preferences.*
 import io.ipoli.android.store.gem.GemPackType
 import org.threeten.bp.DayOfWeek
@@ -20,9 +20,9 @@ interface Constants {
 
         const val DISCORD_CHAT_LINK = "https://discord.gg/7AMKs28"
         const val COMMUNITY_LINK = "https://discuss.mypoli.fun/"
-        const val SUGGEST_IDEA_LINK = "https://discuss.mypoli.fun/c/mypoli/requests"
+        const val REQUEST_FEATURE_LINK = "https://feedback.userreport.com/15ae66d9-82d9-475f-84c9-b60411e23537/"
 
-        const val BUG_REPORT_LINK = "https://discuss.mypoli.fun/c/mypoli/bugs"
+        const val BUG_REPORT_LINK = "https://feedback.userreport.com/15ae66d9-82d9-475f-84c9-b60411e23537/#submit/bug"
 
         val HELP_LINK = "https://www.mypoli.fun/getting-started"
         val FAQ_LINK = "https://www.mypoli.fun/faq"
@@ -110,6 +110,8 @@ interface Constants {
 
         val KEY_TODAY_IMAGE_URL = "TODAY_IMAGE_URL"
         val KEY_TODAY_IMAGE_DATE = "TODAY_IMAGE_DATE"
+
+        const val KEY_AGENDA_START_SCREEN = "AGENDA_START_SCREEN"
 
         val MYPOLI_EMAIL = "hi@mypoli.fun"
 
@@ -322,7 +324,8 @@ interface Constants {
 
         val DEFAULT_REMINDER_NOTIFICATION_STYLE = NotificationStyle.ALL
         val DEFAULT_PLAN_DAY_NOTIFICATION_STYLE = NotificationStyle.ALL
-        val DEFAULT_START_VIEW = StartView.CALENDAR
         const val DEFAULT_AUTO_POSTING_ENABLED = true
+
+        val DEFAULT_AGENDA_START_SCREEN = Player.Preferences.AgendaScreen.AGENDA
     }
 }

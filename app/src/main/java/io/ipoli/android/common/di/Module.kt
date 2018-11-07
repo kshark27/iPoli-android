@@ -400,6 +400,7 @@ interface UseCaseModule {
     val savePlanDayTimeUseCase: SavePlanDayTimeUseCase
     val savePlanDaysUseCase: SavePlanDaysUseCase
     val saveTimeFormatUseCase: SaveTimeFormatUseCase
+    val saveAgendaStartScreenUseCase: SaveAgendaStartScreenUseCase
     val saveTemperatureUnitUseCase: SaveTemperatureUnitUseCase
     val saveReminderNotificationStyleUseCase: SaveReminderNotificationStyleUseCase
     val savePlanDayNotificationStyleUseCase: SavePlanDayNotificationStyleUseCase
@@ -877,6 +878,9 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
 
     override val saveTimeFormatUseCase
         get() = SaveTimeFormatUseCase(playerRepository)
+
+    override val saveAgendaStartScreenUseCase
+        get() = SaveAgendaStartScreenUseCase(playerRepository)
 
     override val saveTemperatureUnitUseCase
         get() = SaveTemperatureUnitUseCase(playerRepository)

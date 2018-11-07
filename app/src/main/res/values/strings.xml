@@ -125,6 +125,7 @@
     <string name="settings_quick_do_notification">Show Quick Do notification</string>
     <string name="allow_read_calendars_perm_reason">myPoli needs to read your calendars to import your events as quests</string>
     <string name="settings_general_title">General</string>
+    <string name="settings_agenda_title">Agenda</string>
     <string name="settings_about_title">About</string>
     <string name="settings_rate_title">Help myPoli</string>
     <string name="settings_rate_desc">Rate myPoli on Google Play and share your opinion</string>
@@ -713,6 +714,7 @@
     <string name="suggestions">Suggestions</string>
     <string name="time_format">Time format</string>
     <string name="select_time_format">Select time format</string>
+    <string name="select_agenda_first_view">Choose start screen</string>
     <string name="twelve_hour_format">%s, 12 hours</string>
     <string name="twenty_four_hour_format">%s, 24 hours</string>
     <string name="device_default_time_format">%s, Device default</string>
@@ -1268,4 +1270,6 @@ These are your physical and mental characteristics.\n\n
     <string name="add_preset_challenge_save_error">Something went wrong, check your connection</string>
     <string name="add_preset_challenge_items_title">Create Schedule</string>
     <string name="add_preset_challenge_info_title">New Preset Challenge</string>
+    <string name="default_first_agenda_view">Start screen</string>
+    <string name="request_feature">Request feature</string>
 </resources>

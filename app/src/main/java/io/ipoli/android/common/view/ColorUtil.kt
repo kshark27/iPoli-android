@@ -111,4 +111,8 @@ object ColorUtil {
     fun alphaInt(@FloatRange(from = 0.0, to = 1.0) value: Float): Int {
         return (255 * value).toInt()
     }
+
+    fun getColorWithAlpha(@ColorInt color: Int, ratio: Float): Int {
+        return Color.argb(Math.round(Color.alpha(color) * ratio), Color.red(color), Color.green(color), Color.blue(color))
+    }
 }

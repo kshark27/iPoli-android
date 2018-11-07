@@ -11,7 +11,7 @@
         <item name="windowActionModeOverlay">true</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="actionModeStyle">@style/Theme.myPoli.Dark.Widget.ActionMode</item>
+        <item name="actionModeStyle">@style/Theme.myPoli.Widget.ActionMode</item>
         <item name="android:colorBackground">@color/dark_background</item>
         <item name="colorSurface">@color/md_grey_800</item>
         <item name="android:textColorPrimary">@color/md_light_text_100</item>
@@ -37,11 +37,11 @@
         <item name="android:textColor">@color/md_light_text_100</item>
     </style>
 
-    <style name="Theme.myPoli.Light.Base" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme.myPoli.Light.Base" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="windowActionModeOverlay">true</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="actionModeStyle">@style/Theme.myPoli.Light.Widget.ActionMode</item>
+        <item name="actionModeStyle">@style/Theme.myPoli.Widget.ActionMode</item>
         <item name="android:colorBackground">@color/md_grey_50</item>
         <item name="colorSurface">@color/md_white</item>
         <item name="android:textColorPrimary">@color/md_dark_text_87</item>
@@ -71,14 +71,8 @@
         <item name="android:windowAnimationStyle">@style/ScaleInDialogAnimation</item>
     </style>
 
-    <style name="Theme.myPoli.Dark.Widget.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
-        <item name="background">@color/dark_background</item>
-        <item name="titleTextStyle">@style/ActionModeTitleTextStyle</item>
-    </style>
-
-    <style name="Theme.myPoli.Light.Widget.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
-        <item name="background">@color/md_white</item>
-        <item name="titleTextStyle">@style/ActionModeTitleTextStyle</item>
+    <style name="Theme.myPoli.Widget.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
+        <item name="background">?attr/colorAccent</item>
     </style>
 
     <style name="Theme.myPoli.Light.DatePicker" parent="android:Theme.Material.Light.Dialog.Alert">
@@ -93,10 +87,6 @@
 
     <style name="Theme.myPoli.DatePicker.Header" parent="@android:style/Widget.Material.DatePicker">
         <item name="android:headerBackground">?attr/colorAccent</item>
-    </style>
-
-    <style name="ActionModeTitleTextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionMode.Title">
-        <item name="android:textColor">@color/md_black</item>
     </style>
 
     <style name="Theme.myPoli.DarkPurple" parent="Theme.myPoli.Dark.Base">

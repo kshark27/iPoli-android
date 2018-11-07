@@ -43,7 +43,7 @@ class FeedbackDialogController : BaseDialogController {
                 listener.onSendFeedback(feedback)
             }
             .setNegativeButton(R.string.cancel, null)
-            .setNeutralButton(R.string.suggest_idea) { _, _ ->
+            .setNeutralButton(R.string.request_feature) { _, _ ->
                 listener.onSuggestIdea()
             }
             .create()

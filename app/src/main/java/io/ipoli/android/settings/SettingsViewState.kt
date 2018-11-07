@@ -39,6 +39,11 @@ sealed class SettingsAction : Action {
         override fun toMap() = mapOf("format" to format.name)
     }
 
+    data class AgendaStartScreenChanged(val startScreen: Player.Preferences.AgendaScreen) :
+        SettingsAction() {
+        override fun toMap() = mapOf("view_mode" to startScreen.name)
+    }
+
     data class TemperatureUnitChanged(val unit: Player.Preferences.TemperatureUnit) :
         SettingsAction() {
         override fun toMap() = mapOf("unit" to unit.name)
@@ -115,6 +120,7 @@ object SettingsReducer : BaseViewStateReducer<SettingsViewState>() {
             type = DATA_CHANGED,
             playerId = player.id,
             timeFormat = player.preferences.timeFormat,
+            agendaStartScreen = player.preferences.agendaStartScreen,
             temperatureUnit = player.preferences.temperatureUnit,
             reminderNotificationStyle = player.preferences.reminderNotificationStyle,
             planTime = player.preferences.planDayTime,
@@ -131,6 +137,7 @@ object SettingsReducer : BaseViewStateReducer<SettingsViewState>() {
         type = LOADING,
         playerId = "",
         timeFormat = TWELVE_HOURS,
+        agendaStartScreen = Constants.DEFAULT_AGENDA_START_SCREEN,
         temperatureUnit = FAHRENHEIT,
         reminderNotificationStyle = Constants.DEFAULT_REMINDER_NOTIFICATION_STYLE,
         planDays = Constants.DEFAULT_PLAN_DAYS,
@@ -151,6 +158,7 @@ data class SettingsViewState(
     val type: StateType,
     val playerId: String,
     val timeFormat: Player.Preferences.TimeFormat,
+    val agendaStartScreen: Player.Preferences.AgendaScreen,
     val temperatureUnit: Player.Preferences.TemperatureUnit,
     val reminderNotificationStyle: Player.Preferences.NotificationStyle,
     val resetDayTime: Time,

@@ -258,8 +258,8 @@ class AndroidPlayerRepository(
             dbObject.preferences["resetDayStartMinute"] = Constants.RESET_DAY_MINUTE
         }
 
-        if (!dbObject.preferences.containsKey("startView")) {
-            dbObject.preferences["startView"] = Constants.DEFAULT_START_VIEW.name
+        if (!dbObject.preferences.containsKey("agendaStartScreen")) {
+            dbObject.preferences["agendaStartScreen"] = Constants.DEFAULT_AGENDA_START_SCREEN.name
         }
 
         if (!dbObject.preferences.containsKey("reminderNotificationStyle")) {
@@ -291,7 +291,7 @@ class AndroidPlayerRepository(
             planDays = cPref.planDays.map { DayOfWeek.valueOf(it) }.toSet(),
             isQuickDoNotificationEnabled = cPref.isQuickDoNotificationEnabled,
             resetDayTime = Time.of(cPref.resetDayStartMinute.toInt()),
-            startView = Player.Preferences.StartView.valueOf(cPref.startView),
+            agendaStartScreen = Player.Preferences.AgendaScreen.valueOf(cPref.agendaStartScreen),
             reminderNotificationStyle = Player.Preferences.NotificationStyle.valueOf(cPref.reminderNotificationStyle),
             planDayNotificationStyle = Player.Preferences.NotificationStyle.valueOf(cPref.planDayNotificationStyle),
             isAutoPostingEnabled = cPref.isAutoPostingEnabled
@@ -574,7 +574,7 @@ class AndroidPlayerRepository(
             it.planDays = preferences.planDays.map { it.name }
             it.isQuickDoNotificationEnabled = preferences.isQuickDoNotificationEnabled
             it.resetDayStartMinute = preferences.resetDayTime.toMinuteOfDay().toLong()
-            it.startView = preferences.startView.name
+            it.agendaStartScreen = preferences.agendaStartScreen.name
             it.reminderNotificationStyle = preferences.reminderNotificationStyle.name
             it.planDayNotificationStyle = preferences.planDayNotificationStyle.name
             it.isAutoPostingEnabled = preferences.isAutoPostingEnabled
@@ -902,8 +902,8 @@ class FirestorePlayerRepository(
             cp.preferences["resetDayStartMinute"] = Constants.RESET_DAY_MINUTE
         }
 
-        if (!cp.preferences.containsKey("startView")) {
-            cp.preferences["startView"] = Constants.DEFAULT_START_VIEW.name
+        if (!cp.preferences.containsKey("agendaStartScreen")) {
+            cp.preferences["agendaStartScreen"] = Constants.DEFAULT_AGENDA_START_SCREEN.name
         }
 
         if (!cp.preferences.containsKey("reminderNotificationStyle")) {
@@ -935,7 +935,7 @@ class FirestorePlayerRepository(
             planDays = cPref.planDays.map { DayOfWeek.valueOf(it) }.toSet(),
             isQuickDoNotificationEnabled = cPref.isQuickDoNotificationEnabled,
             resetDayTime = Time.of(cPref.resetDayStartMinute.toInt()),
-            startView = Player.Preferences.StartView.valueOf(cPref.startView),
+            agendaStartScreen = Player.Preferences.AgendaScreen.valueOf(cPref.agendaStartScreen),
             reminderNotificationStyle = Player.Preferences.NotificationStyle.valueOf(cPref.reminderNotificationStyle),
             planDayNotificationStyle = Player.Preferences.NotificationStyle.valueOf(cPref.planDayNotificationStyle),
             isAutoPostingEnabled = cPref.isAutoPostingEnabled
@@ -1220,7 +1220,7 @@ class FirestorePlayerRepository(
             it.planDays = preferences.planDays.map { it.name }
             it.isQuickDoNotificationEnabled = preferences.isQuickDoNotificationEnabled
             it.resetDayStartMinute = preferences.resetDayTime.toMinuteOfDay().toLong()
-            it.startView = preferences.startView.name
+            it.agendaStartScreen = preferences.agendaStartScreen.name
             it.reminderNotificationStyle = preferences.reminderNotificationStyle.name
             it.planDayNotificationStyle = preferences.planDayNotificationStyle.name
             it.isAutoPostingEnabled = preferences.isAutoPostingEnabled

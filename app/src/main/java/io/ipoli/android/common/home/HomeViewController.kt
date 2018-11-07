@@ -179,6 +179,9 @@ class HomeViewController(args: Bundle? = null) :
                     SettingsViewController.routerTransaction()
                 )
 
+            R.id.requestFeature ->
+                navigateFromRoot().toRequestFeature()
+
             R.id.feedback ->
                 showFeedback()
 

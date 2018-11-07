@@ -33,8 +33,8 @@ class CreateTagItemsUseCase :
             createSectionWithQuests(TagItem.Today, today) +
             createSectionWithQuests(TagItem.Tomorrow, tomorrow) +
             createSectionWithQuests(TagItem.Upcoming, upcoming) +
-            createSectionWithQuests(TagItem.Completed, completed) +
-            createSectionWithQuests(TagItem.Previous, past)
+            createSectionWithQuests(TagItem.Previous, past) +
+            createSectionWithQuests(TagItem.Completed, completed)
     }
 
     private fun createSectionWithQuests(
