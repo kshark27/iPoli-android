@@ -109,7 +109,7 @@ object TodayReducer : BaseViewStateReducer<TodayViewState>() {
                     type = type,
                     quests = questItems,
                     questCompleteCount = questItems.complete.size,
-                    questCount = questItems.complete.size + questItems.incomplete.size
+                    questCount = questItems.complete.size + questItems.incomplete.count { it is CreateTodayItemsUseCase.TodayItem.QuestItem }
                 )
             }
 
@@ -163,6 +163,7 @@ object TodayReducer : BaseViewStateReducer<TodayViewState>() {
     ) =
         subState.copy(
             avatar = player.avatar,
+            rank = player.rank,
             level = player.level,
             levelXpProgress = player.experienceProgressForLevel,
             levelXpMaxProgress = player.experienceForNextLevel,
@@ -178,6 +179,7 @@ object TodayReducer : BaseViewStateReducer<TodayViewState>() {
         TodayViewState(
             type = LOADING,
             avatar = Avatar.AVATAR_00,
+            rank = Player.Rank.NOVICE,
             pet = null,
             level = -1,
             levelXpProgress = -1,
@@ -203,6 +205,7 @@ object TodayReducer : BaseViewStateReducer<TodayViewState>() {
 data class TodayViewState(
     val type: StateType,
     val avatar: Avatar,
+    val rank: Player.Rank,
     val pet: Pet?,
     val level: Int,
     val levelXpProgress: Int,

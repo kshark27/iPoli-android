@@ -46,6 +46,7 @@ import io.ipoli.android.pet.AndroidPetMood
 import io.ipoli.android.pet.PetItem
 import io.ipoli.android.player.data.AndroidAttribute
 import io.ipoli.android.player.data.AndroidAvatar
+import io.ipoli.android.player.data.AndroidRank
 import io.ipoli.android.player.data.Player
 import io.ipoli.android.quest.schedule.addquest.AddQuestAnimationHelper
 import io.ipoli.android.quest.schedule.today.TodayViewState.StateType.*
@@ -319,7 +320,7 @@ class TodayViewController(args: Bundle? = null) :
         view.backdropTransparentColor.visible()
         view.backdropTransparentColor.fadeIn(
             shortAnimTime,
-            to = 0.85f,
+            to = 0.9f,
             delay = longAnimTime,
             onComplete = {
                 view.todayInfoGroup.visible()
@@ -442,6 +443,8 @@ class TodayViewController(args: Bundle? = null) :
         view.todayPlayerAvatar.onDebounceClick {
             navigateFromRoot().toProfile()
         }
+
+        view.todayPlayerRank.setText(AndroidRank.valueOf(state.rank.name).title)
 
         view.todayLevelText.text = state.levelText
 

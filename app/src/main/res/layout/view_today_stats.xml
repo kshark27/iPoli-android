@@ -33,7 +33,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="invisible"
-        app:constraint_referenced_ids="todayPlayerAvatar, todayPetAvatar, petContainer, todayPetMood, todayPetName,
+        app:constraint_referenced_ids="todayPlayerAvatar, todayPlayerRank, todayPetAvatar, petContainer, todayPetMood, todayPetName,
         todayHealthProgress, todayHealthProgressText, todayHealthIconBackground, todayHealthIcon, todayLevelProgress,
         todayLevelProgressText, todayExperienceBackground, todayLevelText, todayGems, todayCoins,
         todayAttrStrength, todayAttrIntelligence, todayAttrWellBeing, todayAttrWillpower, todayAttrExpertise, todayAttrCharisma,
@@ -49,6 +49,20 @@
         android:scaleType="fitCenter"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/todayPlayerRank"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="@color/md_white"
+        app:layout_constraintEnd_toEndOf="@+id/todayPlayerAvatar"
+        app:layout_constraintStart_toStartOf="@+id/todayPlayerAvatar"
+        app:layout_constraintTop_toBottomOf="@+id/todayPlayerAvatar" />
 
     <ImageView
         android:id="@+id/todayPetAvatar"
@@ -195,7 +209,7 @@
         android:textColor="@color/md_light_text_70"
         app:layout_constraintEnd_toStartOf="@+id/todayGems"
         app:layout_constraintStart_toStartOf="@+id/todayPlayerAvatar"
-        app:layout_constraintTop_toBottomOf="@+id/todayPlayerAvatar" />
+        app:layout_constraintTop_toBottomOf="@+id/todayPlayerRank" />
 
     <TextView
         android:id="@+id/todayGems"
@@ -281,9 +295,8 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="@color/md_white"
         app:layout_constraintBottom_toTopOf="@+id/todayQuestsDoneLabel"
-        app:layout_constraintEnd_toStartOf="@+id/todayHabitsDone"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/todayQuestsDoneLabel"
+        app:layout_constraintStart_toStartOf="@+id/todayQuestsDoneLabel"
         app:layout_constraintTop_toBottomOf="@+id/todayAttrStrength" />
 
     <TextView
@@ -295,21 +308,21 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@color/md_light_text_70"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/todayQuestsDone"
-        app:layout_constraintStart_toStartOf="@+id/todayQuestsDone"
+        app:layout_constraintEnd_toStartOf="@+id/todayHabitsDoneLabel"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/todayQuestsDone" />
 
     <TextView
         android:id="@+id/todayHabitsDone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="2/5"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="@color/md_white"
         app:layout_constraintBottom_toBottomOf="@+id/todayQuestsDone"
-        app:layout_constraintEnd_toStartOf="@+id/todayFocusDuration"
-        app:layout_constraintStart_toEndOf="@+id/todayQuestsDone"
+        app:layout_constraintEnd_toEndOf="@+id/todayHabitsDoneLabel"
+        app:layout_constraintStart_toStartOf="@+id/todayHabitsDoneLabel"
         app:layout_constraintTop_toTopOf="@+id/todayQuestsDone" />
 
     <TextView
@@ -320,8 +333,8 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@color/md_light_text_70"
         app:layout_constraintBottom_toBottomOf="@+id/todayQuestsDoneLabel"
-        app:layout_constraintEnd_toEndOf="@+id/todayHabitsDone"
-        app:layout_constraintStart_toStartOf="@+id/todayHabitsDone"
+        app:layout_constraintEnd_toStartOf="@+id/todayFocusDurationLabel"
+        app:layout_constraintStart_toEndOf="@+id/todayQuestsDoneLabel"
         app:layout_constraintTop_toTopOf="@+id/todayQuestsDoneLabel" />
 
     <TextView
@@ -332,8 +345,8 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="@color/md_white"
         app:layout_constraintBottom_toBottomOf="@+id/todayQuestsDone"
-        app:layout_constraintEnd_toStartOf="@+id/todayDailyChallengeProgress"
-        app:layout_constraintStart_toEndOf="@+id/todayHabitsDone"
+        app:layout_constraintEnd_toEndOf="@+id/todayFocusDurationLabel"
+        app:layout_constraintStart_toStartOf="@+id/todayFocusDurationLabel"
         app:layout_constraintTop_toTopOf="@+id/todayQuestsDone" />
 
     <TextView
@@ -344,8 +357,8 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@color/md_light_text_70"
         app:layout_constraintBottom_toBottomOf="@+id/todayQuestsDoneLabel"
-        app:layout_constraintEnd_toEndOf="@+id/todayFocusDuration"
-        app:layout_constraintStart_toStartOf="@+id/todayFocusDuration"
+        app:layout_constraintEnd_toStartOf="@+id/todayDailyChallengeProgressLabel"
+        app:layout_constraintStart_toEndOf="@+id/todayHabitsDoneLabel"
         app:layout_constraintTop_toTopOf="@+id/todayQuestsDoneLabel" />
 
     <TextView
@@ -356,8 +369,8 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="@color/md_white"
         app:layout_constraintBottom_toBottomOf="@+id/todayQuestsDone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/todayFocusDuration"
+        app:layout_constraintEnd_toEndOf="@+id/todayDailyChallengeProgressLabel"
+        app:layout_constraintStart_toStartOf="@+id/todayDailyChallengeProgressLabel"
         app:layout_constraintTop_toTopOf="@+id/todayQuestsDone" />
 
     <TextView
@@ -368,8 +381,8 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@color/md_light_text_70"
         app:layout_constraintBottom_toBottomOf="@+id/todayQuestsDoneLabel"
-        app:layout_constraintEnd_toEndOf="@+id/todayDailyChallengeProgress"
-        app:layout_constraintStart_toStartOf="@+id/todayDailyChallengeProgress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/todayFocusDurationLabel"
         app:layout_constraintTop_toTopOf="@+id/todayQuestsDoneLabel" />
 
 </android.support.constraint.ConstraintLayout>
