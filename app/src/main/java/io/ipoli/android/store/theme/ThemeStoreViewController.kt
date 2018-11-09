@@ -120,7 +120,7 @@ class ThemeStoreViewController(args: Bundle? = null) :
                 showLongToast(R.string.theme_bought)
 
             ThemeStoreViewState.StateType.THEME_TOO_EXPENSIVE -> {
-                navigate().toCurrencyConverted()
+                navigate().toCurrencyConverter()
                 showShortToast(R.string.theme_too_expensive)
             }
 

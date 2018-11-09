@@ -20,9 +20,11 @@ interface Constants {
 
         const val DISCORD_CHAT_LINK = "https://discord.gg/7AMKs28"
         const val COMMUNITY_LINK = "https://discuss.mypoli.fun/"
-        const val REQUEST_FEATURE_LINK = "https://feedback.userreport.com/15ae66d9-82d9-475f-84c9-b60411e23537/"
+        const val REQUEST_FEATURE_LINK =
+            "https://feedback.userreport.com/15ae66d9-82d9-475f-84c9-b60411e23537/"
 
-        const val BUG_REPORT_LINK = "https://feedback.userreport.com/15ae66d9-82d9-475f-84c9-b60411e23537/#submit/bug"
+        const val BUG_REPORT_LINK =
+            "https://feedback.userreport.com/15ae66d9-82d9-475f-84c9-b60411e23537/#submit/bug"
 
         val HELP_LINK = "https://www.mypoli.fun/getting-started"
         val FAQ_LINK = "https://www.mypoli.fun/faq"

@@ -80,7 +80,7 @@ class AvatarStoreViewController(args: Bundle? = null) :
                 showLongToast(R.string.avatar_bought)
 
             AvatarStoreViewState.StateType.AVATAR_TOO_EXPENSIVE -> {
-                navigate().toCurrencyConverted()
+                navigate().toCurrencyConverter()
                 showShortToast(R.string.avatar_too_expensive)
             }
 

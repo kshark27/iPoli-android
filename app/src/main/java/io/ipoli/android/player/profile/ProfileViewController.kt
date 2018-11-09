@@ -299,19 +299,9 @@ class ProfileViewController(args: Bundle? = null) :
         view.healthProgress.max = state.maxHealth
         view.healthProgress.animateProgressFromZero(state.health)
         view.healthProgressText.text = state.healthProgressText
-        val background = view.healthIconBackground.background as GradientDrawable
-        background.setStroke(
-            ViewUtils.dpToPx(2f, view.context).toInt(),
-            colorRes(R.color.md_red_900)
-        )
     }
 
     private fun renderLevelProgress(state: ProfileViewState, view: View) {
-        val background = view.xpBackground.background as GradientDrawable
-        background.setStroke(
-            ViewUtils.dpToPx(2f, view.context).toInt(),
-            colorRes(R.color.md_yellow_800)
-        )
         view.levelProgress.max = state.levelXpMaxProgress
         view.levelProgress.animateProgressFromZero(state.levelXpProgress)
         view.level.text = state.levelText

@@ -116,7 +116,7 @@ class InventoryViewController :
 
         if (showCurrencyConverter) {
             view.onDebounceClick {
-                navigateFromRoot().toCurrencyConverted()
+                navigateFromRoot().toCurrencyConverter()
             }
         } else {
             view.inventoryGems.background = null

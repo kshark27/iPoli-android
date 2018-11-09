@@ -9,6 +9,9 @@ import io.ipoli.android.common.redux.Action
 import io.ipoli.android.common.redux.BaseViewState
 import io.ipoli.android.dailychallenge.usecase.CheckDailyChallengeProgressUseCase
 import io.ipoli.android.habit.usecase.CreateHabitItemsUseCase
+import io.ipoli.android.pet.Pet
+import io.ipoli.android.player.data.Avatar
+import io.ipoli.android.player.data.Player
 import io.ipoli.android.quest.schedule.today.TodayViewState.StateType.*
 import io.ipoli.android.quest.schedule.today.usecase.CreateTodayItemsUseCase
 import org.threeten.bp.LocalDate
@@ -58,21 +61,38 @@ object TodayReducer : BaseViewStateReducer<TodayViewState>() {
             is TodayAction.Load -> {
                 val dataState = state.dataState
 
-                val type = if (dataState.todayImage != null) SHOW_IMAGE else LOADING
+                val type =
+                    if (dataState.todayImage != null && dataState.player != null)
+                        TodayViewState.StateType.SHOW_IMAGE
+                    else
+                        LOADING
 
-                subState.copy(
+                val newState = dataState.player?.let {
+                    updateStateFromPlayer(it, subState)
+                } ?: subState
+
+                newState.copy(
                     type = type,
                     showDataAfterStats = action.showDataAfterStats,
                     todayImageUrl = dataState.todayImage,
-                    awesomenessScore = dataState.awesomenessScore,
                     focusDuration = dataState.focusDuration,
                     dailyChallengeProgress = dataState.dailyChallengeProgress
                 )
             }
 
+            is DataLoadedAction.PlayerChanged -> {
+                val stateType = when {
+                    subState.pet == null && state.dataState.todayImage != null -> SHOW_IMAGE
+                    subState.pet == null -> LOADING
+                    else -> PLAYER_STATS_CHANGED
+                }
+                updateStateFromPlayer(action.player, subState)
+                    .copy(type = stateType)
+            }
+
             is DataLoadedAction.TodayImageChanged -> {
                 subState.copy(
-                    type = SHOW_IMAGE,
+                    type = TodayViewState.StateType.SHOW_IMAGE,
                     todayImageUrl = action.imageUrl
                 )
             }
@@ -84,9 +104,12 @@ object TodayReducer : BaseViewStateReducer<TodayViewState>() {
                         subState.quests == null -> DATA_CHANGED
                         else -> QUESTS_CHANGED
                     }
+                val questItems = action.questItems
                 subState.copy(
                     type = type,
-                    quests = action.questItems
+                    quests = questItems,
+                    questCompleteCount = questItems.complete.size,
+                    questCount = questItems.complete.size + questItems.incomplete.size
                 )
             }
 
@@ -99,31 +122,34 @@ object TodayReducer : BaseViewStateReducer<TodayViewState>() {
                         else -> HABITS_CHANGED
                     }
 
+                val todayHabitItems = action.habitItems
+                    .filterIsInstance(CreateHabitItemsUseCase.HabitItem.Today::class.java)
+                val goodHabits = todayHabitItems.filter { it.habit.isGood }
                 subState.copy(
                     type = type,
-                    todayHabitItems = action.habitItems
-                        .filterIsInstance(CreateHabitItemsUseCase.HabitItem.Today::class.java)
+                    todayHabitItems = todayHabitItems,
+                    habitCompleteCount = goodHabits.count { it.isCompleted },
+                    habitCount = goodHabits.size
                 )
             }
 
             is TodayAction.ImageLoaded ->
-                if (subState.awesomenessScore == null)
+                if (subState.focusDuration == null)
                     subState
                 else
                     subState.copy(
-                        type = SHOW_SUMMARY_STATS
+                        type = TodayViewState.StateType.SHOW_SUMMARY_STATS
                     )
 
             is TodayAction.StatsShown ->
                 if (subState.showDataAfterStats)
                     subState.copy(
-                    type = SHOW_DATA
-                ) else subState
+                        type = TodayViewState.StateType.SHOW_DATA
+                    ) else subState
 
             is DataLoadedAction.TodaySummaryStatsChanged ->
                 subState.copy(
                     type = SUMMARY_STATS_CHANGED,
-                    awesomenessScore = action.awesomenessScore,
                     focusDuration = action.focusDuration,
                     dailyChallengeProgress = action.dailyChallengeProgress
                 )
@@ -131,13 +157,43 @@ object TodayReducer : BaseViewStateReducer<TodayViewState>() {
             else -> subState
         }
 
+    private fun updateStateFromPlayer(
+        player: Player,
+        subState: TodayViewState
+    ) =
+        subState.copy(
+            avatar = player.avatar,
+            level = player.level,
+            levelXpProgress = player.experienceProgressForLevel,
+            levelXpMaxProgress = player.experienceForNextLevel,
+            coins = player.coins,
+            gems = player.gems,
+            pet = player.pet,
+            attributes = player.attributes.map { it.value },
+            health = player.health.current,
+            maxHealth = player.health.max
+        )
+
     override fun defaultState() =
         TodayViewState(
             type = LOADING,
+            avatar = Avatar.AVATAR_00,
+            pet = null,
+            level = -1,
+            levelXpProgress = -1,
+            levelXpMaxProgress = -1,
+            coins = -1,
+            gems = -1,
+            health = -1,
+            maxHealth = -1,
+            attributes = emptyList(),
+            questCount = 0,
+            questCompleteCount = 0,
+            habitCount = 0,
+            habitCompleteCount = 0,
             quests = null,
             todayHabitItems = null,
             todayImageUrl = null,
-            awesomenessScore = null,
             focusDuration = null,
             dailyChallengeProgress = null,
             showDataAfterStats = false
@@ -146,10 +202,23 @@ object TodayReducer : BaseViewStateReducer<TodayViewState>() {
 
 data class TodayViewState(
     val type: StateType,
+    val avatar: Avatar,
+    val pet: Pet?,
+    val level: Int,
+    val levelXpProgress: Int,
+    val levelXpMaxProgress: Int,
+    val coins: Int,
+    val gems: Int,
+    val health: Int,
+    val maxHealth: Int,
+    val attributes: List<Player.Attribute>,
     val quests: CreateTodayItemsUseCase.Result?,
+    val questCount: Int,
+    val questCompleteCount: Int,
+    val habitCount: Int,
+    val habitCompleteCount: Int,
     val todayHabitItems: List<CreateHabitItemsUseCase.HabitItem.Today>?,
     val todayImageUrl: String?,
-    val awesomenessScore: Double?,
     val focusDuration: Duration<Minute>?,
     val dailyChallengeProgress: CheckDailyChallengeProgressUseCase.Result?,
     val showDataAfterStats: Boolean
@@ -159,6 +228,7 @@ data class TodayViewState(
     enum class StateType {
         LOADING,
         SUMMARY_STATS_CHANGED,
+        PLAYER_STATS_CHANGED,
         SHOW_SUMMARY_STATS,
         SHOW_DATA,
         HABITS_CHANGED,

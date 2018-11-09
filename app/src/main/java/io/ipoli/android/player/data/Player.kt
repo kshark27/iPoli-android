@@ -642,15 +642,13 @@ sealed class AuthProvider {
 }
 
 enum class Membership(
-    val dailyHighRewardQuestCap: Int,
-    val dailyHighRewardHabitCap: Int,
     val dailyRewardedChallengeCap: Int,
     val monthlyConvertedGemCap: Int
 ) {
-    NONE(6, 6, 2, 5),
-    MONTHLY(8, 8, 2, 8),
-    QUARTERLY(10, 10, 2, 12),
-    YEARLY(15, 15, 2, Membership.UNLIMITED);
+    NONE(2, 3),
+    MONTHLY(2, 8),
+    QUARTERLY(2, 12),
+    YEARLY(2, Membership.UNLIMITED);
 
     companion object {
         const val UNLIMITED = -1
@@ -663,6 +661,7 @@ enum class AndroidAttribute(
     @ColorRes val colorPrimary: Int,
     @ColorRes val colorPrimaryDark: Int,
     @DrawableRes val background: Int,
+    @DrawableRes val colorIcon: Int,
     @DrawableRes val whiteIcon: Int,
     val bonusNames: Map<Player.Rank, Int>,
     val bonusDescriptions: Map<Player.Rank, Int>
@@ -673,6 +672,7 @@ enum class AndroidAttribute(
         R.color.md_red_400,
         R.color.md_red_900,
         R.drawable.attribute_strength_hexagon,
+        R.drawable.ic_strength_red,
         R.drawable.ic_strength_white,
         mapOf(
             Player.Rank.APPRENTICE to R.string.strength_apprentice_bonus_name,
@@ -705,6 +705,7 @@ enum class AndroidAttribute(
         R.color.md_blue_500,
         R.color.md_blue_800,
         R.drawable.attribute_intelligence_hexagon,
+        R.drawable.ic_intelligence_blue,
         R.drawable.ic_intelligence_white,
         mapOf(
             Player.Rank.APPRENTICE to R.string.intelligence_apprentice_bonus_name,
@@ -737,6 +738,7 @@ enum class AndroidAttribute(
         R.color.md_purple_300,
         R.color.md_purple_600,
         R.drawable.attribute_charisma_hexagon,
+        R.drawable.ic_charisma_purple,
         R.drawable.ic_charisma_white,
         mapOf(
             Player.Rank.APPRENTICE to R.string.charisma_apprentice_bonus_name,
@@ -769,6 +771,7 @@ enum class AndroidAttribute(
         R.color.md_indigo_400,
         R.color.md_indigo_700,
         R.drawable.attribute_expertise_hexagon,
+        R.drawable.ic_expertise_indigo,
         R.drawable.ic_expertise_white,
         mapOf(
             Player.Rank.APPRENTICE to R.string.expertise_apprentice_bonus_name,
@@ -801,6 +804,7 @@ enum class AndroidAttribute(
         R.color.md_green_600,
         R.color.md_green_800,
         R.drawable.attribute_well_beaing_hexagon,
+        R.drawable.ic_well_being_green,
         R.drawable.ic_well_being_white,
         mapOf(
             Player.Rank.APPRENTICE to R.string.well_being_apprentice_bonus_name,
@@ -833,6 +837,7 @@ enum class AndroidAttribute(
         R.color.md_yellow_700,
         R.color.md_yellow_900,
         R.drawable.attribute_willpower_hexagon,
+        R.drawable.ic_willpower_yellow,
         R.drawable.ic_willpower_white,
         mapOf(
             Player.Rank.APPRENTICE to R.string.willpower_apprentice_bonus_name,

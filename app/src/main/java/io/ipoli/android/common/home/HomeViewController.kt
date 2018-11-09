@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.support.annotation.ColorRes
 import android.support.annotation.IdRes
 import android.support.design.internal.NavigationMenuView
-import android.support.design.widget.AppBarLayout
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
@@ -73,22 +72,6 @@ class HomeViewController(args: Bundle? = null) :
 
     override val reducer = HomeReducer
 
-    private val appBarOffsetListener = object :
-        AppBarStateChangeListener() {
-        override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
-
-            appBarLayout.post {
-                if (state == State.EXPANDED) {
-                    (activity as MainActivity).supportActionBar!!.setDisplayShowTitleEnabled(
-                        false
-                    )
-                } else if (state == State.COLLAPSED) {
-                    (activity as MainActivity).supportActionBar!!.setDisplayShowTitleEnabled(true)
-                }
-            }
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup,
@@ -120,7 +103,6 @@ class HomeViewController(args: Bundle? = null) :
 
         contentView.todayCollapsingToolbarContainer.isTitleEnabled = false
 
-        contentView.todayAppBar.addOnOffsetChangedListener(appBarOffsetListener)
         actionBarDrawerToggle.syncState()
 
         return contentView
@@ -133,8 +115,6 @@ class HomeViewController(args: Bundle? = null) :
         when (item.itemId) {
 
             R.id.today -> {
-                (activity as MainActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
-                view?.todayCollapsingToolbarContainer?.isTitleEnabled = false
                 changeChildController(TodayViewController(false))
             }
 
@@ -249,20 +229,11 @@ class HomeViewController(args: Bundle? = null) :
                 RouterTransaction.with(TodayViewController())
             )
         }
-
-        val showTitle =
-            appBarOffsetListener.currentState != AppBarStateChangeListener.State.EXPANDED
-        (activity as MainActivity).supportActionBar?.setDisplayShowTitleEnabled(showTitle)
     }
 
     override fun onDetach(view: View) {
         view.rootCoordinator.bringToFront()
         super.onDetach(view)
-    }
-
-    override fun onDestroyView(view: View) {
-        view.todayAppBar.removeOnOffsetChangedListener(appBarOffsetListener)
-        super.onDestroyView(view)
     }
 
     private fun changeChildController(controller: Controller) {

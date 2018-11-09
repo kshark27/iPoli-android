@@ -179,7 +179,7 @@ class PetViewController(args: Bundle? = null) :
             }
 
             FOOD_TOO_EXPENSIVE -> {
-                navigate().toCurrencyConverted()
+                navigate().toCurrencyConverter()
                 Toast.makeText(
                     view.context,
                     stringRes(R.string.food_too_expensive),
@@ -246,7 +246,7 @@ class PetViewController(args: Bundle? = null) :
             }
 
             ITEM_TOO_EXPENSIVE -> {
-                navigate().toCurrencyConverted()
+                navigate().toCurrencyConverter()
                 Toast.makeText(
                     view.context,
                     stringRes(R.string.pet_item_too_expensive),

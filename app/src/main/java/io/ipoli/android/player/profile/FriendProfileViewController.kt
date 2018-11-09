@@ -337,7 +337,6 @@ class FriendProfileViewController(args: Bundle? = null) :
         @DrawableRes val background: Int,
         @DrawableRes val icon: Int,
         @ColorInt val levelColor: Int
-
     ) : RecyclerViewViewModel
 
     inner class AttributeAdapter :
@@ -354,7 +353,6 @@ class FriendProfileViewController(args: Bundle? = null) :
             square.color = ColorStateList.valueOf(vm.levelColor)
             view.attrLevelBackground.setImageDrawable(square)
         }
-
     }
 
     data class EquipmentItemViewModel(

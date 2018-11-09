@@ -86,18 +86,6 @@
                         android:textColor="@color/md_white" />
 
                     <TextView
-                        android:id="@+id/membershipMonthlyQuestsHabitsReward"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawableStart="@drawable/ic_done_white_24dp"
-                        android:drawablePadding="8dp"
-                        android:gravity="center_vertical"
-                        android:text="@string/membership_benefit_quests_habits_reward"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:textColor="@color/md_white" />
-
-                    <TextView
                         android:id="@+id/membershipMonthlyFreeTrial"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -106,6 +94,17 @@
                         android:drawablePadding="8dp"
                         android:gravity="center_vertical"
                         android:text="@string/membership_benefit_free_trial"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/md_white" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/membership_benefit_cancellation"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/md_white" />
 
@@ -140,18 +139,6 @@
                         android:textColor="@color/md_white" />
 
                     <TextView
-                        android:id="@+id/membershipYearlyQuestsHabitsReward"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawableStart="@drawable/ic_done_white_24dp"
-                        android:drawablePadding="8dp"
-                        android:gravity="center_vertical"
-                        android:text="@string/membership_benefit_quests_habits_reward"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:textColor="@color/md_white" />
-
-                    <TextView
                         android:id="@+id/membershipYearlyFreeTrial"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -160,6 +147,17 @@
                         android:drawablePadding="8dp"
                         android:gravity="center_vertical"
                         android:text="@string/membership_benefit_free_trial"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/md_white" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/membership_benefit_cancellation"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/md_white" />
 
@@ -196,18 +194,6 @@
                         android:textColor="@color/md_white" />
 
                     <TextView
-                        android:id="@+id/membershipQuarterlyQuestsHabitsReward"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawableStart="@drawable/ic_done_white_24dp"
-                        android:drawablePadding="8dp"
-                        android:gravity="center_vertical"
-                        android:text="@string/membership_benefit_quests_habits_reward"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:textColor="@color/md_white" />
-
-                    <TextView
                         android:id="@+id/membershipQuarterlyFreeTrial"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -216,6 +202,17 @@
                         android:drawablePadding="8dp"
                         android:gravity="center_vertical"
                         android:text="@string/membership_benefit_free_trial"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/md_white" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:drawableStart="@drawable/ic_done_white_24dp"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/membership_benefit_cancellation"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/md_white" />
                 </LinearLayout>

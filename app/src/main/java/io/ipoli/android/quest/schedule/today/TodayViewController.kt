@@ -2,11 +2,16 @@ package io.ipoli.android.quest.schedule.today
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.content.res.ColorStateList
+import android.graphics.PorterDuff
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.RotateDrawable
 import android.os.Bundle
 import android.support.annotation.ColorInt
 import android.support.annotation.ColorRes
+import android.support.annotation.DrawableRes
+import android.support.constraint.ConstraintSet
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.widget.TextViewCompat
 import android.support.v7.widget.GridLayoutManager
@@ -15,10 +20,11 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.*
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import android.widget.TextView
 import com.bluelinelabs.conductor.changehandler.VerticalChangeHandler
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.IIcon
@@ -29,11 +35,18 @@ import io.ipoli.android.common.ViewUtils
 import io.ipoli.android.common.redux.android.ReduxViewController
 import io.ipoli.android.common.text.CalendarFormatter
 import io.ipoli.android.common.text.DurationFormatter
+import io.ipoli.android.common.text.LongFormatter
 import io.ipoli.android.common.text.QuestStartTimeFormatter
 import io.ipoli.android.common.view.*
 import io.ipoli.android.common.view.recyclerview.*
 import io.ipoli.android.dailychallenge.usecase.CheckDailyChallengeProgressUseCase
 import io.ipoli.android.event.Event
+import io.ipoli.android.pet.AndroidPetAvatar
+import io.ipoli.android.pet.AndroidPetMood
+import io.ipoli.android.pet.PetItem
+import io.ipoli.android.player.data.AndroidAttribute
+import io.ipoli.android.player.data.AndroidAvatar
+import io.ipoli.android.player.data.Player
 import io.ipoli.android.quest.schedule.addquest.AddQuestAnimationHelper
 import io.ipoli.android.quest.schedule.today.TodayViewState.StateType.*
 import io.ipoli.android.quest.schedule.today.usecase.CreateTodayItemsUseCase
@@ -42,12 +55,12 @@ import kotlinx.android.synthetic.main.controller_today.view.*
 import kotlinx.android.synthetic.main.item_agenda_event.view.*
 import kotlinx.android.synthetic.main.item_agenda_quest.view.*
 import kotlinx.android.synthetic.main.item_habit_list.view.*
+import kotlinx.android.synthetic.main.item_today_profile_attribute.view.*
 import kotlinx.android.synthetic.main.view_fab.view.*
+import kotlinx.android.synthetic.main.view_profile_pet.view.*
 import kotlinx.android.synthetic.main.view_today_stats.view.*
 import org.threeten.bp.LocalDate
-import org.threeten.bp.format.TextStyle
 import space.traversal.kapsule.required
-import java.util.*
 
 class TodayViewController(args: Bundle? = null) :
     ReduxViewController<TodayAction, TodayViewState, TodayReducer>(args = args) {
@@ -224,19 +237,30 @@ class TodayViewController(args: Bundle? = null) :
 
     override fun onAttach(view: View) {
         super.onAttach(view)
-        val fab = (view as ViewGroup).inflate(R.layout.view_fab)
-        (parentController!!.view!!.rootCoordinator as ViewGroup).addView(fab)
-        initAddQuest(view, fab as FloatingActionButton, LocalDate.now())
 
-        statsContainer = view.inflate(R.layout.view_today_stats)
-        (parentController!!.view!!.todayCollapsingToolbarContainer as ViewGroup).addView(
-            statsContainer,
-            0
-        )
+        parentController?.view?.let {
+            it.levelProgress.gone()
+            val fab = (view as ViewGroup).inflate(R.layout.view_fab)
+            (it.rootCoordinator as ViewGroup).addView(fab)
+
+            initAddQuest(view, fab as FloatingActionButton, LocalDate.now())
+
+            statsContainer = view.inflate(R.layout.view_today_stats)
+            (it.todayCollapsingToolbarContainer as ViewGroup).addView(
+                statsContainer,
+                0
+            )
+
+            val petBgr = statsContainer!!.todayPetAvatar.background as GradientDrawable
+            petBgr.mutate()
+            petBgr.setColor(colorRes(R.color.md_grey_50))
+
+        }
     }
 
     override fun onDetach(view: View) {
         parentController?.view?.let {
+            it.levelProgress.visible()
             val fabView = it.rootCoordinator.addQuest
             it.rootCoordinator.removeView(fabView)
             it.todayCollapsingToolbarContainer.removeView(statsContainer)
@@ -291,53 +315,28 @@ class TodayViewController(args: Bundle? = null) :
 
     }
 
-    private fun animateStats(view: View) {
+    private fun animateStats(state: TodayViewState, view: View) {
         view.backdropTransparentColor.visible()
         view.backdropTransparentColor.fadeIn(
             shortAnimTime,
             to = 0.85f,
-            delay = mediumAnimTime,
+            delay = longAnimTime,
             onComplete = {
-
-                val anim = AnimationUtils.loadAnimation(
-                    view.context,
-                    R.anim.slide_in_bottom_fade
-                )
-
-                listOf(
-                    view.todayDate,
-                    view.todayDayOfWeek,
-                    view.todayAwesomenessScore,
-                    view.todayAwesomenessScoreLabel,
-                    view.todayFocusDuration,
-                    view.todayFocusDurationLabel,
-                    view.todayDailyChallengeProgress
-                ).forEach { v ->
-                    v.visible()
-                    v.startAnimation(anim)
+                view.todayInfoGroup.visible()
+                val allViews = view.todayInfoGroup.views()
+                val lastViews = allViews.subList(1, allViews.size)
+                lastViews.forEach {
+                    it.visible()
+                    it.fadeIn(shortAnimTime)
                 }
 
-                val lastAnim = AnimationUtils.loadAnimation(
-                    view.context,
-                    R.anim.slide_in_bottom_fade
-                )
-
-                val v = view.todayDailyChallengeProgressLabel
-                lastAnim.setAnimationListener(object : Animation.AnimationListener {
-                    override fun onAnimationRepeat(animation: Animation?) {
-
-                    }
-
-                    override fun onAnimationEnd(animation: Animation?) {
+                allViews.first().let {
+                    it.visible()
+                    renderPlayerStats(state, view)
+                    it.fadeIn(shortAnimTime, onComplete = {
                         dispatch(TodayAction.StatsShown)
-                    }
-
-                    override fun onAnimationStart(animation: Animation?) {
-                    }
-
-                })
-                v.visible()
-                v.startAnimation(lastAnim)
+                    })
+                }
             })
     }
 
@@ -353,13 +352,18 @@ class TodayViewController(args: Bundle? = null) :
 
             SHOW_SUMMARY_STATS ->
                 statsContainer?.let {
-                    updateStats(state, it)
-                    animateStats(it)
+                    renderSummaryStats(state, it)
+                    animateStats(state, it)
                 }
 
             SUMMARY_STATS_CHANGED ->
                 statsContainer?.let {
-                    updateStats(state, it)
+                    renderSummaryStats(state, it)
+                }
+
+            PLAYER_STATS_CHANGED ->
+                statsContainer?.let {
+                    renderPlayerStats(state, it)
                 }
 
             SHOW_DATA ->
@@ -381,15 +385,8 @@ class TodayViewController(args: Bundle? = null) :
         }
     }
 
-    private fun updateStats(state: TodayViewState, view: View) {
-
-        val today = LocalDate.now()
-        view.todayDate.text = today.dayOfMonth.toString()
-        view.todayDayOfWeek.text =
-            today.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
-
-        val awesomenessScore = Constants.DECIMAL_FORMATTER.format(state.awesomenessScore!!)
-        view.todayAwesomenessScore.text = "$awesomenessScore/${Constants.MAX_AWESOMENESS_SCORE}"
+    @SuppressLint("SetTextI18n")
+    private fun renderSummaryStats(state: TodayViewState, view: View) {
 
         val focusDuration = DurationFormatter.format(view.context, state.focusDuration!!.intValue)
 
@@ -410,10 +407,151 @@ class TodayViewController(args: Bundle? = null) :
         view.todayDailyChallengeProgress.text = dcText
     }
 
+    @SuppressLint("SetTextI18n")
+    private fun renderHabitStats(
+        state: TodayViewState
+    ) {
+        statsContainer?.let {
+            it.todayHabitsDone.text = "${state.habitCompleteCount}/${state.habitCount}"
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun renderQuestStats(
+        state: TodayViewState
+    ) {
+        statsContainer?.let {
+            it.todayQuestsDone.text = "${state.questCompleteCount}/${state.questCount}"
+        }
+    }
+
+    private fun renderPlayerStats(
+        state: TodayViewState,
+        view: View
+    ) {
+        val androidAvatar = AndroidAvatar.valueOf(state.avatar.name)
+
+        Glide.with(view.context).load(androidAvatar.image)
+            .apply(RequestOptions.circleCropTransform())
+            .into(view.todayPlayerAvatar)
+        val background = view.todayPlayerAvatar.background as GradientDrawable
+        background.mutate()
+
+        background.setColor(colorRes(androidAvatar.backgroundColor))
+
+        view.todayPlayerAvatar.onDebounceClick {
+            navigateFromRoot().toProfile()
+        }
+
+        view.todayLevelText.text = state.levelText
+
+        view.todayHealthProgress.max = state.maxHealth
+        view.todayHealthProgress.animateProgressFromCurrentValue(state.health)
+        view.todayHealthProgressText.text = state.healthProgressText
+
+        view.todayLevelProgress.max = state.levelXpMaxProgress
+        view.todayLevelProgress.animateProgressFromCurrentValue(state.levelXpProgress)
+        view.todayLevelProgressText.text = state.levelProgressText
+
+        view.todayCoins.text = state.lifeCoinsText
+
+        view.todayCoins.onDebounceClick {
+            navigateFromRoot().toCurrencyConverter()
+        }
+
+        view.todayGems.text = state.gemsText
+
+        view.todayGems.onDebounceClick {
+            navigateFromRoot().toCurrencyConverter()
+        }
+
+        state.attributeViewModels.forEach { vm ->
+
+            val v = when (vm.type) {
+                Player.AttributeType.STRENGTH -> view.todayAttrStrength
+                Player.AttributeType.INTELLIGENCE -> view.todayAttrIntelligence
+                Player.AttributeType.CHARISMA -> view.todayAttrCharisma
+                Player.AttributeType.EXPERTISE -> view.todayAttrExpertise
+                Player.AttributeType.WELL_BEING -> view.todayAttrWellBeing
+                Player.AttributeType.WILLPOWER -> view.todayAttrWillpower
+            }
+
+            v.attrLevel.text = vm.level
+
+            v.attrLevelProgress.max = vm.progressMax
+            v.attrLevelProgress.animateProgressFromCurrentValue(vm.progress)
+            val pd = v.attrLevelProgress.progressDrawable as RotateDrawable
+            pd.mutate()
+            pd.setColorFilter(vm.progressColor, PorterDuff.Mode.SRC_ATOP)
+
+            v.attrIcon.setImageResource(vm.icon)
+
+            v.onDebounceClick {
+                navigateFromRoot().toAttributes(vm.type)
+            }
+        }
+
+        renderPet(state, view)
+    }
+
+    private fun renderPet(
+        state: TodayViewState,
+        view: View
+    ) {
+
+        view.todayPetAvatar.onDebounceClick {
+            navigateFromRoot().toPet(VerticalChangeHandler())
+        }
+
+        val pet = state.pet!!
+        val avatar = AndroidPetAvatar.valueOf(pet.avatar.name)
+
+        view.pet.setImageResource(avatar.image)
+        view.petState.setImageResource(avatar.stateImage[pet.state]!!)
+        val setItem: (ImageView, EquipmentItemViewModel?) -> Unit = { iv, vm ->
+            if (vm == null) iv.invisible()
+            else iv.setImageResource(vm.image)
+        }
+        setItem(view.hat, state.toItemViewModel(pet.equipment.hat))
+        setItem(view.mask, state.toItemViewModel(pet.equipment.mask))
+        setItem(view.bodyArmor, state.toItemViewModel(pet.equipment.bodyArmor))
+
+        if (pet.equipment.hat == null) {
+            val set = ConstraintSet()
+            val layout = view.petContainer
+            set.clone(layout)
+            set.connect(R.id.pet, ConstraintSet.START, R.id.petContainer, ConstraintSet.START, 0)
+            set.connect(R.id.pet, ConstraintSet.END, R.id.petContainer, ConstraintSet.END, 0)
+            set.connect(R.id.pet, ConstraintSet.TOP, R.id.petContainer, ConstraintSet.TOP, 0)
+            set.connect(R.id.pet, ConstraintSet.BOTTOM, R.id.petContainer, ConstraintSet.BOTTOM, 0)
+            set.applyTo(layout)
+        }
+
+        val drawable = view.todayPetMood.background as GradientDrawable
+        drawable.mutate()
+        drawable.setColor(colorRes(state.petMoodColor))
+
+        view.todayPetName.text = pet.name
+    }
+
+    data class EquipmentItemViewModel(
+        @DrawableRes val image: Int,
+        val item: PetItem
+    )
+
+    private fun TodayViewState.toItemViewModel(petItem: PetItem?): EquipmentItemViewModel? {
+        val petItems = AndroidPetAvatar.valueOf(pet!!.avatar.name).items
+        return petItem?.let {
+            EquipmentItemViewModel(petItems[it]!!, it)
+        }
+    }
+
     private fun renderQuests(
         state: TodayViewState,
         view: View
     ) {
+        renderQuestStats(state)
+
         val incompleteQuestViewModels = state.incompleteQuestViewModels
         val completedQuestVMs = state.completedQuestViewModels
         if (incompleteQuestViewModels.isEmpty() && completedQuestVMs.isEmpty()) {
@@ -451,6 +589,8 @@ class TodayViewController(args: Bundle? = null) :
         view: View,
         state: TodayViewState
     ) {
+        renderHabitStats(state)
+
         view.habitsLabel.visible()
         val habitVMs = state.habitItemViewModels
         if (habitVMs.isEmpty()) {
@@ -462,6 +602,29 @@ class TodayViewController(args: Bundle? = null) :
             (view.habitItems.adapter as HabitListAdapter).updateAll(habitVMs)
         }
     }
+
+    data class AttributeViewModel(
+        val type: Player.AttributeType,
+        val level: String,
+        @DrawableRes val icon: Int,
+        val progress: Int,
+        val progressMax: Int,
+        @ColorInt val progressColor: Int
+    )
+
+    private val TodayViewState.attributeViewModels: List<AttributeViewModel>
+        get() = attributes.map {
+            val attr = AndroidAttribute.valueOf(it.type.name)
+
+            AttributeViewModel(
+                type = it.type,
+                level = it.level.toString(),
+                progress = ((it.progressForLevel * 100f) / it.progressForNextLevel).toInt(),
+                progressMax = 100,
+                progressColor = colorRes(attr.colorPrimaryDark),
+                icon = attr.colorIcon
+            )
+        }
 
     data class TagViewModel(val name: String, @ColorRes val color: Int)
 
@@ -852,6 +1015,24 @@ class TodayViewController(args: Bundle? = null) :
             )
         }
     }
+
+    private val TodayViewState.levelText
+        get() = "$level"
+
+    private val TodayViewState.levelProgressText
+        get() = "$levelXpProgress / $levelXpMaxProgress"
+
+    private val TodayViewState.healthProgressText
+        get() = "$health / $maxHealth"
+
+    private val TodayViewState.gemsText
+        get() = LongFormatter.format(activity!!, gems.toLong())
+
+    private val TodayViewState.lifeCoinsText
+        get() = LongFormatter.format(activity!!, coins.toLong())
+
+    private val TodayViewState.petMoodColor
+        get() = AndroidPetMood.valueOf(pet!!.state.name).color
 
     private val TodayViewState.incompleteQuestViewModels: List<TodayItemViewModel>
         get() =

@@ -153,16 +153,10 @@ class ProfileInfoViewController(args: Bundle? = null) :
             }
 
     private val ProfileViewState.todayCompletedQuestsText
-        get() = "${Math.min(
-            todayCompletedQuests!!,
-            membership!!.dailyHighRewardQuestCap
-        )}/${membership.dailyHighRewardQuestCap}"
+        get() = "${todayCompletedQuests!!}"
 
     private val ProfileViewState.todayCompletedHabitsText
-        get() = "${Math.min(
-            todayCompletedHabits!!,
-            membership!!.dailyHighRewardHabitCap
-        )}/${membership.dailyHighRewardHabitCap}"
+        get() = "${todayCompletedHabits!!}"
 
     @Suppress("IMPLICIT_CAST_TO_ANY")
     private val ProfileViewState.convertedGemsText

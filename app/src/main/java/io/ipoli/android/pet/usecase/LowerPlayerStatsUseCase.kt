@@ -137,12 +137,12 @@ class LowerPlayerStatsUseCase(
         const val PET_MAX_PENALTY = 30
         const val PET_HIGH_PENALTY = 25
         const val PET_MEDIUM_PENALTY = 15
-        const val PET_LOW_PENALTY = 8
+        const val PET_LOW_PENALTY = 4
 
         const val PLAYER_MAX_PENALTY = 22
         const val PLAYER_HIGH_PENALTY = 16
         const val PLAYER_MEDIUM_PENALTY = 5
-        const val PLAYER_LOW_PENALTY = 3
+        const val PLAYER_LOW_PENALTY = 2
 
         const val PLAN_DAY_HIGH_PRODUCTIVE_HOURS = 10
         const val PLAN_DAY_MEDIUM_PRODUCTIVE_HOURS = 6

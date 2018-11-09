@@ -418,22 +418,24 @@ abstract class BaseViewController<A : Action, VS : ViewState> protected construc
             return use24HourFormat!!
         }
 
-    protected fun ProgressBar.animateProgressFromCurrentValue(to: Int) {
-        animateProgress(progress, to)
+    protected fun ProgressBar.animateProgressFromCurrentValue(to: Int, delay: Int = 0) {
+        animateProgress(progress, to, delay)
     }
 
-    protected fun ProgressBar.animateProgressFromZero(to: Int) {
+    protected fun ProgressBar.animateProgressFromZero(to: Int, delay: Int = 0) {
         animateProgress(0, to)
     }
 
     protected fun ProgressBar.animateProgress(
         from: Int,
         to: Int,
+        delay: Int = 0,
         endListener: (() -> Unit)? = null
     ) {
         val animator = ObjectAnimator.ofInt(this, "progress", from, to)
         animator.duration = intRes(android.R.integer.config_mediumAnimTime).toLong()
         animator.interpolator = AccelerateDecelerateInterpolator()
+        animator.startDelay = delay.toLong()
 
         endListener?.let {
             animator.addListener(object : AnimatorListenerAdapter() {

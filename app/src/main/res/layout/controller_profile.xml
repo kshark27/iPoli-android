@@ -131,7 +131,7 @@
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:layout_marginTop="8dp"
-                        android:background="@drawable/bordered_circle"
+                        android:background="@drawable/health_bordered_circle"
                         app:layout_constraintStart_toStartOf="@+id/profileDisplayName"
                         app:layout_constraintTop_toBottomOf="@+id/username" />
 
@@ -175,7 +175,7 @@
                         android:layout_width="28dp"
                         android:layout_height="28dp"
                         android:layout_marginTop="8dp"
-                        android:background="@drawable/bordered_circle"
+                        android:background="@drawable/level_bordered_circle"
                         app:layout_constraintStart_toStartOf="@+id/profileDisplayName"
                         app:layout_constraintTop_toBottomOf="@+id/healthIconBackground" />
 
@@ -184,7 +184,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:textColor="?android:textColorSecondary"
+                        android:textColor="@color/md_dark_text_87"
                         app:layout_constraintBottom_toBottomOf="@id/xpBackground"
                         app:layout_constraintEnd_toEndOf="@id/xpBackground"
                         app:layout_constraintStart_toStartOf="@id/xpBackground"

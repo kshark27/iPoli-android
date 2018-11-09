@@ -34,6 +34,9 @@ open class RewardPlayerUseCase(
 ) : UseCase<RewardPlayerUseCase.Params, RewardPlayerUseCase.Result> {
 
     companion object {
+
+        const val HIGH_REWARD_LIMIT = 12
+
         val QUEST_HP_BASE_REWARDS = intArrayOf(1, 2, 3)
 
         val QUEST_XP_BASE_REWARDS = intArrayOf(2, 5, 7, 10, 15)
@@ -57,7 +60,7 @@ open class RewardPlayerUseCase(
 
         val reward = when (parameters) {
             is Params.ForQuest -> {
-                if (player.statistics.questCompletedCountForToday >= player.membership.dailyHighRewardQuestCap) {
+                if (player.statistics.questCompletedCountForToday >= HIGH_REWARD_LIMIT) {
                     Reward.Low
                 } else {
                     val quest = parameters.quest
@@ -67,7 +70,7 @@ open class RewardPlayerUseCase(
 
             is Params.ForHabit -> {
 
-                if (player.statistics.habitCompletedCountForToday >= player.membership.dailyHighRewardHabitCap) {
+                if (player.statistics.habitCompletedCountForToday >= HIGH_REWARD_LIMIT) {
                     Reward.Low
                 } else {
                     val habit = parameters.habit

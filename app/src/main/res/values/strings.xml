@@ -326,7 +326,7 @@
     <string name="short_bio_hint">Enter a short bio</string>
 
     <string name="membership">Membership</string>
-    <string name="membership_benefit_free_trial">%d days FREE trial (cancel at any time)</string>
+    <string name="membership_benefit_free_trial">%d days FREE trial</string>
     <string name="membership_benefit_cancellation">Cancel at any time</string>
     <string name="quarterly_plan_disadvantage1">Expensive option - billed every 3 months</string>
     <string name="monthly_plan_disadvantage1">Most expensive option - billed monthly</string>
@@ -1247,14 +1247,13 @@ These are your physical and mental characteristics.\n\n
     <string name="share_post">Share Post</string>
     <string name="empty_post_comments_message">No comments yet. Be the first to add one!</string>
     <string name="membership_benefit_convert_gems_count">Convert up to %d Gems per month</string>
-    <string name="membership_benefit_quests_habits_reward">Completing up to %d Quests &amp; Habits per day gives you high rewards</string>
     <string name="membership_benefit_convert_unlimited_gems">Convert Unlimited Gems per month</string>
     <string name="unlimited">Unlimited</string>
     <string name="converter_no_more_gems_message">You have no gems left to convert this month</string>
     <string name="converter_remaining_gems_message">You have %d gems left to convert this month</string>
     <string name="gems_converted_this_month">Gems converted\nthis month</string>
-    <string name="rewarded_habits_today">High Reward Habits today</string>
-    <string name="rewarded_quests_today">High Reward Quests today</string>
+    <string name="rewarded_habits_today">Completed Habits today</string>
+    <string name="rewarded_quests_today">Completed Quests today</string>
     <string name="short_desc_hint">Short Description</string>
     <string name="description_hint">Description</string>
     <string name="preset_challenge_already_accepted">This Challenge is already active</string>

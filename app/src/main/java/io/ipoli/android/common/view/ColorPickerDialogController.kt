@@ -177,7 +177,7 @@ class ColorPickerDialogController :
             SHOW_UNLOCK -> showUnlock(view)
 
             COLOR_PACK_TOO_EXPENSIVE -> {
-                navigate().toCurrencyConverted()
+                navigate().toCurrencyConverter()
                 Toast.makeText(
                     view.context,
                     stringRes(R.string.color_pack_not_enough_coins),

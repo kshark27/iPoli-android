@@ -353,7 +353,7 @@ class Navigator(private val router: Router) {
         pushController({ PostViewController(postId) }, HorizontalChangeHandler())
     }
 
-    fun toCurrencyConverted() {
+    fun toCurrencyConverter() {
         pushDialog { CurrencyConverterDialogController() }
     }
 

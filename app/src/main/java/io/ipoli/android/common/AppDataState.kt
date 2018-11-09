@@ -170,7 +170,6 @@ sealed class DataLoadedAction : Action {
     ) : DataLoadedAction()
 
     data class TodaySummaryStatsChanged(
-        val awesomenessScore: Double,
         val focusDuration: Duration<Minute>,
         val dailyChallengeProgress: CheckDailyChallengeProgressUseCase.Result
     ) : DataLoadedAction()
@@ -208,7 +207,6 @@ data class AppDataState(
     val events: List<Event>,
     val tags: List<Tag>,
     val todayImage: String?,
-    val awesomenessScore: Double?,
     val focusDuration: Duration<Minute>?,
     val dailyChallengeProgress: CheckDailyChallengeProgressUseCase.Result?,
     val agendaDate: LocalDate
@@ -234,7 +232,6 @@ object AppDataReducer : Reducer<AppState, AppDataState> {
 
             is DataLoadedAction.TodaySummaryStatsChanged ->
                 subState.copy(
-                    awesomenessScore = action.awesomenessScore,
                     focusDuration = action.focusDuration,
                     dailyChallengeProgress = action.dailyChallengeProgress
                 )
@@ -329,7 +326,6 @@ object AppDataReducer : Reducer<AppState, AppDataState> {
             events = listOf(),
             tags = listOf(),
             todayImage = null,
-            awesomenessScore = null,
             focusDuration = null,
             dailyChallengeProgress = null,
             agendaDate = LocalDate.now()

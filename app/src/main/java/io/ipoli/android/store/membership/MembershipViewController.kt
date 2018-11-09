@@ -269,19 +269,9 @@ class MembershipViewController(args: Bundle? = null) :
             Membership.MONTHLY.monthlyConvertedGemCap
         )
 
-        view.membershipMonthlyQuestsHabitsReward.text = stringRes(
-            R.string.membership_benefit_quests_habits_reward,
-            Membership.MONTHLY.dailyHighRewardQuestCap
-        )
-
         view.membershipYearlyFreeTrial.text = stringRes(
             R.string.membership_benefit_free_trial,
             Constants.MEMBERSHIP_TRIAL_PERIOD_DAYS
-        )
-
-        view.membershipYearlyQuestsHabitsReward.text = stringRes(
-            R.string.membership_benefit_quests_habits_reward,
-            Membership.YEARLY.dailyHighRewardQuestCap
         )
 
         view.membershipQuarterlyFreeTrial.text = stringRes(
@@ -292,11 +282,6 @@ class MembershipViewController(args: Bundle? = null) :
         view.membershipQuarterlyConvertGems.text = stringRes(
             R.string.membership_benefit_convert_gems_count,
             Membership.QUARTERLY.monthlyConvertedGemCap
-        )
-
-        view.membershipQuarterlyQuestsHabitsReward.text = stringRes(
-            R.string.membership_benefit_quests_habits_reward,
-            Membership.QUARTERLY.dailyHighRewardQuestCap
         )
     }
 

@@ -28,111 +28,348 @@
         app:layout_constraintStart_toStartOf="@+id/todayBackdrop"
         app:layout_constraintTop_toTopOf="@+id/todayBackdrop" />
 
-    <TextView
-        android:id="@+id/todayDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display3"
-        android:textColor="@color/md_white"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/todayDayOfWeek"
-        app:layout_constraintEnd_toEndOf="parent"
+    <android.support.constraint.Group
+        android:id="@+id/todayInfoGroup"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        app:constraint_referenced_ids="todayPlayerAvatar, todayPetAvatar, petContainer, todayPetMood, todayPetName,
+        todayHealthProgress, todayHealthProgressText, todayHealthIconBackground, todayHealthIcon, todayLevelProgress,
+        todayLevelProgressText, todayExperienceBackground, todayLevelText, todayGems, todayCoins,
+        todayAttrStrength, todayAttrIntelligence, todayAttrWellBeing, todayAttrWillpower, todayAttrExpertise, todayAttrCharisma,
+        todayQuestsDone, todayQuestsDoneLabel, todayHabitsDone, todayHabitsDoneLabel, todayFocusDuration, todayFocusDurationLabel, todayDailyChallengeProgress, todayDailyChallengeProgressLabel" />
+
+    <ImageView
+        android:id="@+id/todayPlayerAvatar"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="56dp"
+        android:background="@drawable/white_circular_background"
+        android:scaleType="fitCenter"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.66"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/todayPetAvatar"
+        android:layout_width="68dp"
+        android:layout_height="68dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/white_circular_background"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/todayHealthProgress" />
+
+    <include
+        layout="@layout/view_profile_pet"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="@id/todayPetAvatar"
+        app:layout_constraintEnd_toEndOf="@id/todayPetAvatar"
+        app:layout_constraintStart_toStartOf="@id/todayPetAvatar"
+        app:layout_constraintTop_toTopOf="@id/todayPetAvatar" />
+
+    <ImageView
+        android:id="@+id/todayPetMood"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="2dp"
+        android:background="@drawable/ic_context_indicator"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="@+id/todayPetAvatar"
+        app:layout_constraintEnd_toEndOf="@id/todayPetAvatar" />
 
     <TextView
-        android:id="@+id/todayDayOfWeek"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:textColor="@color/md_light_text_70"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/todayAwesomenessScore"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/todayDate" />
-
-    <TextView
-        android:id="@+id/todayAwesomenessScore"
+        android:id="@+id/todayPetName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@color/md_white"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/todayAwesomenessScoreLabel"
-        app:layout_constraintEnd_toStartOf="@+id/todayFocusDuration"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/todayDayOfWeek" />
+        app:layout_constraintEnd_toEndOf="@+id/todayPetAvatar"
+        app:layout_constraintStart_toStartOf="@+id/todayPetAvatar"
+        app:layout_constraintTop_toBottomOf="@+id/todayPetAvatar" />
+
+    <ProgressBar
+        android:id="@+id/todayHealthProgress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="32dp"
+        android:progressDrawable="@drawable/health_progress_bar"
+        app:layout_constraintBottom_toBottomOf="@+id/todayHealthIconBackground"
+        app:layout_constraintStart_toStartOf="@+id/todayHealthIcon"
+        app:layout_constraintTop_toTopOf="@+id/todayHealthIconBackground"
+        app:layout_constraintWidth_percent="0.5" />
 
     <TextView
-        android:id="@+id/todayAwesomenessScoreLabel"
+        android:id="@+id/todayHealthProgressText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="@color/md_white"
+        app:layout_constraintBottom_toBottomOf="@id/todayHealthProgress"
+        app:layout_constraintStart_toEndOf="@id/todayHealthIconBackground"
+        app:layout_constraintTop_toTopOf="@id/todayHealthProgress" />
+
+    <View
+        android:id="@+id/todayHealthIconBackground"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/health_bordered_circle"
+        app:layout_constraintStart_toEndOf="@+id/todayPlayerAvatar"
+        app:layout_constraintTop_toTopOf="@+id/todayPlayerAvatar" />
+
+    <ImageView
+        android:id="@+id/todayHealthIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_heart_red_24dp"
+        app:layout_constraintBottom_toBottomOf="@id/todayHealthIconBackground"
+        app:layout_constraintEnd_toEndOf="@id/todayHealthIconBackground"
+        app:layout_constraintStart_toStartOf="@id/todayHealthIconBackground"
+        app:layout_constraintTop_toTopOf="@id/todayHealthIconBackground" />
+
+    <ProgressBar
+        android:id="@+id/todayLevelProgress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:progressDrawable="@drawable/profile_xp_level_progress_bar"
+        app:layout_constraintBottom_toBottomOf="@+id/todayExperienceBackground"
+        app:layout_constraintStart_toStartOf="@+id/todayExperienceBackground"
+        app:layout_constraintTop_toTopOf="@+id/todayExperienceBackground"
+        app:layout_constraintWidth_percent="0.4" />
+
+    <TextView
+        android:id="@+id/todayLevelProgressText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="@color/md_white"
+        app:layout_constraintBottom_toBottomOf="@id/todayLevelProgress"
+        app:layout_constraintStart_toEndOf="@id/todayExperienceBackground"
+        app:layout_constraintTop_toTopOf="@id/todayLevelProgress" />
+
+    <View
+        android:id="@+id/todayExperienceBackground"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/level_bordered_circle"
+        app:layout_constraintStart_toStartOf="@+id/todayHealthIconBackground"
+        app:layout_constraintTop_toBottomOf="@+id/todayHealthIconBackground" />
+
+    <TextView
+        android:id="@+id/todayLevelText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/md_dark_text_87"
+        app:layout_constraintBottom_toBottomOf="@id/todayExperienceBackground"
+        app:layout_constraintEnd_toEndOf="@id/todayExperienceBackground"
+        app:layout_constraintStart_toStartOf="@id/todayExperienceBackground"
+        app:layout_constraintTop_toTopOf="@id/todayExperienceBackground" />
+
+    <TextView
+        android:id="@+id/todayCoins"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
+        android:drawableTop="@drawable/ic_life_coin_24dp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="@color/md_light_text_70"
+        app:layout_constraintEnd_toStartOf="@+id/todayGems"
+        app:layout_constraintStart_toStartOf="@+id/todayPlayerAvatar"
+        app:layout_constraintTop_toBottomOf="@+id/todayPlayerAvatar" />
+
+    <TextView
+        android:id="@+id/todayGems"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableTop="@drawable/ic_gem_24dp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="@color/md_light_text_70"
+        app:layout_constraintBottom_toBottomOf="@+id/todayCoins"
+        app:layout_constraintEnd_toEndOf="@+id/todayPlayerAvatar"
+        app:layout_constraintStart_toEndOf="@+id/todayCoins"
+        app:layout_constraintTop_toTopOf="@+id/todayCoins" />
+
+    <include
+        android:id="@+id/todayAttrStrength"
+        layout="@layout/item_today_profile_attribute"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toStartOf="@+id/todayAttrIntelligence"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="@+id/todayHealthIconBackground"
+        app:layout_constraintTop_toBottomOf="@+id/todayExperienceBackground" />
+
+    <include
+        android:id="@+id/todayAttrIntelligence"
+        layout="@layout/item_today_profile_attribute"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/todayAttrStrength"
+        app:layout_constraintEnd_toStartOf="@+id/todayAttrWellBeing"
+        app:layout_constraintStart_toEndOf="@+id/todayAttrStrength"
+        app:layout_constraintTop_toTopOf="@+id/todayAttrStrength" />
+
+    <include
+        android:id="@+id/todayAttrWellBeing"
+        layout="@layout/item_today_profile_attribute"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/todayAttrStrength"
+        app:layout_constraintEnd_toStartOf="@+id/todayAttrWillpower"
+        app:layout_constraintStart_toEndOf="@+id/todayAttrIntelligence"
+        app:layout_constraintTop_toTopOf="@+id/todayAttrStrength" />
+
+    <include
+        android:id="@+id/todayAttrWillpower"
+        layout="@layout/item_today_profile_attribute"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/todayAttrStrength"
+        app:layout_constraintEnd_toStartOf="@+id/todayAttrExpertise"
+        app:layout_constraintStart_toEndOf="@+id/todayAttrWellBeing"
+        app:layout_constraintTop_toTopOf="@+id/todayAttrStrength" />
+
+
+    <include
+        android:id="@+id/todayAttrExpertise"
+        layout="@layout/item_today_profile_attribute"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/todayAttrStrength"
+        app:layout_constraintEnd_toStartOf="@+id/todayAttrCharisma"
+        app:layout_constraintStart_toEndOf="@+id/todayAttrWillpower"
+        app:layout_constraintTop_toTopOf="@+id/todayAttrStrength" />
+
+    <include
+        android:id="@+id/todayAttrCharisma"
+        layout="@layout/item_today_profile_attribute"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/todayAttrStrength"
+        app:layout_constraintEnd_toEndOf="@+id/todayHealthProgress"
+        app:layout_constraintStart_toEndOf="@+id/todayAttrExpertise"
+        app:layout_constraintTop_toTopOf="@+id/todayAttrStrength" />
+
+    <TextView
+        android:id="@+id/todayQuestsDone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="@color/md_white"
+        app:layout_constraintBottom_toTopOf="@+id/todayQuestsDoneLabel"
+        app:layout_constraintEnd_toStartOf="@+id/todayHabitsDone"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/todayAttrStrength" />
+
+    <TextView
+        android:id="@+id/todayQuestsDoneLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="Awesomeness"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:text="Quests Done"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@color/md_light_text_70"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/todayAwesomenessScore"
-        app:layout_constraintStart_toStartOf="@+id/todayAwesomenessScore"
-        app:layout_constraintTop_toBottomOf="@+id/todayAwesomenessScore" />
+        app:layout_constraintEnd_toEndOf="@+id/todayQuestsDone"
+        app:layout_constraintStart_toStartOf="@+id/todayQuestsDone"
+        app:layout_constraintTop_toBottomOf="@+id/todayQuestsDone" />
+
+    <TextView
+        android:id="@+id/todayHabitsDone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="2/5"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="@color/md_white"
+        app:layout_constraintBottom_toBottomOf="@+id/todayQuestsDone"
+        app:layout_constraintEnd_toStartOf="@+id/todayFocusDuration"
+        app:layout_constraintStart_toEndOf="@+id/todayQuestsDone"
+        app:layout_constraintTop_toTopOf="@+id/todayQuestsDone" />
+
+    <TextView
+        android:id="@+id/todayHabitsDoneLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Habits Done"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="@color/md_light_text_70"
+        app:layout_constraintBottom_toBottomOf="@+id/todayQuestsDoneLabel"
+        app:layout_constraintEnd_toEndOf="@+id/todayHabitsDone"
+        app:layout_constraintStart_toStartOf="@+id/todayHabitsDone"
+        app:layout_constraintTop_toTopOf="@+id/todayQuestsDoneLabel" />
 
     <TextView
         android:id="@+id/todayFocusDuration"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="@color/md_white"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/todayAwesomenessScore"
+        app:layout_constraintBottom_toBottomOf="@+id/todayQuestsDone"
         app:layout_constraintEnd_toStartOf="@+id/todayDailyChallengeProgress"
-        app:layout_constraintStart_toEndOf="@+id/todayAwesomenessScore"
-        app:layout_constraintTop_toTopOf="@+id/todayAwesomenessScore" />
+        app:layout_constraintStart_toEndOf="@+id/todayHabitsDone"
+        app:layout_constraintTop_toTopOf="@+id/todayQuestsDone" />
 
     <TextView
         android:id="@+id/todayFocusDurationLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Focus Time"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@color/md_light_text_70"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/todayAwesomenessScoreLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/todayQuestsDoneLabel"
         app:layout_constraintEnd_toEndOf="@+id/todayFocusDuration"
         app:layout_constraintStart_toStartOf="@+id/todayFocusDuration"
-        app:layout_constraintTop_toTopOf="@+id/todayAwesomenessScoreLabel" />
+        app:layout_constraintTop_toTopOf="@+id/todayQuestsDoneLabel" />
 
     <TextView
         android:id="@+id/todayDailyChallengeProgress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="@color/md_white"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/todayAwesomenessScore"
+        app:layout_constraintBottom_toBottomOf="@+id/todayQuestsDone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/todayFocusDuration"
-        app:layout_constraintTop_toTopOf="@+id/todayAwesomenessScore" />
+        app:layout_constraintTop_toTopOf="@+id/todayQuestsDone" />
 
     <TextView
         android:id="@+id/todayDailyChallengeProgressLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Daily Challenge"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@color/md_light_text_70"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/todayAwesomenessScoreLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/todayQuestsDoneLabel"
         app:layout_constraintEnd_toEndOf="@+id/todayDailyChallengeProgress"
         app:layout_constraintStart_toStartOf="@+id/todayDailyChallengeProgress"
-        app:layout_constraintTop_toTopOf="@+id/todayAwesomenessScoreLabel" />
+        app:layout_constraintTop_toTopOf="@+id/todayQuestsDoneLabel" />
 
 </android.support.constraint.ConstraintLayout>

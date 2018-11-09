@@ -15,7 +15,6 @@ import io.ipoli.android.common.notification.QuickDoNotificationUtil
 import io.ipoli.android.common.redux.Action
 import io.ipoli.android.common.view.AppWidgetUtil
 import io.ipoli.android.habit.data.Habit
-import io.ipoli.android.planday.usecase.CalculateAwesomenessScoreUseCase
 import io.ipoli.android.planday.usecase.CalculateFocusDurationUseCase
 import io.ipoli.android.player.data.Player
 import io.ipoli.android.quest.Quest
@@ -49,7 +48,6 @@ object LoadAllDataSideEffectHandler : AppSideEffectHandler() {
     private val reminderScheduler by required { reminderScheduler }
     private val sharedPreferences by required { sharedPreferences }
 
-    private val calculateAwesomenessScoreUseCase by required { calculateAwesomenessScoreUseCase }
     private val calculateFocusDurationUseCase by required { calculateFocusDurationUseCase }
     private val checkDailyChallengeProgressUseCase by required { checkDailyChallengeProgressUseCase }
 
@@ -82,9 +80,6 @@ object LoadAllDataSideEffectHandler : AppSideEffectHandler() {
                 )
             }
 
-            val awesomenessScore = calculateAwesomenessScoreUseCase.execute(
-                CalculateAwesomenessScoreUseCase.Params.WithQuests(action.quests)
-            )
             val focusDuration = calculateFocusDurationUseCase.execute(
                 CalculateFocusDurationUseCase.Params.WithQuests(action.quests)
             )
@@ -92,7 +87,6 @@ object LoadAllDataSideEffectHandler : AppSideEffectHandler() {
 
             dispatch(
                 DataLoadedAction.TodaySummaryStatsChanged(
-                    awesomenessScore,
                     focusDuration,
                     dcProgress
                 )

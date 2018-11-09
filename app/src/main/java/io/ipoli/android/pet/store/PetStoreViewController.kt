@@ -81,7 +81,7 @@ class PetStoreViewController(args: Bundle? = null) :
             }
 
             PET_TOO_EXPENSIVE -> {
-                navigate().toCurrencyConverted()
+                navigate().toCurrencyConverter()
                 Toast.makeText(view.context, "Pet too expensive", Toast.LENGTH_SHORT).show()
             }
 
