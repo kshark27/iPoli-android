@@ -223,10 +223,12 @@ class CalendarDayView : FrameLayout, StateChangeListener {
     }
 
     private fun initUi(attrs: AttributeSet?, defStyleAttr: Int) {
-
-        setMainLayout()
         fetchStyleAttributes(attrs, defStyleAttr)
+    }
 
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        setMainLayout()
         setupFSM()
 
         setupScroll()
