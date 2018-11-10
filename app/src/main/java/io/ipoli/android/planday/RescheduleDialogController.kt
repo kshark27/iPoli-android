@@ -258,7 +258,7 @@ class RescheduleDialogController(args: Bundle? = null) :
             vms.add(
                 0,
                 RescheduleViewModel.StartNow(
-                    R.drawable.ic_clock_text_secondary_24dp,
+                    R.drawable.ic_clock_now_secondary_24dp,
                     stringRes(R.string.start_now)
                 )
             )
@@ -266,7 +266,7 @@ class RescheduleDialogController(args: Bundle? = null) :
             vms.add(
                 1,
                 RescheduleViewModel.StartIn5Minutes(
-                    R.drawable.ic_clock_text_secondary_24dp,
+                    R.drawable.ic_clock_forward_secondary_24dp,
                     stringRes(R.string.start_in_5_minutes)
                 )
             )
@@ -282,7 +282,7 @@ class RescheduleDialogController(args: Bundle? = null) :
             vms.add(
                 3,
                 RescheduleViewModel.ChooseDuration(
-                    R.drawable.ic_timer_text_secondary_24dp,
+                    R.drawable.ic_sandclock_text_secondary_24dp,
                     stringRes(R.string.change_duration)
                 )
             )
