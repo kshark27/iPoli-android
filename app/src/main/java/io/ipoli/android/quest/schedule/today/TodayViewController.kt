@@ -323,20 +323,23 @@ class TodayViewController(args: Bundle? = null) :
             to = 0.9f,
             delay = longAnimTime,
             onComplete = {
-                view.todayInfoGroup.visible()
-                val allViews = view.todayInfoGroup.views()
-                val lastViews = allViews.subList(1, allViews.size)
-                lastViews.forEach {
-                    it.visible()
-                    it.fadeIn(shortAnimTime)
-                }
+                activity?.let { _ ->
+                    val animTime = shortAnimTime
+                    view.todayInfoGroup.visible()
+                    val allViews = view.todayInfoGroup.views()
+                    val lastViews = allViews.subList(1, allViews.size)
+                    lastViews.forEach {
+                        it.visible()
+                        it.fadeIn(animTime)
+                    }
 
-                allViews.first().let {
-                    it.visible()
-                    renderPlayerStats(state, view)
-                    it.fadeIn(shortAnimTime, onComplete = {
-                        dispatch(TodayAction.StatsShown)
-                    })
+                    allViews.first().let {
+                        it.visible()
+                        renderPlayerStats(state, view)
+                        it.fadeIn(animTime, onComplete = {
+                            dispatch(TodayAction.StatsShown)
+                        })
+                    }
                 }
             })
     }
