@@ -130,8 +130,8 @@ class PlanDayReviewViewController(args: Bundle? = null) :
                         navigate()
                             .toReschedule(
                                 includeToday = true,
-                                listener = { date ->
-                                    dispatch(PlanDayAction.RescheduleQuest(questId, date))
+                                listener = { date, time, duration ->
+                                    dispatch(PlanDayAction.RescheduleQuest(questId, date, time, duration))
                                 },
                                 cancelListener = {
                                     view.reviewQuests.adapter.notifyItemChanged(viewHolder.adapterPosition)

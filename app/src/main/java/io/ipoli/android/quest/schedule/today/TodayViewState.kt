@@ -5,6 +5,7 @@ import io.ipoli.android.common.BaseViewStateReducer
 import io.ipoli.android.common.DataLoadedAction
 import io.ipoli.android.common.datetime.Duration
 import io.ipoli.android.common.datetime.Minute
+import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.common.redux.Action
 import io.ipoli.android.common.redux.BaseViewState
 import io.ipoli.android.dailychallenge.usecase.CheckDailyChallengeProgressUseCase
@@ -30,8 +31,18 @@ sealed class TodayAction : Action {
         override fun toMap() = mapOf("habitId" to habitId)
     }
 
-    data class RescheduleQuest(val questId: String, val date: LocalDate?) : TodayAction() {
-        override fun toMap() = mapOf("questId" to questId, "date" to date)
+    data class RescheduleQuest(
+        val questId: String,
+        val date: LocalDate?,
+        val time: Time?,
+        val duration: Duration<Minute>?
+    ) : TodayAction() {
+        override fun toMap() = mapOf(
+            "questId" to questId,
+            "date" to date,
+            "time" to time,
+            "duration" to duration?.intValue
+        )
     }
 
     data class CompleteQuest(val questId: String) : TodayAction() {

@@ -92,8 +92,8 @@ class BucketListViewController(args: Bundle? = null) :
                             navigate()
                                 .toReschedule(
                                     includeToday = true,
-                                    listener = { date ->
-                                        dispatch(BucketListAction.RescheduleQuest(questId, date))
+                                    listener = { date, time, duration ->
+                                        dispatch(BucketListAction.RescheduleQuest(questId, date, time, duration))
                                     },
                                     cancelListener = {
                                         view.questList.adapter.notifyItemChanged(viewHolder.adapterPosition)

@@ -36,6 +36,7 @@ import io.ipoli.android.common.ShareAppDialogController
 import io.ipoli.android.common.datetime.Day
 import io.ipoli.android.common.datetime.Duration
 import io.ipoli.android.common.datetime.Minute
+import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.common.feedback.WebUrlViewController
 import io.ipoli.android.common.home.HomeViewController
 import io.ipoli.android.common.migration.MigrationViewController
@@ -543,7 +544,7 @@ class Navigator(private val router: Router) {
 
     fun toReschedule(
         includeToday: Boolean,
-        listener: (LocalDate?) -> Unit,
+        listener: (LocalDate?, Time?, Duration<Minute>?) -> Unit,
         cancelListener: () -> Unit = {}
     ) {
         pushDialog { RescheduleDialogController(includeToday, listener, cancelListener) }

@@ -4,6 +4,9 @@ import io.ipoli.android.Constants
 import io.ipoli.android.common.AppSideEffectHandler
 import io.ipoli.android.common.AppState
 import io.ipoli.android.common.Validator
+import io.ipoli.android.common.datetime.Duration
+import io.ipoli.android.common.datetime.Minute
+import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.common.redux.Action
 import io.ipoli.android.planday.PlanDayAction
 import io.ipoli.android.quest.Color
@@ -119,33 +122,16 @@ object EditQuestSideEffectHandler : AppSideEffectHandler() {
             }
 
             is PlanDayAction.ScheduleQuestForToday ->
-                rescheduleQuestUseCase.execute(
-                    RescheduleQuestUseCase.Params(
-                        action.questId,
-                        LocalDate.now()
-                    )
-                )
+                rescheduleQuest(action.questId, LocalDate.now(), null, null)
 
             is PlanDayAction.RescheduleQuest ->
-                rescheduleQuestUseCase.execute(
-                    RescheduleQuestUseCase.Params(
-                        action.questId,
-                        action.date
-                    )
-                )
+                rescheduleQuest(action.questId, action.date, action.time, action.duration)
 
             is PlanDayAction.AcceptSuggestion ->
-                rescheduleQuestUseCase.execute(
-                    RescheduleQuestUseCase.Params(
-                        action.questId,
-                        LocalDate.now()
-                    )
-                )
+                rescheduleQuest(action.questId, LocalDate.now(), null, null)
 
             is PlanDayAction.MoveQuestToBucketList ->
-                rescheduleQuestUseCase.execute(
-                    RescheduleQuestUseCase.Params(action.questId, null)
-                )
+                rescheduleQuest(action.questId, null, null, null)
 
             is PlanDayAction.RemoveQuest ->
                 removeQuestUseCase.execute(action.questId)
@@ -165,17 +151,11 @@ object EditQuestSideEffectHandler : AppSideEffectHandler() {
             is TagAction.CompleteQuest ->
                 completeQuest(action.questId)
 
-
             is TodayAction.CompleteQuest ->
                 completeQuest(action.questId)
 
             is TodayAction.RescheduleQuest ->
-                rescheduleQuestUseCase.execute(
-                    RescheduleQuestUseCase.Params(
-                        action.questId,
-                        action.date
-                    )
-                )
+                rescheduleQuest(action.questId, action.date, action.time, action.duration)
 
             is TodayAction.RemoveQuest ->
                 removeQuestUseCase.execute(action.questId)
@@ -193,12 +173,7 @@ object EditQuestSideEffectHandler : AppSideEffectHandler() {
                 undoCompletedQuestUseCase.execute(action.questId)
 
             is AgendaAction.RescheduleQuest ->
-                rescheduleQuestUseCase.execute(
-                    RescheduleQuestUseCase.Params(
-                        action.questId,
-                        action.date
-                    )
-                )
+                rescheduleQuest(action.questId, action.date, action.time, action.duration)
 
             is AgendaAction.RemoveQuest ->
                 removeQuestUseCase.execute(action.questId)
@@ -210,12 +185,7 @@ object EditQuestSideEffectHandler : AppSideEffectHandler() {
                 undoCompletedQuestUseCase.execute(action.questId)
 
             is BucketListAction.RescheduleQuest ->
-                rescheduleQuestUseCase.execute(
-                    RescheduleQuestUseCase.Params(
-                        action.questId,
-                        action.date
-                    )
-                )
+                rescheduleQuest(action.questId, action.date, action.time, action.duration)
 
             is BucketListAction.RemoveQuest ->
                 removeQuestUseCase.execute(action.questId)
@@ -223,6 +193,17 @@ object EditQuestSideEffectHandler : AppSideEffectHandler() {
             is BucketListAction.UndoRemoveQuest ->
                 undoRemoveQuestUseCase.execute(action.questId)
         }
+    }
+
+    private fun rescheduleQuest(
+        questId: String,
+        date: LocalDate?,
+        time: Time?,
+        duration: Duration<Minute>?
+    ) {
+        rescheduleQuestUseCase.execute(
+            RescheduleQuestUseCase.Params(questId, date, time, duration)
+        )
     }
 
     enum class ValidationError {

@@ -2,6 +2,9 @@ package io.ipoli.android.quest.bucketlist
 
 import io.ipoli.android.common.AppState
 import io.ipoli.android.common.BaseViewStateReducer
+import io.ipoli.android.common.datetime.Duration
+import io.ipoli.android.common.datetime.Minute
+import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.common.redux.Action
 import io.ipoli.android.common.redux.BaseViewState
 import io.ipoli.android.quest.bucketlist.usecase.CreateBucketListItemsUseCase
@@ -21,8 +24,18 @@ sealed class BucketListAction : Action {
         override fun toMap() = mapOf("questId" to questId)
     }
 
-    data class RescheduleQuest(val questId: String, val date: LocalDate?) : BucketListAction() {
-        override fun toMap() = mapOf("questId" to questId, "date" to date)
+    data class RescheduleQuest(
+        val questId: String,
+        val date: LocalDate?,
+        val time: Time?,
+        val duration: Duration<Minute>?
+    ) : BucketListAction() {
+        override fun toMap() = mapOf(
+            "questId" to questId,
+            "date" to date,
+            "time" to time,
+            "duration" to duration?.intValue
+        )
     }
 
     data class RemoveQuest(val questId: String) : BucketListAction() {

@@ -171,8 +171,8 @@ class TodayViewController(args: Bundle? = null) :
                     navigate()
                         .toReschedule(
                             includeToday = false,
-                            listener = { date ->
-                                dispatch(TodayAction.RescheduleQuest(questId, date))
+                            listener = { date, time, duration ->
+                                dispatch(TodayAction.RescheduleQuest(questId, date, time, duration))
                             },
                             cancelListener = {
                                 view.questItems.adapter.notifyItemChanged(viewHolder.adapterPosition)

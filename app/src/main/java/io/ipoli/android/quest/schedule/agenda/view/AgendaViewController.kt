@@ -129,11 +129,13 @@ class AgendaViewController(args: Bundle? = null) :
                             navigate()
                                 .toReschedule(
                                     includeToday = !vm.isScheduledForToday,
-                                    listener = { date ->
+                                    listener = { date, time, duration ->
                                         dispatch(
                                             AgendaAction.RescheduleQuest(
                                                 questId,
-                                                date
+                                                date,
+                                                time,
+                                                duration
                                             )
                                         )
                                     },

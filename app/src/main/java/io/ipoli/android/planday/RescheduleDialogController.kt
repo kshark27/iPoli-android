@@ -12,6 +12,9 @@ import io.ipoli.android.Constants
 import io.ipoli.android.R
 import io.ipoli.android.common.AppState
 import io.ipoli.android.common.BaseViewStateReducer
+import io.ipoli.android.common.datetime.Duration
+import io.ipoli.android.common.datetime.Minute
+import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.common.redux.Action
 import io.ipoli.android.common.redux.BaseViewState
 import io.ipoli.android.common.view.ReduxDialogController
@@ -84,13 +87,13 @@ class RescheduleDialogController(args: Bundle? = null) :
 
     private var includeToday: Boolean = true
 
-    private var listener: (LocalDate?) -> Unit = {}
+    private var listener: (LocalDate?, Time?, Duration<Minute>?) -> Unit = { _, _, _ -> }
 
     private var cancelListener: () -> Unit = {}
 
     constructor(
         includeToday: Boolean,
-        listener: (LocalDate?) -> Unit,
+        listener: (LocalDate?, Time?, Duration<Minute>?) -> Unit,
         cancelListener: () -> Unit = {}
     ) : this() {
         this.includeToday = includeToday
@@ -191,20 +194,48 @@ class RescheduleDialogController(args: Bundle? = null) :
                         DatePickerDialog(
                             view.context,
                             DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-                                listener(LocalDate.of(year, month + 1, dayOfMonth))
+                                listener(LocalDate.of(year, month + 1, dayOfMonth), null, null)
                                 dismiss()
                             }, date.year, date.month.value - 1, date.dayOfMonth
                         ).show()
                     }
 
                     is RescheduleViewModel.ExactDate -> {
-                        listener(vm.date)
+                        listener(vm.date, null, null)
                         dismiss()
                     }
 
                     is RescheduleViewModel.Bucket -> {
-                        listener(null)
+                        listener(null, null, null)
                         dismiss()
+                    }
+
+
+                    is RescheduleViewModel.StartNow -> {
+                        listener(null, Time.now(), null)
+                        dismiss()
+                    }
+
+                    is RescheduleViewModel.StartIn5Minutes -> {
+                        listener(null, Time.now().plus(5), null)
+                        dismiss()
+                    }
+
+                    is RescheduleViewModel.ChooseStartTime -> {
+                        createTimePickerDialog(
+                            startTime = Time.now(),
+                            showNeutral = true,
+                            onTimePicked = { t ->
+                                listener(null, t, null)
+                                dismiss()
+                            }).show(router)
+                    }
+
+                    is RescheduleViewModel.ChooseDuration -> {
+                        navigateFromRoot().toDurationPicker { d ->
+                            listener(null, null, d)
+                            dismiss()
+                        }
                     }
                 }
             }

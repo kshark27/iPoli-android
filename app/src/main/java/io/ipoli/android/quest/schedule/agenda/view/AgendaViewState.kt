@@ -3,6 +3,9 @@ package io.ipoli.android.quest.schedule.agenda.view
 import io.ipoli.android.common.AppState
 import io.ipoli.android.common.BaseViewStateReducer
 import io.ipoli.android.common.DataLoadedAction
+import io.ipoli.android.common.datetime.Duration
+import io.ipoli.android.common.datetime.Minute
+import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.common.datetime.isBetween
 import io.ipoli.android.common.redux.Action
 import io.ipoli.android.common.redux.BaseViewState
@@ -39,8 +42,18 @@ sealed class AgendaAction : Action {
         override fun toMap() = mapOf("questId" to questId)
     }
 
-    data class RescheduleQuest(val questId: String, val date: LocalDate?) : AgendaAction() {
-        override fun toMap() = mapOf("questId" to questId, "date" to date)
+    data class RescheduleQuest(
+        val questId: String,
+        val date: LocalDate?,
+        val time: Time?,
+        val duration: Duration<Minute>?
+    ) : AgendaAction() {
+        override fun toMap() = mapOf(
+            "questId" to questId,
+            "date" to date,
+            "time" to time,
+            "duration" to duration?.intValue
+        )
     }
 
     data class RemoveQuest(val questId: String) : AgendaAction() {

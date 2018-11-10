@@ -13,6 +13,8 @@ import io.ipoli.android.R
 import io.ipoli.android.common.AppState
 import io.ipoli.android.common.BaseViewStateReducer
 import io.ipoli.android.common.DataLoadedAction
+import io.ipoli.android.common.datetime.Duration
+import io.ipoli.android.common.datetime.Minute
 import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.common.datetime.TimeOfDay
 import io.ipoli.android.common.redux.Action
@@ -63,8 +65,18 @@ sealed class PlanDayAction : Action {
         override fun toMap() = mapOf("questId" to questId)
     }
 
-    data class RescheduleQuest(val questId: String, val date: LocalDate?) : PlanDayAction() {
-        override fun toMap() = mapOf("questId" to questId, "date" to date)
+    data class RescheduleQuest(
+        val questId: String,
+        val date: LocalDate?,
+        val time: Time?,
+        val duration: Duration<Minute>?
+    ) : PlanDayAction() {
+        override fun toMap() = mapOf(
+            "questId" to questId,
+            "date" to date,
+            "time" to time,
+            "duration" to duration?.intValue
+        )
     }
 
     data class AcceptSuggestion(val questId: String) : PlanDayAction() {
