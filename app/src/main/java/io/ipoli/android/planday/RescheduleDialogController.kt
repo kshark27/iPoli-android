@@ -84,9 +84,9 @@ class RescheduleDialogController(args: Bundle? = null) :
 
     private var includeToday: Boolean = true
 
-    private lateinit var listener: (LocalDate?) -> Unit
+    private var listener: (LocalDate?) -> Unit = {}
 
-    private lateinit var cancelListener: () -> Unit
+    private var cancelListener: () -> Unit = {}
 
     constructor(
         includeToday: Boolean,
@@ -102,12 +102,14 @@ class RescheduleDialogController(args: Bundle? = null) :
     override fun onCreateContentView(inflater: LayoutInflater, savedViewState: Bundle?): View {
         val view = inflater.inflate(R.layout.dialog_reschedule, null)
         view.dateList.layoutManager = GridLayoutManager(view.context, 2)
-        view.dateList.adapter = DateAdapter()
+        val adapter = DateAdapter()
+        view.dateList.adapter = adapter
+        adapter.updateAll(rescheduleViewModels)
         return view
     }
 
     override fun onHeaderViewCreated(headerView: View) {
-        headerView.dialogHeaderTitle.setText(R.string.choose_date)
+        headerView.dialogHeaderTitle.setText(R.string.reschedule)
     }
 
     override fun onCreateDialog(
@@ -124,7 +126,6 @@ class RescheduleDialogController(args: Bundle? = null) :
         when (state.type) {
             DATA_LOADED -> {
                 changeIcon(AndroidPetAvatar.valueOf(state.petAvatar.name).headImage)
-                (view.dateList.adapter as DateAdapter).updateAll(state.viewModels)
             }
 
             else -> {
@@ -134,42 +135,77 @@ class RescheduleDialogController(args: Bundle? = null) :
 
     override fun onDialogCreated(dialog: AlertDialog, contentView: View) {
         dialog.setOnShowListener {
-            dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener {
-                cancelListener.invoke()
+            dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener { _ ->
+                cancelListener()
                 dismiss()
             }
         }
     }
 
-    data class DateViewModel(
-        val icon: Int,
-        val text: String,
-        val date: LocalDate?,
-        val showPicker: Boolean = false
-    ) : RecyclerViewViewModel {
+    sealed class RescheduleViewModel : RecyclerViewViewModel {
+        abstract val icon: Int
+        abstract val text: String
+
         override val id: String
             get() = text
+
+        data class ChooseStartTime(override val icon: Int, override val text: String) :
+            RescheduleViewModel()
+
+        data class StartNow(override val icon: Int, override val text: String) :
+            RescheduleViewModel()
+
+        data class StartIn5Minutes(override val icon: Int, override val text: String) :
+            RescheduleViewModel()
+
+        data class ChooseDuration(override val icon: Int, override val text: String) :
+            RescheduleViewModel()
+
+        data class ChooseDate(override val icon: Int, override val text: String) :
+            RescheduleViewModel()
+
+        data class Bucket(override val icon: Int, override val text: String) : RescheduleViewModel()
+
+        data class ExactDate(
+            val date: LocalDate,
+            override val icon: Int,
+            override val text: String
+        ) : RescheduleViewModel()
     }
 
     inner class DateAdapter :
-        BaseRecyclerViewAdapter<DateViewModel>(R.layout.item_reschedule_date) {
+        BaseRecyclerViewAdapter<RescheduleViewModel>(R.layout.item_reschedule_date) {
 
-        override fun onBindViewModel(vm: DateViewModel, view: View, holder: SimpleViewHolder) {
+        override fun onBindViewModel(
+            vm: RescheduleViewModel,
+            view: View,
+            holder: SimpleViewHolder
+        ) {
             view.rescheduleDate.text = vm.text
             view.rescheduleIcon.setImageResource(vm.icon)
             view.onDebounceClick {
-                if (!vm.showPicker) {
-                    listener(vm.date)
-                    dismiss()
-                } else {
-                    val date = LocalDate.now()
-                    DatePickerDialog(
-                        view.context,
-                        DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-                            listener(LocalDate.of(year, month + 1, dayOfMonth))
-                            dismiss()
-                        }, date.year, date.month.value - 1, date.dayOfMonth
-                    ).show()
+
+                when (vm) {
+                    is RescheduleViewModel.ChooseDate -> {
+                        val date = LocalDate.now()
+                        DatePickerDialog(
+                            view.context,
+                            DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+                                listener(LocalDate.of(year, month + 1, dayOfMonth))
+                                dismiss()
+                            }, date.year, date.month.value - 1, date.dayOfMonth
+                        ).show()
+                    }
+
+                    is RescheduleViewModel.ExactDate -> {
+                        listener(vm.date)
+                        dismiss()
+                    }
+
+                    is RescheduleViewModel.Bucket -> {
+                        listener(null)
+                        dismiss()
+                    }
                 }
             }
 
@@ -177,51 +213,79 @@ class RescheduleDialogController(args: Bundle? = null) :
 
     }
 
-    private val RescheduleDialogViewState.viewModels: List<DateViewModel>
+    private val rescheduleViewModels: List<RescheduleViewModel>
         get() {
-            val vms = mutableListOf<DateViewModel>()
+            val vms = mutableListOf<RescheduleViewModel>()
             val today = LocalDate.now()
             vms.addAll(
                 listOf(
-                    DateViewModel(
+                    RescheduleViewModel.ExactDate(
+                        today.plusDays(1),
                         R.drawable.ic_tomorrow_text_secondary_24dp,
-                        stringRes(R.string.tomorrow),
-                        today.plusDays(1)
+                        stringRes(R.string.tomorrow)
                     ),
-
-                    DateViewModel(
+                    RescheduleViewModel.Bucket(
                         R.drawable.ic_bucket_text_secondary_24dp,
-                        stringRes(R.string.bucket),
-                        null
+                        stringRes(R.string.to_bucket)
                     ),
 
-                    DateViewModel(
+                    RescheduleViewModel.ChooseDate(
                         R.drawable.ic_more_circle_text_secondary_24dp,
-                        stringRes(R.string.pick_date),
-                        null,
-                        true
+                        stringRes(R.string.pick_date)
                     )
                 )
             )
             if (includeToday) {
                 vms.add(
                     0,
-                    DateViewModel(
+                    RescheduleViewModel.ExactDate(
+                        today,
                         R.drawable.ic_today_text_secondary_24dp,
-                        stringRes(R.string.today),
-                        today
+                        stringRes(R.string.today)
                     )
                 )
             } else {
                 vms.add(
                     1,
-                    DateViewModel(
+                    RescheduleViewModel.ExactDate(
+                        today.plusDays(7),
                         R.drawable.ic_next_week_text_secondary_24dp,
-                        stringRes(R.string.next_week),
-                        today.plusDays(7)
+                        stringRes(R.string.next_week)
                     )
                 )
             }
+
+            vms.add(
+                0,
+                RescheduleViewModel.StartNow(
+                    R.drawable.ic_clock_text_secondary_24dp,
+                    stringRes(R.string.start_now)
+                )
+            )
+
+            vms.add(
+                1,
+                RescheduleViewModel.StartIn5Minutes(
+                    R.drawable.ic_clock_text_secondary_24dp,
+                    stringRes(R.string.start_in_5_minutes)
+                )
+            )
+
+            vms.add(
+                2,
+                RescheduleViewModel.ChooseStartTime(
+                    R.drawable.ic_clock_text_secondary_24dp,
+                    stringRes(R.string.start_at)
+                )
+            )
+
+            vms.add(
+                3,
+                RescheduleViewModel.ChooseDuration(
+                    R.drawable.ic_timer_text_secondary_24dp,
+                    stringRes(R.string.change_duration)
+                )
+            )
 
             return vms
         }
