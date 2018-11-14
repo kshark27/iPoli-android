@@ -25,6 +25,7 @@ data class Habit(
     val isGood: Boolean,
     val timesADay: Int = 1,
     val challengeId: String? = null,
+    val reminders: List<Reminder> = emptyList(),
     val note: String = "",
     val streak: Streak,
     val successRate: Int = 0,
@@ -35,6 +36,8 @@ data class Habit(
     override val updatedAt: Instant = Instant.now(),
     val removedAt: Instant? = null
 ) : EntityWithTags {
+
+    data class Reminder(val message: String, val time: Time)
 
     data class PreferenceHistory(
         val days: SortedMap<LocalDate, Set<DayOfWeek>>,

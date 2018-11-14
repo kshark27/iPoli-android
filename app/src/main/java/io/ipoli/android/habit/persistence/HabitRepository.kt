@@ -26,6 +26,8 @@ import io.ipoli.android.tag.persistence.RoomTagMapper
 import io.ipoli.android.tag.persistence.TagDao
 import org.jetbrains.annotations.NotNull
 import org.threeten.bp.DayOfWeek
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import java.util.*
 
 /**
@@ -36,6 +38,7 @@ interface HabitRepository : CollectionRepository<Habit> {
 
     fun findAllForChallenge(challengeId: String): List<Habit>
     fun findNotRemovedForChallenge(challengeId: String): List<Habit>
+    fun findHabitsToRemind(remindTime: LocalDateTime): List<Habit>
     fun removeFromChallenge(habitId: String)
     fun findAllNotRemoved(): List<Habit>
 }
@@ -51,6 +54,7 @@ data class DbHabit(override val map: MutableMap<String, Any?> = mutableMapOf()) 
     var isGood: Boolean by map
     var timesADay: Long by map
     var challengeId: String? by map
+    var reminders: List<MutableMap<String, Any?>> by map
     var note: String by map
     var preferenceHistory: Map<String, MutableMap<String, Any?>> by map
     var history: Map<String, MutableMap<String, Any?>> by map
@@ -64,6 +68,11 @@ data class DbHabit(override val map: MutableMap<String, Any?> = mutableMapOf()) 
     data class PreferenceHistory(val map: MutableMap<String, Any?> = mutableMapOf()) {
         var days: MutableMap<String, List<String>> by map
         var timesADay: MutableMap<String, Long> by map
+    }
+
+    data class Reminder(val map: MutableMap<String, Any?> = mutableMapOf()) {
+        var message: String by map
+        var time: Long by map
     }
 }
 
@@ -98,6 +107,16 @@ abstract class HabitDao : BaseDao<RoomHabit>() {
     @Query("SELECT * FROM habits WHERE id = :id")
     abstract fun listenById(id: String): LiveData<RoomHabit>
 
+    @Query(
+        """
+        SELECT habits.*
+        FROM habits
+        INNER JOIN entity_reminders ON habits.id = entity_reminders.entityId
+        WHERE entity_reminders.entityType = 'HABIT' AND entity_reminders.date = :date AND entity_reminders.millisOfDay = :millisOfDay AND habits.removedAt IS NULL
+        """
+    )
+    abstract fun findAllToRemindAt(date: Long, millisOfDay: Long): List<RoomHabit>
+
     @Query("UPDATE habits $REMOVE_QUERY")
     abstract fun remove(id: String, currentTimeMillis: Long = System.currentTimeMillis())
 
@@ -123,7 +142,11 @@ abstract class HabitDao : BaseDao<RoomHabit>() {
     )
 }
 
-class RoomHabitRepository(dao: HabitDao, tagDao: TagDao) : HabitRepository,
+class RoomHabitRepository(
+    dao: HabitDao,
+    private val entityReminderDao: EntityReminderDao,
+    tagDao: TagDao
+) : HabitRepository,
     BaseRoomRepositoryWithTags<Habit, RoomHabit, HabitDao, RoomHabit.Companion.RoomTagJoin>(dao) {
 
     override fun findAllNotRemoved() =
@@ -155,6 +178,12 @@ class RoomHabitRepository(dao: HabitDao, tagDao: TagDao) : HabitRepository,
     override fun findAll() =
         dao.findAll().map { toEntityObject(it) }
 
+    override fun findHabitsToRemind(remindTime: LocalDateTime): List<Habit> {
+        val date = remindTime.toLocalDate().startOfDayUTC()
+        val millisOfDay = remindTime.toLocalTime().toSecondOfDay().seconds.millisValue
+        return dao.findAllToRemindAt(date, millisOfDay).map { toEntityObject(it) }
+    }
+
     override fun listenById(id: String) =
         dao.listenById(id).distinct().notifySingle()
 
@@ -175,7 +204,133 @@ class RoomHabitRepository(dao: HabitDao, tagDao: TagDao) : HabitRepository,
     }
 
     override fun undoRemove(id: String) {
-        dao.undoRemove(id)
+        TODO("Not used")
+    }
+
+    override fun save(entities: List<Habit>): List<Habit> {
+        val roomHabits = entities.map { toDatabaseObject(it) }
+        return bulkSave(roomHabits, entities)
+    }
+
+    @Transaction
+    private fun bulkSave(
+        roomHabits: List<RoomHabit>,
+        entities: List<Habit>
+    ): List<Habit> {
+
+        dao.saveAll(roomHabits)
+
+        val newEntities = entities.mapIndexed { index, habit ->
+            habit.copy(
+                id = roomHabits[index].id
+            )
+        }
+
+        val joins = newEntities.map { e ->
+            e.tags.map { t ->
+                createTagJoin(e.id, t.id)
+            }
+        }.flatten()
+
+        saveTags(joins)
+
+        bulkSaveReminders(newEntities)
+        return newEntities
+    }
+
+    private fun bulkSaveReminders(habits: List<Habit>) {
+
+        val goodHabits = habits.filter { it.isGood }
+
+        purgeReminders(goodHabits.map { it.id })
+
+        val today = LocalDate.now()
+
+        val rems = goodHabits.filter { it.shouldBeDoneOn(today) }
+            .flatMap { h ->
+                h.reminders.map { r ->
+                    createReminderData(r, h)
+                }
+            }
+
+        if (rems.isEmpty()) {
+            return
+        }
+
+        entityReminderDao.saveAll(rems)
+    }
+
+    override fun save(entity: Habit): Habit {
+        val rq = toDatabaseObject(entity)
+        return save(rq, entity)
+    }
+
+    @Transaction
+    private fun save(
+        habit: RoomHabit,
+        entity: Habit
+    ): Habit {
+        if (entity.id.isNotBlank()) {
+            deleteAllTags(entity.id)
+        }
+        dao.save(habit)
+        val joins = entity.tags.map {
+            createTagJoin(habit.id, it.id)
+        }
+        saveTags(joins)
+
+        val newHabit = entity.copy(id = habit.id)
+        saveReminders(newHabit, newHabit.reminders)
+        return newHabit
+    }
+
+    private fun purgeReminders(
+        habitIds: List<String>
+    ) {
+        val limit = 999
+        if (habitIds.size > limit) {
+            val rangeCount = habitIds.size / limit
+            for (i in 0..rangeCount) {
+                val fromIndex = i * limit
+                val toIndex = Math.min(fromIndex + limit, habitIds.lastIndex + 1)
+                entityReminderDao.purgeForEntities(habitIds.subList(fromIndex, toIndex))
+            }
+        } else {
+            entityReminderDao.purgeForEntities(habitIds)
+        }
+    }
+
+    private fun saveReminders(habit: Habit, reminders: List<Habit.Reminder>) {
+        if (!habit.isGood) {
+            return
+        }
+        purgeHabitReminders(habit.id)
+        if (habit.reminders.isNotEmpty() && habit.shouldBeDoneOn(LocalDate.now())) {
+            addReminders(reminders, habit)
+        }
+    }
+
+    private fun addReminders(
+        reminders: List<Habit.Reminder>,
+        habit: Habit
+    ) {
+        val rs = reminders.map {
+            createReminderData(it, habit)
+        }
+        entityReminderDao.saveAll(rs)
+    }
+
+    private fun createReminderData(reminder: Habit.Reminder, habit: Habit) =
+        RoomEntityReminder(
+            id = UUID.randomUUID().toString(),
+            date = LocalDate.now().startOfDayUTC(),
+            millisOfDay = reminder.time.toMillisOfDay(),
+            entityType = EntityReminder.EntityType.HABIT.name,
+            entityId = habit.id
+        )
+
+    private fun purgeHabitReminders(habitId: String) {
+        entityReminderDao.purgeForEntity(habitId)
     }
 
     override fun toEntityObject(dbObject: RoomHabit) =
@@ -200,6 +355,10 @@ class RoomHabitMapper(private val tagDao: TagDao) {
             isGood = dbObject.isGood,
             timesADay = dbObject.timesADay.toInt(),
             challengeId = dbObject.challengeId,
+            reminders = dbObject.reminders.map {
+                val dbReminder = DbHabit.Reminder(it)
+                Habit.Reminder(dbReminder.message, Time.of(dbReminder.time.toInt()))
+            },
             note = dbObject.note,
             preferenceHistory = dbObject.preferenceHistory.let {
 
@@ -239,7 +398,9 @@ class RoomHabitMapper(private val tagDao: TagDao) {
 
         return h.copy(
             streak = CalculateHabitStreakUseCase().execute(CalculateHabitStreakUseCase.Params(habit = h)),
-            successRate = CalculateHabitSuccessRateUseCase().execute(CalculateHabitSuccessRateUseCase.Params(habit = h))
+            successRate = CalculateHabitSuccessRateUseCase().execute(
+                CalculateHabitSuccessRateUseCase.Params(habit = h)
+            )
         )
     }
 
@@ -254,6 +415,12 @@ class RoomHabitMapper(private val tagDao: TagDao) {
             timesADay = entity.timesADay.toLong(),
             challengeId = entity.challengeId,
             note = entity.note,
+            reminders = entity.reminders.map { r ->
+                DbHabit.Reminder().apply {
+                    message = r.message
+                    time = r.time.toMinuteOfDay().toLong()
+                }.map
+            },
             preferenceHistory = entity.preferenceHistory.let {
                 mapOf(
                     "days" to it.days.map { d ->
@@ -365,6 +532,7 @@ data class RoomHabit(
     val timesADay: Long,
     val challengeId: String?,
     val note: String,
+    val reminders: List<MutableMap<String, Any?>>,
     val preferenceHistory: Map<String, MutableMap<String, Any?>>,
     val history: Map<String, MutableMap<String, Any?>>,
     val currentStreak: Long,
@@ -424,6 +592,10 @@ class FirestoreHabitRepository(
             )
         }
 
+        if (!dataMap.containsKey("reminders")) {
+            dataMap["reminders"] = emptyList<MutableMap<String, Any?>>()
+        }
+
         val h = DbHabit(dataMap.withDefault {
             null
         })
@@ -440,6 +612,10 @@ class FirestoreHabitRepository(
             isGood = h.isGood,
             timesADay = h.timesADay.toInt(),
             challengeId = h.challengeId,
+            reminders = h.reminders.map {
+                val dbReminder = DbHabit.Reminder(it)
+                Habit.Reminder(dbReminder.message, Time.of(dbReminder.time.toInt()))
+            },
             note = h.note,
             preferenceHistory = h.preferenceHistory.let {
                 val dp = DbHabit.PreferenceHistory(it.toMutableMap())
@@ -474,6 +650,12 @@ class FirestoreHabitRepository(
         h.isGood = entity.isGood
         h.timesADay = entity.timesADay.toLong()
         h.challengeId = entity.challengeId
+        h.reminders = entity.reminders.map { r ->
+            DbHabit.Reminder().apply {
+                message = r.message
+                time = r.time.toMinuteOfDay().toLong()
+            }.map
+        }
         h.note = entity.note
         h.preferenceHistory = entity.preferenceHistory.let {
             mapOf(

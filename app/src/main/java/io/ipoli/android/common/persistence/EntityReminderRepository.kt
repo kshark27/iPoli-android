@@ -1,14 +1,10 @@
 package io.ipoli.android.common.persistence
 
 import android.arch.persistence.room.*
-import io.ipoli.android.common.datetime.milliseconds
-import io.ipoli.android.common.datetime.seconds
-import io.ipoli.android.common.datetime.startOfDayUTC
+import io.ipoli.android.common.datetime.*
+import io.ipoli.android.common.datetime.Duration
 import org.jetbrains.annotations.NotNull
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.LocalTime
-import org.threeten.bp.ZoneId
-import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.*
 
 /**
  * Created by Venelin Valkov <venelin@mypoli.fun>
@@ -17,6 +13,15 @@ import org.threeten.bp.ZonedDateTime
 
 interface EntityReminderRepository {
     fun findNextReminderTime(afterTime: ZonedDateTime = ZonedDateTime.now(ZoneId.systemDefault())): LocalDateTime?
+    fun snooze(
+        date: LocalDate,
+        time: Time,
+        entityType: EntityReminder.EntityType,
+        entityId: String,
+        duration: Duration<Minute>
+    )
+
+    fun save(entities: List<EntityReminder>)
 }
 
 class RoomEntityReminderRepository(private val dao: EntityReminderDao) : EntityReminderRepository {
@@ -33,6 +38,42 @@ class RoomEntityReminderRepository(private val dao: EntityReminderDao) : EntityR
             LocalTime.ofSecondOfDay(r.millisOfDay.milliseconds.asSeconds.longValue)
         )
     }
+
+    override fun snooze(
+        date: LocalDate,
+        time: Time,
+        entityType: EntityReminder.EntityType,
+        entityId: String,
+        duration: Duration<Minute>
+    ) {
+        val newTime = time.plus(duration.intValue)
+        val newDate = if (newTime < time)
+            date.plusDays(1)
+        else
+            date
+
+        dao.snooze(
+            entityId = entityId,
+            entityType = entityType.name,
+            oldDate = date.startOfDayUTC(),
+            oldMillisOfDay = time.toMillisOfDay(),
+            newDate = newDate.startOfDayUTC(),
+            newMillisOfDay = newTime.toMillisOfDay()
+        )
+    }
+
+    override fun save(entities: List<EntityReminder>) {
+        dao.saveAll(entities.map { toDatabaseObject(it) })
+    }
+
+    private fun toDatabaseObject(entityReminder: EntityReminder) =
+        RoomEntityReminder(
+            id = entityReminder.id,
+            date = entityReminder.date.startOfDayUTC(),
+            millisOfDay = entityReminder.time.toMillisOfDay(),
+            entityType = entityReminder.entityType.name,
+            entityId = entityReminder.entityId
+        )
 }
 
 @Dao
@@ -49,6 +90,22 @@ interface EntityReminderDao {
 
     @Query("DELETE FROM entity_reminders WHERE entityId IN (:entityIds)")
     fun purgeForEntities(entityIds: List<String>)
+
+    @Query(
+        """
+        UPDATE entity_reminders
+        SET date = :newDate, millisOfDay = :newMillisOfDay
+        WHERE entityType = :entityType AND entityId = :entityId AND date = :oldDate AND millisOfDay = :oldMillisOfDay
+        """
+    )
+    fun snooze(
+        entityId: String,
+        entityType: String,
+        oldDate: Long,
+        oldMillisOfDay: Long,
+        newDate: Long,
+        newMillisOfDay: Long
+    )
 
     @Query(
         """
@@ -79,6 +136,14 @@ data class RoomEntityReminder(
     val millisOfDay: Long,
     val entityType: String,
     val entityId: String
+)
+
+data class EntityReminder(
+    val id: String,
+    val date: LocalDate,
+    val time: Time,
+    val entityType: EntityType,
+    val entityId: String
 ) {
-    enum class EntityType { QUEST }
+    enum class EntityType { QUEST, HABIT }
 }

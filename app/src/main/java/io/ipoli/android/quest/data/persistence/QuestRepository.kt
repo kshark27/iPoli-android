@@ -421,8 +421,7 @@ class RoomQuestRepository(
     private val entityReminderDao: EntityReminderDao,
     private val tagDao: TagDao,
     private val remoteDatabase: FirebaseFirestore
-) :
-    BaseRoomRepositoryWithTags<Quest, RoomQuest, QuestDao, RoomQuest.Companion.RoomTagJoin>(dao),
+) : BaseRoomRepositoryWithTags<Quest, RoomQuest, QuestDao, RoomQuest.Companion.RoomTagJoin>(dao),
     QuestRepository {
 
     override fun findAllForSync(lastSync: Duration<Millisecond>) =
@@ -682,7 +681,6 @@ class RoomQuestRepository(
         purgeReminders(questIds)
     }
 
-
     override fun save(entities: List<Quest>): List<Quest> {
         val roomQs = entities.map { toDatabaseObject(it) }
         return bulkSave(roomQs, entities)
@@ -819,7 +817,7 @@ class RoomQuestRepository(
             id = UUID.randomUUID().toString(),
             date = date.startOfDayUTC(),
             millisOfDay = time.toMillisOfDay(),
-            entityType = RoomEntityReminder.EntityType.QUEST.name,
+            entityType = EntityReminder.EntityType.QUEST.name,
             entityId = questId
         )
 

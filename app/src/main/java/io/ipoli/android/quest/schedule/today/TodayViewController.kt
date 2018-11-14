@@ -392,7 +392,7 @@ class TodayViewController(args: Bundle? = null) :
     @SuppressLint("SetTextI18n")
     private fun renderSummaryStats(state: TodayViewState, view: View) {
 
-        val focusDuration = DurationFormatter.format(view.context, state.focusDuration!!.intValue)
+        val focusDuration = DurationFormatter.formatNarrow(state.focusDuration!!.intValue)
 
         view.todayFocusDuration.text = "$focusDuration/${Constants.DAILY_FOCUS_HOURS_GOAL}h"
 

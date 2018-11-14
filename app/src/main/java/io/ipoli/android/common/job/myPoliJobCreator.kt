@@ -8,7 +8,6 @@ import io.ipoli.android.dailychallenge.job.DailyChallengeCompleteJob
 import io.ipoli.android.planday.job.PlanDayJob
 import io.ipoli.android.planday.job.SnoozedPlanDayJob
 import io.ipoli.android.quest.show.job.TimerCompleteNotificationJob
-import io.ipoli.android.repeatingquest.SaveQuestsForRepeatingQuestJob
 import io.ipoli.android.store.membership.job.CheckMembershipStatusJob
 import io.ipoli.android.store.powerup.job.RemoveExpiredPowerUpsJob
 
@@ -21,7 +20,6 @@ class myPoliJobCreator : JobCreator {
         when (tag) {
             RatePopupJob.TAG -> RatePopupJob()
             TimerCompleteNotificationJob.TAG -> TimerCompleteNotificationJob()
-            SaveQuestsForRepeatingQuestJob.TAG -> SaveQuestsForRepeatingQuestJob()
             RemoveExpiredPowerUpsJob.TAG -> RemoveExpiredPowerUpsJob()
             CheckMembershipStatusJob.TAG -> CheckMembershipStatusJob()
             PlanDayJob.TAG -> PlanDayJob()
@@ -29,6 +27,7 @@ class myPoliJobCreator : JobCreator {
             DailyChallengeCompleteJob.TAG -> DailyChallengeCompleteJob()
             UpdateAchievementProgressJob.TAG -> UpdateAchievementProgressJob()
             ResetDayJob.TAG -> ResetDayJob()
+            ResetDateJob.TAG -> ResetDateJob()
             else -> null
         }
 }

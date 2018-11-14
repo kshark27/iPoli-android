@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
  * Created by Venelin Valkov <venelin@mypoli.fun>
  * on 8/20/17.
  */
-data class Time constructor(private val minutesAfterMidnight: Int) {
+data class Time constructor(private val minutesAfterMidnight: Int) : Comparable<Time> {
 
     fun toMinuteOfDay(): Int {
         return minutesAfterMidnight
@@ -168,8 +168,8 @@ data class Time constructor(private val minutesAfterMidnight: Int) {
         return Time((this.minutesAfterMidnight - minutes) % MINUTES_IN_A_DAY)
     }
 
-    operator fun compareTo(time: Time) =
-        minutesAfterMidnight.compareTo(time.minutesAfterMidnight)
+    override operator fun compareTo(other: Time) =
+        minutesAfterMidnight.compareTo(other.minutesAfterMidnight)
 
     /**
      * @param start inclusive

@@ -23,7 +23,7 @@ class RescheduleQuestUseCase(
         return if (shouldMoveToBucket || parameters.scheduledDate != null) {
             changeDate(quest!!, parameters.scheduledDate)
         } else if (parameters.startTime != null) {
-            changeTime(quest!!, parameters.startTime)
+            changeTime(quest!!, parameters.scheduledDate, parameters.startTime)
         } else changeDuration(quest!!, parameters.duration!!)
     }
 
@@ -33,10 +33,12 @@ class RescheduleQuestUseCase(
         )
     )
 
-    private fun changeTime(quest: Quest, startTime: Time): Quest {
+    private fun changeTime(quest: Quest, scheduledDate: LocalDate?, startTime: Time): Quest {
         val newQuest = questRepository.save(
             quest.copy(
-                startTime = startTime
+                startTime = startTime,
+                scheduledDate = scheduledDate ?: quest.scheduledDate,
+                originalScheduledDate = quest.originalScheduledDate ?: scheduledDate
             )
         )
         reminderScheduler.schedule()

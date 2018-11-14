@@ -32,7 +32,9 @@ import io.ipoli.android.common.billing.BillingRequestExecutor
 import io.ipoli.android.common.billing.BillingResponseHandler
 import io.ipoli.android.common.image.AndroidImageLoader
 import io.ipoli.android.common.image.ImageLoader
+import io.ipoli.android.common.job.AndroidResetDateScheduler
 import io.ipoli.android.common.job.AndroidResetDayScheduler
+import io.ipoli.android.common.job.ResetDateScheduler
 import io.ipoli.android.common.job.ResetDayScheduler
 import io.ipoli.android.common.middleware.LogEventsMiddleWare
 import io.ipoli.android.common.migration.DataExporter
@@ -149,8 +151,6 @@ import io.ipoli.android.quest.show.sideeffect.QuestSideEffectHandler
 import io.ipoli.android.quest.show.usecase.*
 import io.ipoli.android.quest.subquest.usecase.*
 import io.ipoli.android.quest.usecase.*
-import io.ipoli.android.repeatingquest.AndroidSaveQuestsForRepeatingQuestScheduler
-import io.ipoli.android.repeatingquest.SaveQuestsForRepeatingQuestScheduler
 import io.ipoli.android.repeatingquest.persistence.RepeatingQuestRepository
 import io.ipoli.android.repeatingquest.persistence.RoomRepeatingQuestRepository
 import io.ipoli.android.repeatingquest.sideeffect.RepeatingQuestSideEffectHandler
@@ -303,7 +303,6 @@ interface UseCaseModule {
     val rewardScheduler: RewardScheduler
     val levelUpScheduler: LevelUpScheduler
     val levelDownScheduler: LevelDownScheduler
-    val saveQuestsForRepeatingQuestScheduler: SaveQuestsForRepeatingQuestScheduler
     val removeExpiredPowerUpsScheduler: RemoveExpiredPowerUpsScheduler
     val checkMembershipStatusScheduler: CheckMembershipStatusScheduler
     val ratePopupScheduler: RatePopupScheduler
@@ -312,6 +311,7 @@ interface UseCaseModule {
     val updateAchievementProgressScheduler: UpdateAchievementProgressScheduler
     val showUnlockedAchievementsScheduler: ShowUnlockedAchievementsScheduler
     val resetDayScheduler: ResetDayScheduler
+    val resetDateScheduler: ResetDateScheduler
     val secretSocietyInviteScheduler: SecretSocietyInviteScheduler
     val addPostScheduler: AddPostScheduler
 
@@ -320,7 +320,9 @@ interface UseCaseModule {
     val removeQuestUseCase: RemoveQuestUseCase
     val undoRemoveQuestUseCase: UndoRemovedQuestUseCase
     val findQuestsToRemindUseCase: FindQuestsToRemindUseCase
+    val findHabitsToRemindUseCase: FindHabitsToRemindUseCase
     val snoozeQuestUseCase: SnoozeQuestUseCase
+    val snoozeHabitReminderUseCase: SnoozeHabitReminderUseCase
     val completeQuestUseCase: CompleteQuestUseCase
     val undoCompletedQuestUseCase: UndoCompletedQuestUseCase
     val rewardPlayerUseCase: RewardPlayerUseCase
@@ -437,6 +439,7 @@ interface UseCaseModule {
     val createChallengeProgressItemsUseCase: CreateChallengeProgressItemsUseCase
     val createAgendaPreviewItemsUseCase: CreateAgendaPreviewItemsUseCase
     val createPresetChallengeUseCase: CreatePresetChallengeUseCase
+    val saveHabitRemindersUseCase: SaveHabitRemindersUseCase
 }
 
 class MainUseCaseModule(private val context: Context) : UseCaseModule {
@@ -510,7 +513,8 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
     override val habitRepository =
         RoomHabitRepository(
             dao = localDatabase.habitDao(),
-            tagDao = localDatabase.tagDao()
+            tagDao = localDatabase.tagDao(),
+            entityReminderDao = localDatabase.entityReminderDao()
         )
 
     override val entityReminderRepository =
@@ -544,8 +548,6 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
 
     override val levelDownScheduler get() = AndroidLevelDownScheduler()
 
-    override val saveQuestsForRepeatingQuestScheduler get() = AndroidSaveQuestsForRepeatingQuestScheduler()
-
     override val removeExpiredPowerUpsScheduler get() = AndroidRemoveExpiredPowerUpsScheduler()
 
     override val checkMembershipStatusScheduler
@@ -571,6 +573,9 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
     override val resetDayScheduler
         get() = AndroidResetDayScheduler(context)
 
+    override val resetDateScheduler
+        get() = AndroidResetDateScheduler()
+
     override val secretSocietyInviteScheduler
         get() = AndroidSecretSocietyInviteScheduler()
 
@@ -594,7 +599,12 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
             reminderScheduler
         )
     override val findQuestsToRemindUseCase get() = FindQuestsToRemindUseCase(questRepository)
+    override val findHabitsToRemindUseCase get() = FindHabitsToRemindUseCase(habitRepository)
     override val snoozeQuestUseCase get() = SnoozeQuestUseCase(questRepository, reminderScheduler)
+
+    override val snoozeHabitReminderUseCase
+        get() = SnoozeHabitReminderUseCase(entityReminderRepository, reminderScheduler)
+
     override val completeQuestUseCase
         get() = CompleteQuestUseCase(
             questRepository,
@@ -957,7 +967,8 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
             habitRepository,
             playerRepository,
             rewardPlayerUseCase,
-            removeRewardFromPlayerUseCase
+            removeRewardFromPlayerUseCase,
+            reminderScheduler
         )
 
     override val completeHabitUseCase
@@ -968,7 +979,8 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
             rewardScheduler,
             challengeRepository,
             addPostScheduler,
-            postRepository
+            postRepository,
+            reminderScheduler
         )
 
     override val undoCompleteHabitUseCase
@@ -978,7 +990,7 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
         )
 
     override val removeHabitUseCase
-        get() = RemoveHabitUseCase(habitRepository)
+        get() = RemoveHabitUseCase(habitRepository, reminderScheduler)
 
     override val createHabitItemsUseCase
         get() = CreateHabitItemsUseCase()
@@ -1023,7 +1035,7 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
         get() = RemoveTagFromAttributeUseCase(playerRepository)
 
     override val createChallengeFromPresetUseCase
-        get() = CreateChallengeFromPresetUseCase(saveChallengeUseCase)
+        get() = CreateChallengeFromPresetUseCase(saveChallengeUseCase, reminderScheduler)
 
     override val createHabitHistoryItemsUseCase
         get() = CreateHabitHistoryItemsUseCase()
@@ -1036,6 +1048,13 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
 
     override val createPresetChallengeUseCase
         get() = CreatePresetChallengeUseCase(presetChallengeRepository)
+
+    override val saveHabitRemindersUseCase
+        get() = SaveHabitRemindersUseCase(
+            habitRepository,
+            entityReminderRepository,
+            reminderScheduler
+        )
 }
 
 interface StateStoreModule {

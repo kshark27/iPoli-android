@@ -1277,4 +1277,7 @@ These are your physical and mental characteristics.\n\n
     <string name="start_now">Start now</string>
     <string name="start_in_5_minutes">Start in 5 min</string>
     <string name="change_duration">Pick duration</string>
+    <string name="add_reminder">Add Reminder</string>
+    <string name="remind_me_at">Remind me at</string>
+    <string name="edit_habit_max_reminders_hint">Maximum number of Reminders reached. You can set a Reminder for each time you do the Habit per day.</string>
 </resources>

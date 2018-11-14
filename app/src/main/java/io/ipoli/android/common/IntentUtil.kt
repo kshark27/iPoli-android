@@ -42,6 +42,16 @@ object IntentUtil {
             }
         }
 
+
+    fun showHabit(habitId: String, context: Context) =
+        Intent(context, MainActivity::class.java).apply {
+            action = MainActivity.ACTION_SHOW_HABIT
+            putExtra(Constants.HABIT_ID_EXTRA_KEY, habitId)
+            if (Build.VERSION.SDK_INT < MIN_NO_NEW_TASK_VERSION) {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+        }
+
     fun showAddQuestPost(questId: String, challengeId: String, context: Context) =
         Intent(context, MainActivity::class.java).apply {
             action = MainActivity.ACTION_ADD_POST

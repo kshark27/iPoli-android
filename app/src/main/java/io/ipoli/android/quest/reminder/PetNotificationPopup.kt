@@ -8,6 +8,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PixelFormat
 import android.graphics.Rect
+import android.support.annotation.DrawableRes
+import android.support.annotation.StringRes
 import android.util.DisplayMetrics
 import android.view.*
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -28,7 +30,7 @@ import kotlinx.android.synthetic.main.popup_pet_notification.view.*
 
 class PetNotificationPopup(
     private val viewModel: PetNotificationPopup.ViewModel,
-    private val onStart: () -> Unit = {},
+    private val onDo: () -> Unit = {},
     private val onSnooze: () -> Unit = {},
     private val onDismiss: () -> Unit = {}
 ) {
@@ -38,7 +40,9 @@ class PetNotificationPopup(
         val title: String?,
         val body: String?,
         val petAvatar: PetAvatar,
-        val petState: PetState
+        val petState: PetState,
+        @StringRes val doTextRes: Int,
+        @DrawableRes val doImageRes: Int
     )
 
     private lateinit var overlayView: ViewGroup
@@ -57,6 +61,8 @@ class PetNotificationPopup(
 
     private fun initUI() {
         with(overlayView) {
+            startHint.setText(viewModel.doTextRes)
+            start.setImageResource(viewModel.doImageRes)
             headline.text = viewModel.headline
             if (viewModel.title != null) {
                 title.text = viewModel.title
@@ -103,7 +109,7 @@ class PetNotificationPopup(
             start.setOnClickListener {
                 start.isClickable = false
                 hide {
-                    onStart()
+                    onDo()
                 }
             }
         }

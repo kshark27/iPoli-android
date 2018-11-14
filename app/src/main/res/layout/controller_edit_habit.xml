@@ -308,6 +308,50 @@
 
             </LinearLayout>
 
+            <View
+                android:id="@+id/habitRemindersDivider"
+                style="@style/EditSimpleDivider" />
+
+            <TextView
+                android:id="@+id/habitRemindersLabel"
+                style="@style/EditSimpleTextViewRow"
+                android:clickable="false"
+                android:drawableStart="@drawable/ic_reminder_white_24dp"
+                android:focusable="false"
+                android:text="@string/reminders" />
+
+            <LinearLayout
+                android:id="@+id/habitRemindersContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="56dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/habitReminderList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <Button
+                    android:id="@+id/addHabitReminder"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_reminder"
+                    android:textColor="@color/md_white" />
+
+                <TextView
+                    android:id="@+id/addHabitMaxMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/edit_habit_max_reminders_hint"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="@color/md_light_text_70" />
+
+            </LinearLayout>
+
             <View style="@style/EditSimpleDivider" />
 
             <TextView

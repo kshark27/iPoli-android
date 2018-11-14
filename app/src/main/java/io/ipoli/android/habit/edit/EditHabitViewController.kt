@@ -18,12 +18,17 @@ import io.ipoli.android.R
 import io.ipoli.android.common.datetime.DateUtils
 import io.ipoli.android.common.redux.android.ReduxViewController
 import io.ipoli.android.common.view.*
+import io.ipoli.android.common.view.recyclerview.BaseRecyclerViewAdapter
+import io.ipoli.android.common.view.recyclerview.RecyclerViewViewModel
+import io.ipoli.android.common.view.recyclerview.SimpleViewHolder
+import io.ipoli.android.habit.data.Habit
 import io.ipoli.android.habit.edit.EditHabitViewState.StateType.*
 import io.ipoli.android.quest.Color
 import io.ipoli.android.quest.Icon
 import io.ipoli.android.tag.widget.EditItemAutocompleteTagAdapter
 import io.ipoli.android.tag.widget.EditItemTagAdapter
 import kotlinx.android.synthetic.main.controller_edit_habit.view.*
+import kotlinx.android.synthetic.main.item_edit_habit_reminder.view.*
 import kotlinx.android.synthetic.main.view_no_elevation_toolbar.view.*
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.format.TextStyle
@@ -69,7 +74,7 @@ class EditHabitViewController(args: Bundle? = null) :
             stringRes(R.string.edit_habit)
         }
 
-        view.habitTagList.layoutManager = LinearLayoutManager(activity!!)
+        view.habitTagList.layoutManager = LinearLayoutManager(view.context)
         view.habitTagList.adapter = EditItemTagAdapter(removeTagCallback = {
             dispatch(EditHabitAction.RemoveTag(it))
         })
@@ -80,6 +85,15 @@ class EditHabitViewController(args: Bundle? = null) :
 
         view.goodHabit.dispatchOnClick {
             EditHabitAction.MakeGood
+        }
+
+        view.habitReminderList.layoutManager = LinearLayoutManager(view.context)
+        view.habitReminderList.adapter = ReminderAdapter()
+
+        view.addHabitReminder.onDebounceClick {
+            navigate().toHabitReminderPicker(null) { r ->
+                dispatch(EditHabitAction.AddReminder(r))
+            }
         }
 
         return view
@@ -105,8 +119,7 @@ class EditHabitViewController(args: Bundle? = null) :
             R.id.actionSave -> {
                 dispatch(
                     EditHabitAction.Validate(
-                        view!!.habitName.text.toString(),
-                        view!!.habitTimesADay.selectedItemPosition
+                        view!!.habitName.text.toString()
                     )
                 )
                 true
@@ -124,6 +137,7 @@ class EditHabitViewController(args: Bundle? = null) :
                 renderDays(view, state)
                 renderTags(view, state)
                 renderTimesADay(view, state)
+                renderReminders(view, state)
                 renderColor(view, state)
                 renderIcon(view, state)
                 renderNote(view, state)
@@ -133,11 +147,22 @@ class EditHabitViewController(args: Bundle? = null) :
             HABIT_TYPE_CHANGED ->
                 renderHabitTypeSelection(view, state)
 
-            TAGS_CHANGED ->
+            TAGS_CHANGED -> {
                 renderTags(view, state)
+                renderColor(view, state)
+                renderIcon(view, state)
+            }
 
             DAYS_CHANGED ->
                 renderDays(view, state)
+
+            TIMES_A_DAY_CHANGED -> {
+                renderTimesADay(view, state)
+                renderReminders(view, state)
+            }
+
+            REMINDERS_CHANGED ->
+                renderReminders(view, state)
 
             COLOR_CHANGED ->
                 renderColor(view, state)
@@ -165,6 +190,25 @@ class EditHabitViewController(args: Bundle? = null) :
             else -> {
             }
 
+        }
+    }
+
+    private fun renderReminders(view: View, state: EditHabitViewState) {
+        val rvms = state.reminderViewModels
+
+        if (rvms.isEmpty()) {
+            view.habitReminderList.gone()
+        } else {
+            (view.habitReminderList.adapter as ReminderAdapter).updateAll(state.reminderViewModels)
+            view.habitReminderList.visible()
+        }
+
+        if (state.maxRemindersReached) {
+            view.addHabitReminder.gone()
+            view.addHabitMaxMessage.visible()
+        } else {
+            view.addHabitReminder.visible()
+            view.addHabitMaxMessage.gone()
         }
     }
 
@@ -208,6 +252,10 @@ class EditHabitViewController(args: Bundle? = null) :
 
         view.timesADayDivider.visible()
         view.timesADayContainer.visible()
+
+        view.habitRemindersDivider.visible()
+        view.habitRemindersLabel.visible()
+        view.habitRemindersContainer.visible()
     }
 
     private fun renderBadHabitSelection(view: View) {
@@ -236,6 +284,10 @@ class EditHabitViewController(args: Bundle? = null) :
 
         view.timesADayDivider.gone()
         view.timesADayContainer.gone()
+
+        view.habitRemindersDivider.gone()
+        view.habitRemindersLabel.gone()
+        view.habitRemindersContainer.gone()
     }
 
     private fun renderTimesADay(
@@ -263,6 +315,7 @@ class EditHabitViewController(args: Bundle? = null) :
                         id: Long
                     ) {
                         styleSelectedTimesADay(view)
+                        dispatch(EditHabitAction.ChangeTimesADay(position))
                     }
 
                 }
@@ -304,8 +357,8 @@ class EditHabitViewController(args: Bundle? = null) :
         view.habitColor.onDebounceClick {
             navigate()
                 .toColorPicker(
-                    {
-                        dispatch(EditHabitAction.ChangeColor(it))
+                    { c ->
+                        dispatch(EditHabitAction.ChangeColor(c))
                     },
                     state.color
                 )
@@ -324,8 +377,8 @@ class EditHabitViewController(args: Bundle? = null) :
             navigate()
                 .toIconPicker(
                     { icon ->
-                        icon?.let {
-                            dispatch(EditHabitAction.ChangeIcon(icon))
+                        icon?.let { i ->
+                            dispatch(EditHabitAction.ChangeIcon(i))
                         }
                     }, state.icon
                 )
@@ -394,6 +447,30 @@ class EditHabitViewController(args: Bundle? = null) :
 
     }
 
+    data class ReminderViewModel(val timeText: String, val reminder: Habit.Reminder) :
+        RecyclerViewViewModel {
+        override val id: String
+            get() = timeText
+    }
+
+    inner class ReminderAdapter :
+        BaseRecyclerViewAdapter<ReminderViewModel>(R.layout.item_edit_habit_reminder) {
+
+        override fun onBindViewModel(vm: ReminderViewModel, view: View, holder: SimpleViewHolder) {
+
+            view.reminderStartTime.text = vm.timeText
+            view.reminderStartTime.onDebounceClick {
+                navigateFromRoot().toHabitReminderPicker(vm.reminder) { r ->
+                    dispatch(EditHabitAction.ChangeReminder(holder.adapterPosition, r))
+                }
+            }
+            view.removeReminder.dispatchOnClick {
+                EditHabitAction.RemoveReminder(holder.adapterPosition)
+            }
+        }
+
+    }
+
     data class WeekDayViewModel(
         val text: String,
         @DrawableRes val background: Int,
@@ -409,7 +486,6 @@ class EditHabitViewController(args: Bundle? = null) :
             item.setTextColor(colorRes(R.color.md_light_text_100))
             item.setPadding(0, 0, 0, 0)
         }
-
     }
 
     private val EditHabitViewState.challengeText: String
@@ -438,6 +514,12 @@ class EditHabitViewController(args: Bundle? = null) :
 
     private val EditHabitViewState.timesADayIndex: Int
         get() = timesADayValues.indexOfFirst { it == timesADay }
+
+    private val EditHabitViewState.reminderViewModels: List<ReminderViewModel>
+        get() =
+            reminders.map {
+                ReminderViewModel(it.time.toString(shouldUse24HourFormat), it)
+            }
 
     private fun EditHabitViewState.daysViewModels() =
         DateUtils.localeDaysOfWeek.map {

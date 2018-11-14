@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
     private val playerRepository by required { playerRepository }
     private val sharedPreferences by required { sharedPreferences }
     private val unlockAchievementsUseCase by required { unlockAchievementsUseCase }
+    private val resetDateScheduler by required { resetDateScheduler }
 
     private val stateStore by required { stateStore }
     private val dataExporter by required { dataExporter }
@@ -155,6 +156,11 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
                 navigator.setQuest(questId)
             }
 
+            ACTION_SHOW_HABIT -> {
+                val habitId = intent.getStringExtra(Constants.HABIT_ID_EXTRA_KEY)
+                navigator.setHabit(habitId)
+            }
+
             ACTION_SHOW_PET ->
                 navigator.setPet(showBackButton = false)
 
@@ -218,6 +224,9 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
         if (intent.action == ACTION_SHOW_TIMER) {
             val questId = intent.getStringExtra(Constants.QUEST_ID_EXTRA_KEY)
             navigator.setQuest(questId)
+        } else if (intent.action == ACTION_SHOW_HABIT) {
+            val habitId = intent.getStringExtra(Constants.HABIT_ID_EXTRA_KEY)
+            navigator.setHabit(habitId)
         } else if (shouldShowQuickAdd(intent)) {
             navigator.setAddQuest(
                 closeListener = {
@@ -262,6 +271,7 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
                 }
             }
             unlockAchievementsUseCase.execute(UnlockAchievementsUseCase.Params(p))
+            resetDateScheduler.schedule()
             if (p.isLoggedIn()) {
                 try {
                     dataExporter.exportNewData()
@@ -395,6 +405,7 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
 
     companion object {
         const val ACTION_SHOW_TIMER = "io.ipoli.android.intent.action.SHOW_TIMER"
+        const val ACTION_SHOW_HABIT = "io.ipoli.android.intent.action.SHOW_HABIT"
         const val ACTION_ADD_POST = "io.ipoli.android.intent.action.ADD_POST"
         const val ACTION_SHOW_QUICK_ADD = "io.ipoli.android.intent.action.SHOW_QUICK_ADD"
         const val ACTION_SHOW_PET = "io.ipoli.android.intent.action.SHOW_PET"

@@ -51,8 +51,10 @@ import io.ipoli.android.friends.feed.post.PostViewController
 import io.ipoli.android.friends.invite.AcceptFriendshipDialogController
 import io.ipoli.android.friends.invite.InviteFriendsDialogController
 import io.ipoli.android.friends.share.SharePostDialogController
+import io.ipoli.android.habit.data.Habit
 import io.ipoli.android.habit.edit.EditHabitViewController
 import io.ipoli.android.habit.predefined.PredefinedHabitListViewController
+import io.ipoli.android.habit.reminder.HabitReminderPickerDialogController
 import io.ipoli.android.habit.show.HabitViewController
 import io.ipoli.android.note.NotePickerDialogController
 import io.ipoli.android.onboarding.OnboardData
@@ -222,8 +224,8 @@ class Navigator(private val router: Router) {
         pushController({ EditHabitViewController("", params) }, VerticalChangeHandler())
     }
 
-    fun toEditHabit(habitId: String, changeHandler: ControllerChangeHandler? = null) {
-        pushController({ EditHabitViewController(habitId) }, changeHandler)
+    fun toEditHabit(habitId: String) {
+        pushController({ EditHabitViewController(habitId) }, HorizontalChangeHandler())
     }
 
     fun toAddChallenge() {
@@ -310,12 +312,16 @@ class Navigator(private val router: Router) {
         pushController({ ChallengeViewController(challengeId) }, VerticalChangeHandler())
     }
 
+    fun setHabit(habitId: String) {
+        setController({ HabitViewController(habitId, false) })
+    }
+
     fun toHabit(habitId: String) {
-        pushController({ HabitViewController(habitId) }, VerticalChangeHandler())
+        pushController({ HabitViewController(habitId, true) }, VerticalChangeHandler())
     }
 
     fun setQuest(questId: String) {
-        setController({ QuestViewController(questId) })
+        setController({ QuestViewController(questId, false) })
     }
 
     fun toQuest(questId: String) {
@@ -323,7 +329,7 @@ class Navigator(private val router: Router) {
     }
 
     fun toQuest(questId: String, changeHandler: ControllerChangeHandler? = null) {
-        pushController({ QuestViewController(questId) }, changeHandler)
+        pushController({ QuestViewController(questId, true) }, changeHandler)
     }
 
     fun toGemStore(changeHandler: ControllerChangeHandler? = null) {
@@ -629,6 +635,15 @@ class Navigator(private val router: Router) {
     ) {
         pushDialog {
             AddPresetChallengeHabitDialogController(habit, listener)
+        }
+    }
+
+    fun toHabitReminderPicker(
+        reminder: Habit.Reminder? = null,
+        listener: (Habit.Reminder) -> Unit
+    ) {
+        pushDialog {
+            HabitReminderPickerDialogController(reminder, listener)
         }
     }
 

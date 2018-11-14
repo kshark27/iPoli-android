@@ -7,13 +7,17 @@ import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.habit.data.Habit
 import io.ipoli.android.quest.Quest
 import io.ipoli.android.quest.Reminder
+import io.ipoli.android.quest.job.ReminderScheduler
 import io.ipoli.android.quest.subquest.SubQuest
 import io.ipoli.android.tag.Tag
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
 import java.util.*
 
-class CreateChallengeFromPresetUseCase(private val saveChallengeUseCase: SaveChallengeUseCase) :
+class CreateChallengeFromPresetUseCase(
+    private val saveChallengeUseCase: SaveChallengeUseCase,
+    private val reminderScheduler: ReminderScheduler
+) :
     UseCase<CreateChallengeFromPresetUseCase.Params, Challenge> {
 
     override fun execute(parameters: Params): Challenge {
@@ -118,7 +122,7 @@ class CreateChallengeFromPresetUseCase(private val saveChallengeUseCase: SaveCha
             )
         }
 
-        return saveChallengeUseCase.execute(
+        val challenge = saveChallengeUseCase.execute(
             SaveChallengeUseCase.Params.WithNewQuestsAndHabits(
                 name = pc.name,
                 tags = parameters.tags,
@@ -134,6 +138,8 @@ class CreateChallengeFromPresetUseCase(private val saveChallengeUseCase: SaveCha
                 habits = habits
             )
         )
+        reminderScheduler.schedule()
+        return challenge
     }
 
     private fun createAverageTrackedValue(

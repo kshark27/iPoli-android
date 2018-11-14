@@ -135,21 +135,23 @@ object DurationFormatter {
             return ""
         }
         if (duration == 0) {
-            return "0min"
+            return "0m"
         }
         val hours = TimeUnit.MINUTES.toHours(duration.toLong()).toInt()
         val mins = duration - hours * 60
         if (hours <= 0 && mins <= 0) {
             return ""
         }
+
+        if (hours == 0 && mins > 0) {
+            return "${mins}m"
+        }
+
         if (hours > 0 && mins > 0) {
             return hours.toString() + "h " + mins + "m"
         }
 
-        return if (hours > 0 && mins == 0) {
-            "$hours hours"
-        } else mins.toString() + " min"
-
+        return "${hours}h"
     }
 
     private fun formatEmptyDuration(context: Context): String {

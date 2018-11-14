@@ -73,19 +73,26 @@ sealed class EditHabitAction : Action {
     data class ChangeNote(val note: String) : EditHabitAction() {
         override fun toMap() = mapOf("note" to note)
     }
+
     data class Validate(
-        val name: String,
-        val selectedTimesADayPosition: Int
+        val name: String
     ) : EditHabitAction() {
         override fun toMap() = mapOf(
-            "name" to name,
-            "selectedTimesADayPosition" to selectedTimesADayPosition
+            "name" to name
         )
     }
 
     data class Remove(val habitId: String) : EditHabitAction() {
         override fun toMap() = mapOf("habitId" to habitId)
     }
+
+    data class AddReminder(val reminder: Habit.Reminder) : EditHabitAction()
+
+    data class ChangeReminder(val index: Int, val reminder: Habit.Reminder) : EditHabitAction()
+
+    data class RemoveReminder(val index: Int) : EditHabitAction()
+
+    data class ChangeTimesADay(val index: Int) : EditHabitAction()
 }
 
 object EditHabitReducer : BaseViewStateReducer<EditHabitViewState>() {
@@ -103,7 +110,9 @@ object EditHabitReducer : BaseViewStateReducer<EditHabitViewState>() {
                     subState.copy(
                         type = EditHabitViewState.StateType.HABIT_DATA_CHANGED,
                         tags = state.dataState.tags,
-                        isEditing = false
+                        isEditing = false,
+                        hasChangedColor = false,
+                        hasChangedIcon = false
                     )
                 } else {
                     createFromHabits(state.dataState.habits!!, action.habitId, subState, state)
@@ -116,7 +125,9 @@ object EditHabitReducer : BaseViewStateReducer<EditHabitViewState>() {
                         icon = params.icon,
                         timesADay = params.timesADay,
                         isGood = params.isGood,
-                        days = params.days
+                        days = params.days,
+                        hasChangedColor = true,
+                        hasChangedIcon = true
                     )
                 } else s
             }
@@ -160,25 +171,39 @@ object EditHabitReducer : BaseViewStateReducer<EditHabitViewState>() {
 
             is EditHabitAction.AddTag -> {
                 val tag = subState.tags.first { it.name == action.tagName }
+
+                val color = if (!subState.hasChangedColor && subState.habitTags.isEmpty())
+                    tag.color
+                else subState.color
+
+                val icon =
+                    if (!subState.hasChangedIcon && subState.habitTags.isEmpty() && tag.icon != null)
+                        tag.icon
+                    else subState.icon
+
                 val habitTags = subState.habitTags + tag
                 subState.copy(
                     type = TAGS_CHANGED,
                     habitTags = habitTags,
                     tags = subState.tags - tag,
-                    maxTagsReached = habitTags.size >= Constants.MAX_TAGS_PER_ITEM
+                    maxTagsReached = habitTags.size >= Constants.MAX_TAGS_PER_ITEM,
+                    icon = icon,
+                    color = color
                 )
             }
 
             is EditHabitAction.ChangeColor ->
                 subState.copy(
                     type = COLOR_CHANGED,
-                    color = action.color
+                    color = action.color,
+                    hasChangedColor = true
                 )
 
             is EditHabitAction.ChangeIcon ->
                 subState.copy(
                     type = ICON_CHANGED,
-                    icon = action.icon
+                    icon = action.icon,
+                    hasChangedIcon = true
                 )
 
             is EditHabitAction.ChangeChallenge ->
@@ -205,6 +230,52 @@ object EditHabitReducer : BaseViewStateReducer<EditHabitViewState>() {
                     isGood = false
                 )
 
+            is EditHabitAction.ChangeTimesADay -> {
+                val newTimesADay = subState.timesADayValues[action.index]
+                subState.copy(
+                    type = TIMES_A_DAY_CHANGED,
+                    timesADay = newTimesADay,
+                    maxRemindersReached = newTimesADay <= subState.reminders.size,
+                    reminders = if (subState.reminders.size > newTimesADay)
+                        subState.reminders.subList(0, newTimesADay)
+                    else
+                        subState.reminders
+                )
+            }
+
+            is EditHabitAction.AddReminder -> {
+                val newReminders = (subState.reminders + action.reminder)
+                    .distinctBy { it.time }
+                    .sortedBy { it.time }
+                subState.copy(
+                    type = REMINDERS_CHANGED,
+                    reminders = newReminders,
+                    maxRemindersReached = newReminders.size == subState.timesADay
+                )
+            }
+
+            is EditHabitAction.ChangeReminder ->
+                subState.copy(
+                    type = REMINDERS_CHANGED,
+                    reminders = subState.reminders
+                        .mapIndexed { i, r ->
+                            if (i == action.index) action.reminder else r
+                        }
+                        .distinctBy { it.time }
+                        .sortedBy { it.time }
+                )
+
+            is EditHabitAction.RemoveReminder ->
+                subState.copy(
+                    type = REMINDERS_CHANGED,
+                    reminders = subState.reminders
+                        .mapIndexedNotNull { i, r ->
+                            if (i == action.index) null else r
+                        }
+                        .sortedBy { it.time },
+                    maxRemindersReached = false
+                )
+
             is EditHabitAction.Validate -> {
                 val name = action.name
                 val errors = Validator.validate(action).check<ValidationError> {
@@ -220,8 +291,7 @@ object EditHabitReducer : BaseViewStateReducer<EditHabitViewState>() {
                     errors.isEmpty() ->
                         subState.copy(
                             type = VALID_NAME,
-                            name = name,
-                            timesADay = subState.timesADayValues[action.selectedTimesADayPosition]
+                            name = name
                         )
                     errors.contains(ValidationError.EMPTY_NAME) -> subState.copy(
                         type = VALIDATION_ERROR_EMPTY_NAME
@@ -267,7 +337,11 @@ object EditHabitReducer : BaseViewStateReducer<EditHabitViewState>() {
                 isGood = habit.isGood,
                 timesADay = habit.timesADay,
                 days = habit.days.toSet(),
-                isEditing = true
+                reminders = habit.reminders,
+                maxRemindersReached = habit.reminders.size == habit.timesADay,
+                isEditing = true,
+                hasChangedColor = true,
+                hasChangedIcon = true
             )
         }
     }
@@ -288,7 +362,11 @@ object EditHabitReducer : BaseViewStateReducer<EditHabitViewState>() {
         note = "",
         maxTagsReached = false,
         timesADayValues = (1..Constants.MAX_HABIT_TIMES_A_DAY).toList(),
-        isEditing = false
+        reminders = emptyList(),
+        maxRemindersReached = false,
+        isEditing = false,
+        hasChangedColor = false,
+        hasChangedIcon = false
     )
 
     enum class ValidationError {
@@ -313,7 +391,11 @@ data class EditHabitViewState(
     val note: String,
     val maxTagsReached: Boolean,
     val timesADayValues: List<Int>,
-    val isEditing: Boolean
+    val reminders: List<Habit.Reminder>,
+    val maxRemindersReached: Boolean,
+    val isEditing: Boolean,
+    val hasChangedColor: Boolean,
+    val hasChangedIcon: Boolean
 ) : BaseViewState() {
     enum class StateType {
         LOADING,
@@ -324,6 +406,8 @@ data class EditHabitViewState(
         ICON_CHANGED,
         CHALLENGE_CHANGED,
         NOTE_CHANGED,
+        REMINDERS_CHANGED,
+        TIMES_A_DAY_CHANGED,
         VALID_NAME,
         HABIT_TYPE_CHANGED,
         VALIDATION_ERROR_EMPTY_NAME,

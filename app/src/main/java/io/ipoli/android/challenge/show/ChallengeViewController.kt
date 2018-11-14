@@ -781,7 +781,7 @@ class ChallengeViewController(args: Bundle? = null) :
             view.questRepeatIndicator.gone()
 
             view.onDebounceClick {
-                navigateFromRoot().toEditHabit(vm.id, HorizontalChangeHandler())
+                navigateFromRoot().toEditHabit(vm.id)
             }
         }
 

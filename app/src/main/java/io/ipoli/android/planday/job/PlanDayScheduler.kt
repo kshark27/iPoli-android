@@ -69,7 +69,9 @@ object PlanDayNotification {
                 title = null,
                 body = null,
                 petAvatar = pet.avatar,
-                petState = pet.state
+                petState = pet.state,
+                doTextRes = R.string.start,
+                doImageRes = R.drawable.ic_play_arrow_white_32dp
             )
             showPetPopup(vm, notificationId, notificationManager, planDayScheduler, c).show(c)
         }
@@ -100,7 +102,7 @@ object PlanDayNotification {
                     .makeText(context, context.getString(R.string.remind_in_15), Toast.LENGTH_SHORT)
                     .show()
             },
-            onStart = {
+            onDo = {
                 notificationId?.let {
                     notificationManager.cancel(it)
                 }

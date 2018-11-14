@@ -497,6 +497,13 @@ object Migration8To9 : Migration(8, 9) {
     }
 }
 
+object Migration9To10 : Migration(9, 10) {
+
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE habits ADD COLUMN `reminders` TEXT NOT NULL DEFAULT '[]'")
+    }
+}
+
 @Database(
     entities = [
         RoomPlayer::class,
@@ -512,7 +519,7 @@ object Migration8To9 : Migration(8, 9) {
         RoomHabit.Companion.RoomTagJoin::class,
         RoomEntityReminder::class
     ],
-    version = 9,
+    version = 10,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -558,7 +565,8 @@ abstract class MyPoliRoomDatabase : RoomDatabase() {
                     Migration5To6,
                     Migration6To7,
                     Migration7To8,
-                    Migration8To9
+                    Migration8To9,
+                    Migration9To10
                 )
                 .addCallback(CALLBACK)
                 .build()

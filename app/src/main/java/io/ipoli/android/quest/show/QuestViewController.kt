@@ -45,6 +45,7 @@ class QuestViewController : ReduxViewController<QuestAction, QuestViewState, Que
         HelpConfig(R.string.help_dialog_quest_title, R.string.help_dialog_quest_message)
 
     private var questId = ""
+    private var showBackButton = true
     private var isTimerStopped = true
 
     private val handler = Handler(Looper.getMainLooper())
@@ -71,8 +72,9 @@ class QuestViewController : ReduxViewController<QuestAction, QuestViewState, Que
     @Suppress("unused")
     constructor(args: Bundle? = null) : super(args)
 
-    constructor(questId: String) : super() {
+    constructor(questId: String, showBackButton: Boolean) : super() {
         this.questId = questId
+        this.showBackButton = showBackButton
     }
 
     override fun onCreateView(
@@ -217,7 +219,9 @@ class QuestViewController : ReduxViewController<QuestAction, QuestViewState, Que
 
     override fun onAttach(view: View) {
         super.onAttach(view)
-        showBackButton()
+        if (showBackButton) {
+            showBackButton()
+        }
         view.questContainer.requestFocus()
         val showTitle =
             appBarOffsetListener.currentState != AppBarStateChangeListener.State.EXPANDED

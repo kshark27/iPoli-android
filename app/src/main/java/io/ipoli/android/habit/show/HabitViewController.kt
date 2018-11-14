@@ -33,6 +33,7 @@ class HabitViewController(args: Bundle? = null) :
     override val reducer = HabitReducer
 
     private var habitId: String = ""
+    private var showBackButton = true
 
     private val appBarOffsetListener = object :
         AppBarStateChangeListener() {
@@ -50,8 +51,9 @@ class HabitViewController(args: Bundle? = null) :
         }
     }
 
-    constructor(habitId: String) : this() {
+    constructor(habitId: String, showBackButton: Boolean) : this() {
         this.habitId = habitId
+        this.showBackButton = showBackButton
     }
 
     override fun onCreateView(
@@ -106,7 +108,9 @@ class HabitViewController(args: Bundle? = null) :
 
     override fun onAttach(view: View) {
         super.onAttach(view)
-        showBackButton()
+        if (showBackButton) {
+            showBackButton()
+        }
         val showTitle =
             appBarOffsetListener.currentState != AppBarStateChangeListener.State.EXPANDED
         (activity as MainActivity).supportActionBar?.setDisplayShowTitleEnabled(showTitle)

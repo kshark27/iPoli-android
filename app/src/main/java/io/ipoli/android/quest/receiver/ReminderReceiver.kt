@@ -1,6 +1,7 @@
 package io.ipoli.android.quest.receiver
 
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -12,11 +13,18 @@ import io.ipoli.android.R
 import io.ipoli.android.common.AsyncBroadcastReceiver
 import io.ipoli.android.common.IntentUtil
 import io.ipoli.android.common.datetime.Time
+import io.ipoli.android.common.datetime.minutes
+import io.ipoli.android.common.datetime.toTime
 import io.ipoli.android.common.notification.NotificationUtil
 import io.ipoli.android.common.notification.ScreenUtil
 import io.ipoli.android.common.view.AndroidIcon
+import io.ipoli.android.common.view.AppWidgetUtil
 import io.ipoli.android.common.view.asThemedWrapper
 import io.ipoli.android.common.view.largeIcon
+import io.ipoli.android.habit.data.Habit
+import io.ipoli.android.habit.usecase.CompleteHabitUseCase
+import io.ipoli.android.habit.usecase.SnoozeHabitReminderUseCase
+import io.ipoli.android.player.data.Player
 import io.ipoli.android.player.data.Player.Preferences.NotificationStyle
 import io.ipoli.android.quest.Quest
 import io.ipoli.android.quest.Reminder
@@ -35,7 +43,10 @@ import java.util.*
 class ReminderReceiver : AsyncBroadcastReceiver() {
 
     private val findQuestsToRemindUseCase by required { findQuestsToRemindUseCase }
+    private val findHabitsToRemindUseCase by required { findHabitsToRemindUseCase }
     private val snoozeQuestUseCase by required { snoozeQuestUseCase }
+    private val snoozeHabitReminderUseCase by required { snoozeHabitReminderUseCase }
+    private val completeHabitUseCase by required { completeHabitUseCase }
     private val playerRepository by required { playerRepository }
 
     private val reminderScheduler by required { reminderScheduler }
@@ -59,105 +70,224 @@ class ReminderReceiver : AsyncBroadcastReceiver() {
             ZoneId.systemDefault()
         )
 
+        val remindTime = remindDateTime.toTime()
+
         val quests = findQuestsToRemindUseCase.execute(remindDateTime)
-        val p = playerRepository.find()!!
-        val style = p.preferences.reminderNotificationStyle
-        val pet = p.pet
+        val habits = findHabitsToRemindUseCase.execute(remindDateTime)
+
+        val player = playerRepository.find()!!
 
         GlobalScope.launch(Dispatchers.Main) {
-            quests.forEach {
+            quests.forEach { q ->
+                showQuestNotification(q, notificationManager, player, c)
+            }
+            habits.forEach { h ->
+                val idx = h.reminders.sortedBy { it.time.toMinuteOfDay() }
+                    .binarySearchBy(remindTime) { it.time }
 
-                val reminder = it.reminders.first()
+                val reminderIndex =
+                    if (idx < 0)
+                        Math.min(Math.max(0, Math.abs(idx + 1)), h.reminders.size - 1)
+                    else
+                        idx
 
-                val message = when {
-                    reminder.message.isNotBlank() -> reminder.message
-                    reminder is Reminder.Relative -> if (reminder.minutesFromStart == 0L) "This is your Quest - time to act!" else "Time to prepare for your Quest"
-                    else -> "This is your Quest - time to act!"
-                }
+                val reminder = h.reminders[reminderIndex]
 
-                val startTimeMessage = startTimeMessage(it)
-
-                val iconicsDrawable = IconicsDrawable(context)
-                val icon = it.icon?.let {
-                    val androidIcon = AndroidIcon.valueOf(it.name)
-                    iconicsDrawable.largeIcon(
-                        androidIcon.icon,
-                        androidIcon.color
-                    )
-                } ?: iconicsDrawable.largeIcon(
-                    GoogleMaterial.Icon.gmd_notifications_active,
-                    R.color.md_blue_500
-                )
-
-                val questName = it.name
-
-
-                var notificationId: Int? = showNotification(
-                    context = context,
-                    questId = it.id,
-                    questName = questName,
-                    message = message,
-                    icon = icon,
-                    notificationManager = notificationManager
-                )
-                if (!(style == NotificationStyle.NOTIFICATION || style == NotificationStyle.ALL)) {
-                    notificationManager.cancel(notificationId!!)
-                    notificationId = null
-                }
-
-                if (style == NotificationStyle.POPUP || style == NotificationStyle.ALL) {
-                    val viewModel = PetNotificationPopup.ViewModel(
-                        headline = questName,
-                        title = message,
-                        body = startTimeMessage,
-                        petAvatar = pet.avatar,
-                        petState = pet.state
-                    )
-                    showPetPopup(viewModel, notificationManager, notificationId, it, c)
-                }
+                showHabitNotification(h, reminder, remindDateTime, notificationManager, player, c)
             }
         }
         reminderScheduler.schedule()
     }
 
-    private fun showPetPopup(
-        viewModel: PetNotificationPopup.ViewModel,
+    private fun showHabitNotification(
+        habit: Habit,
+        reminder: Habit.Reminder,
+        remindDateTime: LocalDateTime,
         notificationManager: NotificationManager,
-        notificationId: Int?,
-        quest: Quest,
+        player: Player,
         context: Context
     ) {
-        PetNotificationPopup(
-            viewModel,
-            onDismiss = {
-                notificationId?.let {
-                    notificationManager.cancel(it)
+
+        val notificationStyle = player.preferences.reminderNotificationStyle
+        val pet = player.pet
+
+        val message = when {
+            reminder.message.isNotBlank() -> reminder.message
+            else -> "Time to build your Habit!"
+        }
+
+        val icon = habit.icon.let {
+            val androidIcon = AndroidIcon.valueOf(it.name)
+            IconicsDrawable(context)
+                .largeIcon(androidIcon.icon, androidIcon.color)
+        }
+
+        var notificationId: Int? = showNotification(
+            context = context,
+            contentIntent = IntentUtil.getActivityPendingIntent(
+                context,
+                IntentUtil.showHabit(habit.id, context)
+            ),
+            title = habit.name,
+            message = message,
+            icon = icon,
+            notificationManager = notificationManager
+        )
+
+        if (!(notificationStyle == NotificationStyle.NOTIFICATION || notificationStyle == NotificationStyle.ALL)) {
+            notificationManager.cancel(notificationId!!)
+            notificationId = null
+        }
+
+        if (notificationStyle == NotificationStyle.POPUP || notificationStyle == NotificationStyle.ALL) {
+            val viewModel = PetNotificationPopup.ViewModel(
+                headline = habit.name,
+                title = message,
+                body = "Do it now",
+                petAvatar = pet.avatar,
+                petState = pet.state,
+                doTextRes = R.string.mark_done,
+                doImageRes = R.drawable.ic_done_white_32dp
+            )
+
+            PetNotificationPopup(
+                viewModel,
+                onDismiss = {
+                    notificationId?.let {
+                        notificationManager.cancel(it)
+                    }
+                },
+                onSnooze = {
+                    notificationId?.let {
+                        notificationManager.cancel(it)
+                    }
+                    GlobalScope.launch(Dispatchers.IO) {
+                        snoozeHabitReminderUseCase.execute(
+                            SnoozeHabitReminderUseCase.Params(
+                                habitId = habit.id,
+                                remindTime = remindDateTime,
+                                snoozeDuration = 15.minutes
+                            )
+                        )
+                    }
+                    Toast
+                        .makeText(
+                            context,
+                            context.getString(R.string.remind_in_15),
+                            Toast.LENGTH_SHORT
+                        )
+                        .show()
+                },
+                onDo = {
+                    notificationId?.let {
+                        notificationManager.cancel(it)
+                    }
+                    GlobalScope.launch(Dispatchers.IO) {
+                        completeHabitUseCase.execute(CompleteHabitUseCase.Params(habit.id))
+                    }
+                    AppWidgetUtil.updateHabitWidget(context)
                 }
-            },
-            onSnooze = {
-                notificationId?.let {
-                    notificationManager.cancel(it)
+            ).show(context)
+        }
+
+    }
+
+    private fun showQuestNotification(
+        quest: Quest,
+        notificationManager: NotificationManager,
+        player: Player,
+        context: Context
+    ) {
+
+        val notificationStyle = player.preferences.reminderNotificationStyle
+        val pet = player.pet
+
+        val reminder = quest.reminders.first()
+
+        val message = when {
+            reminder.message.isNotBlank() -> reminder.message
+            reminder is Reminder.Relative -> if (reminder.minutesFromStart == 0L) "This is your Quest - time to act!" else "Time to prepare for your Quest"
+            else -> "This is your Quest - time to act!"
+        }
+
+        val startTimeMessage = startTimeMessage(quest)
+
+        val iconicsDrawable = IconicsDrawable(context)
+        val icon = quest.icon?.let {
+            val androidIcon = AndroidIcon.valueOf(it.name)
+            iconicsDrawable.largeIcon(
+                androidIcon.icon,
+                androidIcon.color
+            )
+        } ?: iconicsDrawable.largeIcon(
+            GoogleMaterial.Icon.gmd_notifications_active,
+            R.color.md_blue_500
+        )
+
+        val questName = quest.name
+
+        var notificationId: Int? = showNotification(
+            context = context,
+            contentIntent = IntentUtil.getActivityPendingIntent(
+                context,
+                IntentUtil.showTimer(quest.id, context)
+            ),
+            title = questName,
+            message = message,
+            icon = icon,
+            notificationManager = notificationManager
+        )
+        if (!(notificationStyle == NotificationStyle.NOTIFICATION || notificationStyle == NotificationStyle.ALL)) {
+            notificationManager.cancel(notificationId!!)
+            notificationId = null
+        }
+
+        if (notificationStyle == NotificationStyle.POPUP || notificationStyle == NotificationStyle.ALL) {
+            val viewModel = PetNotificationPopup.ViewModel(
+                headline = questName,
+                title = message,
+                body = startTimeMessage,
+                petAvatar = pet.avatar,
+                petState = pet.state,
+                doTextRes = R.string.start,
+                doImageRes = R.drawable.ic_play_arrow_white_32dp
+            )
+            PetNotificationPopup(
+                viewModel,
+                onDismiss = {
+                    notificationId?.let {
+                        notificationManager.cancel(it)
+                    }
+                },
+                onSnooze = {
+                    notificationId?.let {
+                        notificationManager.cancel(it)
+                    }
+                    GlobalScope.launch(Dispatchers.IO) {
+                        snoozeQuestUseCase.execute(quest.id)
+                    }
+                    Toast
+                        .makeText(
+                            context,
+                            context.getString(R.string.remind_in_15),
+                            Toast.LENGTH_SHORT
+                        )
+                        .show()
+                },
+                onDo = {
+                    notificationId?.let {
+                        notificationManager.cancel(it)
+                    }
+                    context.startActivity(IntentUtil.showTimer(quest.id, context))
                 }
-                GlobalScope.launch(Dispatchers.IO) {
-                    snoozeQuestUseCase.execute(quest.id)
-                }
-                Toast
-                    .makeText(context, context.getString(R.string.remind_in_15), Toast.LENGTH_SHORT)
-                    .show()
-            },
-            onStart = {
-                notificationId?.let {
-                    notificationManager.cancel(it)
-                }
-                context.startActivity(IntentUtil.showTimer(quest.id, context))
-            }
-        ).show(context)
+            ).show(context)
+        }
     }
 
     private fun showNotification(
         context: Context,
-        questId: String,
-        questName: String,
+        title: String,
+        contentIntent: PendingIntent,
         message: String,
         icon: IconicsDrawable,
         notificationManager: NotificationManager
@@ -166,15 +296,12 @@ class ReminderReceiver : AsyncBroadcastReceiver() {
             Uri.parse("android.resource://" + context.packageName + "/" + R.raw.notification)
         val notification = NotificationUtil.createDefaultNotification(
             context = context,
-            title = questName,
+            title = title,
             icon = icon.toBitmap(),
             message = message,
             sound = sound,
             channelId = Constants.REMINDERS_NOTIFICATION_CHANNEL_ID,
-            contentIntent = IntentUtil.getActivityPendingIntent(
-                context,
-                IntentUtil.showTimer(questId, context)
-            )
+            contentIntent = contentIntent
         )
 
         val notificationId = Random().nextInt()
@@ -192,7 +319,9 @@ class ReminderReceiver : AsyncBroadcastReceiver() {
             val minutesDiff = quest.startTime!!.toMinuteOfDay() - Time.now().toMinuteOfDay()
 
             when {
-                minutesDiff > Time.MINUTES_IN_AN_HOUR -> "Starts at ${quest.startTime.toString(false)}"
+                minutesDiff > Time.MINUTES_IN_AN_HOUR -> "Starts at ${quest.startTime.toString(
+                    false
+                )}"
                 minutesDiff > 0 -> "Starts in $minutesDiff min"
                 else -> "Starts now"
             }

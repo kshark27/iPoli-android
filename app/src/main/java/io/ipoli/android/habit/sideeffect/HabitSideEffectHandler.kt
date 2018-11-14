@@ -49,6 +49,7 @@ object HabitSideEffectHandler : AppSideEffectHandler() {
                         timesADay = s.timesADay,
                         isGood = s.isGood,
                         challengeId = s.challenge?.id,
+                        reminders = s.reminders,
                         note = s.note
                     )
                 )
@@ -88,8 +89,10 @@ object HabitSideEffectHandler : AppSideEffectHandler() {
 
             is HabitAction.Load -> {
                 val habitState = state.stateFor(HabitViewState::class.java)
-                dispatchHabitHistoryItems(habitState.currentDate,
-                    state.dataState.habits!!.first { it.id == action.habitId })
+                dispatchHabitHistoryItems(
+                    habitState.currentDate,
+                    habitRepository.findById(action.habitId)!!
+                )
             }
 
             is HabitAction.ToggleHistory -> {

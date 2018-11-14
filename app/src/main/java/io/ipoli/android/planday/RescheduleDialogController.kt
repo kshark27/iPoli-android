@@ -48,8 +48,8 @@ object RescheduleDialogReducer : BaseViewStateReducer<RescheduleDialogViewState>
         state: AppState,
         subState: RescheduleDialogViewState,
         action: Action
-    ): RescheduleDialogViewState {
-        return when (action) {
+    ) =
+        when (action) {
             is RescheduleDialogAction.Load -> {
                 subState.copy(
                     type = DATA_LOADED,
@@ -58,7 +58,6 @@ object RescheduleDialogReducer : BaseViewStateReducer<RescheduleDialogViewState>
             }
             else -> subState
         }
-    }
 
     override fun defaultState() = RescheduleDialogViewState(
         type = LOADING,
@@ -212,12 +211,12 @@ class RescheduleDialogController(args: Bundle? = null) :
 
 
                     is RescheduleViewModel.StartNow -> {
-                        listener(null, Time.now(), null)
+                        listener(LocalDate.now(), Time.now(), null)
                         dismiss()
                     }
 
                     is RescheduleViewModel.StartIn5Minutes -> {
-                        listener(null, Time.now().plus(5), null)
+                        listener(LocalDate.now(), Time.now().plus(5), null)
                         dismiss()
                     }
 

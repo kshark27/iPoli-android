@@ -10,6 +10,7 @@ import io.ipoli.android.habit.data.Habit
 import io.ipoli.android.habit.persistence.HabitRepository
 import io.ipoli.android.player.persistence.PlayerRepository
 import io.ipoli.android.player.usecase.RewardPlayerUseCase
+import io.ipoli.android.quest.job.ReminderScheduler
 import io.ipoli.android.quest.job.RewardScheduler
 import org.threeten.bp.LocalDate
 
@@ -24,7 +25,8 @@ class CompleteHabitUseCase(
     private val rewardScheduler: RewardScheduler,
     private val challengeRepository: ChallengeRepository,
     private val addPostScheduler: AddPostScheduler,
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    private val reminderScheduler: ReminderScheduler
 ) : UseCase<CompleteHabitUseCase.Params, Habit> {
 
     override fun execute(parameters: Params): Habit {
@@ -53,7 +55,7 @@ class CompleteHabitUseCase(
             history[date] = history[date] ?: CompletedEntry()
         }
 
-        return if (isCompleted) {
+        val newHabit = if (isCompleted) {
             if (habit.isGood) {
                 val reward = rewardPlayerUseCase.execute(
                     RewardPlayerUseCase.Params.ForHabit(
@@ -106,6 +108,8 @@ class CompleteHabitUseCase(
         } else {
             saveHabit(habit, history)
         }
+        reminderScheduler.schedule()
+        return newHabit
     }
 
     private fun addPostIfHabitIsPublic(

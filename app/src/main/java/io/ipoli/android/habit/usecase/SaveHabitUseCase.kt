@@ -9,6 +9,7 @@ import io.ipoli.android.player.usecase.RemoveRewardFromPlayerUseCase
 import io.ipoli.android.player.usecase.RewardPlayerUseCase
 import io.ipoli.android.quest.Color
 import io.ipoli.android.quest.Icon
+import io.ipoli.android.quest.job.ReminderScheduler
 import io.ipoli.android.tag.Tag
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
@@ -21,7 +22,8 @@ class SaveHabitUseCase(
     private val habitRepository: HabitRepository,
     private val playerRepository: PlayerRepository,
     private val rewardPlayerUseCase: RewardPlayerUseCase,
-    private val removeRewardFromPlayerUseCase: RemoveRewardFromPlayerUseCase
+    private val removeRewardFromPlayerUseCase: RemoveRewardFromPlayerUseCase,
+    private val reminderScheduler: ReminderScheduler
 ) : UseCase<SaveHabitUseCase.Params, Habit> {
 
     override fun execute(parameters: Params): Habit {
@@ -35,6 +37,7 @@ class SaveHabitUseCase(
                 timesADay = parameters.timesADay,
                 isGood = parameters.isGood,
                 challengeId = parameters.challengeId,
+                reminders = if (parameters.isGood) parameters.reminders else emptyList(),
                 streak = Habit.Streak(0, 0),
                 preferenceHistory = Habit.PreferenceHistory(
                     days = sortedMapOf(LocalDate.now() to parameters.days),
@@ -84,11 +87,14 @@ class SaveHabitUseCase(
                 timesADay = parameters.timesADay,
                 isGood = parameters.isGood,
                 challengeId = parameters.challengeId,
+                reminders = if (parameters.isGood) parameters.reminders else emptyList(),
                 note = parameters.note
             )
         }
 
-        return habitRepository.save(habit)
+        val newHabit = habitRepository.save(habit)
+        reminderScheduler.schedule()
+        return newHabit
     }
 
     private fun handleRewardIfTimesADayUpdated(
@@ -143,6 +149,7 @@ class SaveHabitUseCase(
         val timesADay: Int,
         val isGood: Boolean,
         val challengeId: String? = null,
+        val reminders: List<Habit.Reminder>,
         val note: String = "",
         val player: Player? = null
     )
