@@ -487,7 +487,6 @@ data class PeriodRange(val start: LocalDate, val end: LocalDate)
 
 data class PeriodProgress(
     val completedCount: Int,
-    val needToCompleteCount: Int,
     val scheduledCount: Int
 )
 

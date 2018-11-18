@@ -305,7 +305,7 @@ class RepeatingQuestListViewController(args: Bundle? = null) :
                 val progress = it.periodProgress!!
 
                 val needToCompleteCount =
-                    Math.max(progress.needToCompleteCount, progress.scheduledCount)
+                        progress.scheduledCount
 
                 val complete = (0 until progress.completedCount).map { _ ->
                     RepeatingQuestItemViewModel.ProgressViewModel(

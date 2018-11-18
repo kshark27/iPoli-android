@@ -28,8 +28,7 @@ class FindPeriodProgressForRepeatingQuestUseCase(
                     rq.id,
                     periodRange.start,
                     periodRange.end
-                ),
-                needToCompleteCount = rq.repeatPattern.countForCurrentPeriod
+                )
             )
         )
     }
