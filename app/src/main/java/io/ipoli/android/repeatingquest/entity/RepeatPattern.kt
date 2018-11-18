@@ -83,7 +83,9 @@ sealed class RepeatPattern {
             if (periodStart.isBefore(startDate)) {
                 periodStart = startDate
             }
-            return periodStart.datesBetween(endDate).filter { shouldDoOn(it) }
+            return periodStart.datesBetween(endDate).filter {
+                it.isAfterOrEqual(startDate) && it.isBeforeOrEqual(endDate) && shouldDoOn(it)
+            }
         }
 
         override fun periodRangeFor(date: LocalDate) =
@@ -154,14 +156,11 @@ sealed class RepeatPattern {
             val dates = mutableListOf<LocalDate>()
             while (periodStart.isBeforeOrEqual(endDate)) {
                 val date = LocalDate.of(periodStart.year, month, dayOfMonth)
-                if (date.isAfter(endDate)) {
-                    break
-                }
                 dates.add(date)
                 periodStart = periodStart.plusYears(1)
             }
 
-            return dates
+            return dates.filter { it.isAfterOrEqual(startDate) && it.isBeforeOrEqual(endDate) }
         }
 
         override fun periodRangeFor(date: LocalDate) =
@@ -224,7 +223,8 @@ sealed class RepeatPattern {
 
                 val shouldDoOnWeek = weeksPassed % doEveryXPeriods == 0L
 
-                shouldDoOnWeek && shouldDoOn(it)
+                it.isAfterOrEqual(startDate) && it.isBeforeOrEqual(endDate) &&
+                    shouldDoOnWeek && shouldDoOn(it)
 
             }
         }
@@ -296,7 +296,8 @@ sealed class RepeatPattern {
 
                 val shouldDoOnMonth = monthsPassed % doEveryXPeriods == 0L
 
-                shouldDoOnMonth && shouldDoOn(it)
+                it.isAfterOrEqual(startDate) && it.isBeforeOrEqual(endDate) &&
+                    shouldDoOnMonth && shouldDoOn(it)
             }
         }
 
