@@ -91,18 +91,13 @@ class SaveRepeatingQuestUseCase(
                 )
             }
 
-    private fun saveQuestsFor(repeatingQuest: RepeatingQuest): RepeatingQuest {
-        val currentPeriod = repeatingQuest.repeatPattern.periodRangeFor(LocalDate.now())
-        val nextPeriodFirstDate = currentPeriod.end.plusDays(1)
-        val end = repeatingQuest.repeatPattern.periodRangeFor(nextPeriodFirstDate).end
-        return saveQuestsForRepeatingQuestUseCase.execute(
+    private fun saveQuestsFor(repeatingQuest: RepeatingQuest) =
+        saveQuestsForRepeatingQuestUseCase.execute(
             SaveQuestsForRepeatingQuestUseCase.Params(
                 repeatingQuest = repeatingQuest,
-                start = LocalDate.now(),
-                end = end
+                start = LocalDate.now()
             )
         ).repeatingQuest
-    }
 
     data class Params(
         val id: String = "",

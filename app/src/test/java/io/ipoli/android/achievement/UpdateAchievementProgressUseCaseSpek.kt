@@ -15,7 +15,6 @@ import io.ipoli.android.planday.usecase.CalculateAwesomenessScoreUseCase
 import io.ipoli.android.planday.usecase.CalculateFocusDurationUseCase
 import io.ipoli.android.player.data.Statistics
 import io.ipoli.android.player.persistence.PlayerRepository
-import org.amshove.kluent.`should be equal to`
 import org.amshove.kluent.`should equal`
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
@@ -62,11 +61,6 @@ class UpdateAchievementProgressUseCaseSpek : Spek({
             ).execute(
                 UpdateAchievementProgressUseCase.Params(currentDate = currentDate)
             )
-        }
-
-        it("should reset completed quests today") {
-            val stats = executeUseCase(Statistics(questCompletedCountForToday = 8))
-            stats.questCompletedCountForToday.`should be equal to`(0)
         }
 
         it("should reset complete quests for 100 days in a row") {

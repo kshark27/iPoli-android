@@ -6,10 +6,9 @@
     android:layout_height="wrap_content">
 
     <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
         android:id="@+id/contentLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
 
         <TextView
             android:id="@+id/rpEvery"
@@ -18,8 +17,8 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="16dp"
             android:text="@string/every"
-            android:textColor="?android:textColorSecondary"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="?android:textColorSecondary"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -30,13 +29,14 @@
             style="@style/Widget.AppCompat.Spinner.DropDown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:background="@drawable/bordered_rectangle_accent_background"
             android:dropDownWidth="wrap_content"
             android:entries="@array/repeating_quest_picker_frequencies"
-            android:paddingEnd="4dp"
             android:paddingStart="4dp"
+            android:paddingEnd="4dp"
             app:layout_constraintBottom_toBottomOf="@+id/rpEvery"
-            app:layout_constraintStart_toStartOf="@+id/rpStart"
+            app:layout_constraintStart_toEndOf="@+id/rpEvery"
             app:layout_constraintTop_toTopOf="@+id/rpEvery" />
 
         <TextView
@@ -68,8 +68,8 @@
             android:id="@+id/rpTimes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/times"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="?android:textColorSecondary"
@@ -85,9 +85,9 @@
             android:id="@+id/rpWeekDayList"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="8dp"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -97,9 +97,9 @@
             android:id="@+id/rpMonthDayList"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="8dp"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -109,14 +109,13 @@
             android:id="@+id/rpPetSchedulingHint"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
             android:drawablePadding="16dp"
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:text="You're choosing flexible pattern"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
@@ -124,12 +123,28 @@
             app:layout_constraintTop_toBottomOf="@+id/messageTopBarrier" />
 
         <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/skipEveryText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Repeat every"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="?android:textColorSecondary"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/skipEvery"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/skipEvery"
+            tools:text="Repeat every" />
+
+        <TextView
+            android:id="@+id/rpEndLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:text="@string/until"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="?android:textColorSecondary"
@@ -140,12 +155,12 @@
             tools:text="Until" />
 
         <TextView
-            android:id="@+id/textView6"
+            android:id="@+id/rpStartLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:text="@string/start"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="?android:textColorSecondary"
@@ -180,44 +195,16 @@
             app:layout_constraintTop_toBottomOf="@+id/rpEvery"
             tools:text="21 Feb" />
 
-        <TextView
-            android:id="@+id/rpEveryXDaysRepeatLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:text="Repeat every"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:textColor="?android:textColorSecondary"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/rpEveryXDaysCount"
-            app:layout_constraintTop_toTopOf="@+id/rpEveryXDaysCount"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:text="Day" />
-
         <Spinner
-            android:id="@+id/rpEveryXDaysCount"
+            android:id="@+id/skipEvery"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
-            android:layout_marginStart="16dp"
             android:background="@drawable/bordered_rectangle_accent_background"
             android:dropDownWidth="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/rpEvery"
-            app:layout_constraintStart_toEndOf="@+id/rpEveryXDaysRepeatLabel" />
-
-        <TextView
-            android:id="@+id/rpEveryXDaysLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="days"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:textColor="?android:textColorSecondary"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/rpEveryXDaysCount"
-            app:layout_constraintStart_toEndOf="@id/rpEveryXDaysCount"
-            app:layout_constraintTop_toTopOf="@+id/rpEveryXDaysCount"
-            tools:text="Day" />
+            app:layout_constraintStart_toEndOf="@+id/skipEveryText"
+            app:layout_constraintTop_toBottomOf="@+id/rpPetSchedulingHint" />
 
         <Button
             android:id="@+id/rpStart"
@@ -226,8 +213,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
-            app:layout_constraintStart_toEndOf="@+id/textView6"
-            app:layout_constraintTop_toBottomOf="@+id/rpPetSchedulingHint"
+            app:layout_constraintStart_toEndOf="@+id/rpStartLabel"
+            app:layout_constraintTop_toBottomOf="@+id/skipEvery"
             tools:text="Today" />
 
         <Button
@@ -245,7 +232,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="rpMonthDayList,rpWeekDayList,rpDayOfYear, rpRepeatType, rpEveryXDaysCount" />
+            app:constraint_referenced_ids="rpMonthDayList,rpWeekDayList,rpDayOfYear, rpRepeatType" />
 
         <android.support.constraint.Group
             android:id="@+id/yearlyPatternGroup"
@@ -255,17 +242,16 @@
             app:constraint_referenced_ids="rpDayOfYear,textView" />
 
         <android.support.constraint.Group
-            android:id="@+id/everyXDaysPatternGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:constraint_referenced_ids="rpEveryXDaysCount,rpEveryXDaysLabel,rpEveryXDaysRepeatLabel" />
-
-        <android.support.constraint.Group
             android:id="@+id/countGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:constraint_referenced_ids="textView2,rpTimes,rpCount" />
+
+        <android.support.constraint.Group
+            android:id="@+id/startEndGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="rpEndLabel, rpEnd, rpStartLabel, rpStart" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

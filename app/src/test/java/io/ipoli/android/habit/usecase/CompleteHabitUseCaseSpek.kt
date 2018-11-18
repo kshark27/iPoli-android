@@ -51,6 +51,7 @@ class CompleteHabitUseCaseSpek : Spek({
                 mock(),
                 mock(),
                 mock(),
+                mock(),
                 mock()
             ).execute(
                 CompleteHabitUseCase.Params(habit.id, date)

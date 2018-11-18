@@ -7,6 +7,7 @@ import io.ipoli.android.challenge.usecase.CreateChallengeFromPresetUseCase.Physi
 import io.ipoli.android.challenge.usecase.CreateChallengeFromPresetUseCase.PhysicalCharacteristics.Units
 import io.ipoli.android.common.datetime.days
 import io.ipoli.android.common.datetime.minutes
+import io.ipoli.android.friends.feed.data.Post
 import io.ipoli.android.quest.Color
 import io.ipoli.android.quest.Icon
 import io.ipoli.android.repeatingquest.usecase.SaveQuestsForRepeatingQuestUseCase
@@ -51,7 +52,10 @@ class CreateChallengeFromPresetUseCaseSpek : Spek({
                 schedule = PresetChallenge.Schedule(
                     quests = quests,
                     habits = habits
-                )
+                ),
+                status = Post.Status.APPROVED,
+                author = null,
+                participantCount = 0
             )
 
         fun createNutritionChallenge() =
@@ -93,7 +97,7 @@ class CreateChallengeFromPresetUseCaseSpek : Spek({
                 TestUtil.habitRepoMock(null)
             )
 
-            return CreateChallengeFromPresetUseCase(sc).execute(params)
+            return CreateChallengeFromPresetUseCase(sc, mock()).execute(params)
         }
 
         it("should create Challenge with Quests") {

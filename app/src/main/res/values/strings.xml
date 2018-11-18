@@ -543,7 +543,7 @@
         <item>Week</item>
         <item>Month</item>
         <item>Year</item>
-        <item>X days</item>
+        <item>Date I want</item>
     </string-array>
 
 
@@ -552,7 +552,7 @@
         <item>Weekly</item>
         <item>Monthly</item>
         <item>Yearly</item>
-        <item>Week</item>
+        <item>Manual</item>
     </string-array>
 
     <string-array name="difficulties">
@@ -710,6 +710,7 @@
     <string name="next_week">Next week</string>
     <string name="choose_date">Choose date</string>
     <string name="reschedule">Reschedule</string>
+    <string name="schedule_new_quest">Schedule new Quest</string>
     <string name="days_to_plan">Days to plan</string>
     <string name="plan_my_day_at">Plan my day at</string>
     <string name="my_day">My Day</string>
@@ -1280,4 +1281,8 @@ These are your physical and mental characteristics.\n\n
     <string name="add_reminder">Add Reminder</string>
     <string name="remind_me_at">Remind me at</string>
     <string name="edit_habit_max_reminders_hint">Maximum number of Reminders reached. You can set a Reminder for each time you do the Habit per day.</string>
+    <string name="repeat_pattern_picker_title">How to repeat?</string>
+    <string name="manual_schedule_repeat_pattern">Every date I schedule</string>
+    <string name="manual_schedule_hint">You will schedule this Repeating Quest manually</string>
+    <string name="never">Never</string>
 </resources>

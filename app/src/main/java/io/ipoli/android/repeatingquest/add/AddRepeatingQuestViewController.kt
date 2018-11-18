@@ -32,7 +32,6 @@ import io.ipoli.android.quest.subquest.view.ReadOnlySubQuestAdapter
 import io.ipoli.android.repeatingquest.add.EditRepeatingQuestViewState.DurationOption.*
 import io.ipoli.android.repeatingquest.add.EditRepeatingQuestViewState.RepeatPatternOption.*
 import io.ipoli.android.repeatingquest.add.EditRepeatingQuestViewState.RepeatPatternOption.MORE_OPTIONS
-import io.ipoli.android.repeatingquest.entity.RepeatPattern
 import io.ipoli.android.tag.widget.EditItemAutocompleteTagAdapter
 import io.ipoli.android.tag.widget.EditItemTagAdapter
 import kotlinx.android.synthetic.main.controller_add_repeating_quest.view.*
@@ -129,6 +128,9 @@ class AddRepeatingQuestViewController(args: Bundle? = null) :
                 getChildRouter(view.pager).popCurrentController()
                 toolbarTitle = state.toolbarTitle
             }
+
+            EditRepeatingQuestViewState.StateType.TAGS_CHANGED ->
+                colorLayout(view, state.color)
 
             EditRepeatingQuestViewState.StateType.COLOR_CHANGED ->
                 colorLayout(view, state.color)
@@ -243,8 +245,11 @@ class AddRepeatingQuestViewController(args: Bundle? = null) :
                 EditRepeatingQuestViewState.StateType.VALIDATION_ERROR_EMPTY_NAME ->
                     view.rqName.error = stringRes(R.string.name_validation)
 
-                EditRepeatingQuestViewState.StateType.TAGS_CHANGED ->
+                EditRepeatingQuestViewState.StateType.TAGS_CHANGED -> {
                     renderTags(state, view)
+                    renderColor(state, view)
+                    renderIcon(state, view)
+                }
 
                 else -> {
                 }
@@ -375,32 +380,18 @@ class AddRepeatingQuestViewController(args: Bundle? = null) :
             ) {
                 (view as TextView).text = vm.value.text
                 view.onDebounceClick {
-                    when {
-                        vm.value == MORE_OPTIONS ->
-                            navigate().toRepeatPatternPicker(
-                                null,
-                                { repeatPattern ->
-                                    dispatch(
-                                        EditRepeatingQuestAction.RepeatPatternPicked(
-                                            repeatPattern
-                                        )
+                    when (MORE_OPTIONS) {
+                        vm.value -> navigate().toRepeatPatternPicker(
+                            null,
+                            { repeatPattern ->
+                                dispatch(
+                                    EditRepeatingQuestAction.RepeatPatternPicked(
+                                        repeatPattern
                                     )
-                                },
-                                { }
-                            )
-                        vm.value == EVERY_X_DAYS -> {
-                            navigate().toRepeatPatternPicker(
-                                RepeatPattern.EveryXDays(2),
-                                { repeatPattern ->
-                                    dispatch(
-                                        EditRepeatingQuestAction.RepeatPatternPicked(
-                                            repeatPattern
-                                        )
-                                    )
-                                },
-                                { }
-                            )
-                        }
+                                )
+                            },
+                            { }
+                        )
                         else -> dispatch(EditRepeatingQuestAction.PickRepeatPattern(vm.value))
                     }
                 }
@@ -415,7 +406,6 @@ class AddRepeatingQuestViewController(args: Bundle? = null) :
                 FIVE_PER_WEEK -> stringRes(R.string.five_times_a_week)
                 WORK_DAYS -> stringRes(R.string.every_work_day)
                 WEEKEND_DAYS -> stringRes(R.string.every_weekend_day)
-                EVERY_X_DAYS -> stringRes(R.string.every_x_days)
                 MORE_OPTIONS -> stringRes(R.string.more_options)
             }
     }
@@ -689,11 +679,10 @@ class AddRepeatingQuestViewController(args: Bundle? = null) :
             state: EditRepeatingQuestViewState
         ) {
             view.summaryColor.onDebounceClick {
-
                 navigate()
                     .toColorPicker(
-                        {
-                            dispatch(EditRepeatingQuestAction.ChangeColor(it))
+                        { c ->
+                            dispatch(EditRepeatingQuestAction.ChangeColor(c))
                         }, state.color
                     )
             }

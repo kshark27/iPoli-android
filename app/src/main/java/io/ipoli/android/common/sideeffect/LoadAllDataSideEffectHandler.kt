@@ -19,6 +19,7 @@ import io.ipoli.android.planday.usecase.CalculateFocusDurationUseCase
 import io.ipoli.android.player.data.Player
 import io.ipoli.android.quest.Quest
 import io.ipoli.android.quest.RepeatingQuest
+import io.ipoli.android.repeatingquest.usecase.FindLastCompletedDateForRepeatingQuestUseCase
 import io.ipoli.android.repeatingquest.usecase.FindNextDateForRepeatingQuestUseCase
 import io.ipoli.android.repeatingquest.usecase.FindPeriodProgressForRepeatingQuestUseCase
 import io.ipoli.android.tag.Tag
@@ -39,6 +40,7 @@ object LoadAllDataSideEffectHandler : AppSideEffectHandler() {
     private val habitRepository by required { habitRepository }
     private val todayImageRepository by required { todayImageRepository }
     private val findNextDateForRepeatingQuestUseCase by required { findNextDateForRepeatingQuestUseCase }
+    private val findLastCompletedDateForRepeatingQuestUseCase by required { findLastCompletedDateForRepeatingQuestUseCase }
     private val findPeriodProgressForRepeatingQuestUseCase by required { findPeriodProgressForRepeatingQuestUseCase }
     private val findQuestsForChallengeUseCase by required { findQuestsForChallengeUseCase }
     private val findHabitsForChallengeUseCase by required { findHabitsForChallengeUseCase }
@@ -185,6 +187,10 @@ object LoadAllDataSideEffectHandler : AppSideEffectHandler() {
                         FindNextDateForRepeatingQuestUseCase.Params(
                             it
                         )
+                    )
+                }.map {
+                    findLastCompletedDateForRepeatingQuestUseCase.execute(
+                        FindLastCompletedDateForRepeatingQuestUseCase.Params(it)
                     )
                 }.map {
                     findPeriodProgressForRepeatingQuestUseCase.execute(

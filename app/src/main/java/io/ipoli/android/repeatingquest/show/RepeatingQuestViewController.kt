@@ -4,14 +4,12 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.support.annotation.ColorInt
-import android.support.annotation.LayoutRes
 import android.support.design.widget.AppBarLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.view.*
 import io.ipoli.android.MainActivity
 import io.ipoli.android.R
 import io.ipoli.android.common.ViewUtils
-import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.common.redux.android.ReduxViewController
 import io.ipoli.android.common.text.DateFormatter
 import io.ipoli.android.common.text.DurationFormatter
@@ -23,6 +21,7 @@ import io.ipoli.android.tag.Tag
 import kotlinx.android.synthetic.main.controller_repeating_quest.view.*
 import kotlinx.android.synthetic.main.item_quest_tag_list.view.*
 import kotlinx.android.synthetic.main.item_repeating_quest_sub_quest.view.*
+import kotlinx.android.synthetic.main.repeating_quest_progress_indicator_empty.view.*
 
 
 /**
@@ -35,6 +34,22 @@ class RepeatingQuestViewController(args: Bundle? = null) :
     override val reducer = RepeatingQuestReducer
 
     private var repeatingQuestId: String = ""
+
+    private val appBarOffsetListener = object :
+        AppBarStateChangeListener() {
+        override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
+
+            appBarLayout.post {
+                if (state == State.EXPANDED) {
+                    val supportActionBar = (activity as MainActivity).supportActionBar
+                    supportActionBar?.setDisplayShowTitleEnabled(false)
+                } else if (state == State.COLLAPSED) {
+                    val supportActionBar = (activity as MainActivity).supportActionBar
+                    supportActionBar?.setDisplayShowTitleEnabled(true)
+                }
+            }
+        }
+    }
 
     constructor(
         repeatingQuestId: String
@@ -49,33 +64,23 @@ class RepeatingQuestViewController(args: Bundle? = null) :
     ): View {
         setHasOptionsMenu(true)
         applyStatusBarColors = false
-        val view = inflater.inflate(
-            R.layout.controller_repeating_quest,
-            container,
-            false
-        )
+        val view = container.inflate(R.layout.controller_repeating_quest)
         setToolbar(view.toolbar)
-        val collapsingToolbar = view.collapsingToolbarContainer
-        collapsingToolbar.isTitleEnabled = false
-
-        view.appbar.addOnOffsetChangedListener(object : AppBarStateChangeListener() {
-            override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
-
-                appBarLayout.post {
-                    if (state == State.EXPANDED) {
-                        val supportActionBar = (activity as MainActivity).supportActionBar
-                        supportActionBar?.setDisplayShowTitleEnabled(false)
-                    } else if (state == State.COLLAPSED) {
-                        val supportActionBar = (activity as MainActivity).supportActionBar
-                        supportActionBar?.setDisplayShowTitleEnabled(true)
-                    }
-                }
-
-            }
-        })
+        view.collapsingToolbarContainer.isTitleEnabled = false
 
         view.subQuestList.layoutManager = LinearLayoutManager(activity!!)
         view.subQuestList.adapter = SubQuestsAdapter()
+
+        view.addQuest.onDebounceClick {
+            navigate().toReschedule(
+                includeToday = true,
+                isNewQuest = true,
+                listener = { date, time, _ ->
+                    dispatch(RepeatingQuestAction.AddQuest(repeatingQuestId, date, time))
+                })
+        }
+
+        view.appbar.addOnOffsetChangedListener(appBarOffsetListener)
 
         return view
     }
@@ -119,11 +124,19 @@ class RepeatingQuestViewController(args: Bundle? = null) :
     override fun onAttach(view: View) {
         super.onAttach(view)
         showBackButton()
+        val showTitle =
+            appBarOffsetListener.currentState != AppBarStateChangeListener.State.EXPANDED
+        (activity as MainActivity).supportActionBar?.setDisplayShowTitleEnabled(showTitle)
     }
 
     override fun onDetach(view: View) {
         (activity as MainActivity).supportActionBar?.setDisplayShowTitleEnabled(true)
         super.onDetach(view)
+    }
+
+    override fun onDestroyView(view: View) {
+        view.appbar.removeOnOffsetChangedListener(appBarOffsetListener)
+        super.onDestroyView(view)
     }
 
     override fun render(state: RepeatingQuestViewState, view: View) {
@@ -198,7 +211,9 @@ class RepeatingQuestViewController(args: Bundle? = null) :
         state: RepeatingQuestViewState,
         view: View
     ) {
-        view.nextText.text = state.nextScheduledDateText
+        view.rqLastComplete.text = state.lastCompletedDateText
+        view.rqNextDate.text = state.nextScheduledDateText
+        view.rqScheduledTime.text = state.scheduledTimeText
     }
 
     private fun renderName(
@@ -216,22 +231,26 @@ class RepeatingQuestViewController(args: Bundle? = null) :
         val inflater = LayoutInflater.from(view.context)
         view.progressContainer.removeAllViews()
 
-        for (vm in state.progressViewModels) {
-            val progressViewEmpty = inflater.inflate(
-                vm.layout,
+        state.progressViewModels.forEachIndexed { index, vm ->
+            val progressView = inflater.inflate(
+                R.layout.repeating_quest_progress_indicator_empty,
                 view.progressContainer,
                 false
             )
-            val progressViewEmptyBackground =
-                progressViewEmpty.background as GradientDrawable
-            progressViewEmptyBackground.setStroke(
-                ViewUtils.dpToPx(1.5f, view.context).toInt(),
-                vm.color
+            val indicatorView =
+                progressView.indicatorDot.background as GradientDrawable
+            indicatorView.setStroke(
+                ViewUtils.dpToPx(2f, view.context).toInt(),
+                colorRes(R.color.md_white)
             )
 
-            progressViewEmptyBackground.setColor(vm.color)
+            indicatorView.setColor(vm.color)
 
-            view.progressContainer.addView(progressViewEmpty)
+            if (index == 0) {
+                progressView.indicatorLink.gone()
+            }
+
+            view.progressContainer.addView(progressView)
         }
 
         view.frequencyText.text = state.frequencyText
@@ -273,52 +292,42 @@ class RepeatingQuestViewController(args: Bundle? = null) :
         get() = progress.map {
             when (it) {
                 RepeatingQuestViewState.ProgressModel.COMPLETE -> {
-                    ProgressViewModel(
-                        R.layout.repeating_quest_progress_indicator_empty,
-                        attrData(R.attr.colorAccent)
-                    )
+                    ProgressViewModel(colorRes(R.color.md_white))
                 }
 
                 RepeatingQuestViewState.ProgressModel.INCOMPLETE -> {
-                    ProgressViewModel(
-                        R.layout.repeating_quest_progress_indicator_empty,
-                        colorRes(R.color.md_white)
-                    )
+                    ProgressViewModel(colorRes(color500))
                 }
             }
         }
 
-    private val RepeatingQuestViewState.timeSpentText
-        get() = Time.of(totalDuration.intValue).toString(shouldUse24HourFormat)
+    private val RepeatingQuestViewState.lastCompletedDateText
+        get() = when {
+            lastCompletedDate != null -> {
+                DateFormatter.format(view!!.context, lastCompletedDate)
+            }
+            else -> stringRes(R.string.never)
+        }
+
 
     private val RepeatingQuestViewState.nextScheduledDateText
         get() = when {
             isCompleted -> stringRes(R.string.completed)
             nextScheduledDate != null -> {
-                var res = stringRes(
-                    R.string.repeating_quest_next,
-                    DateFormatter.format(view!!.context, nextScheduledDate)
-                )
-                res += if (startTime != null) {
-                    " ${startTime.toString(shouldUse24HourFormat)} - ${endTime!!.toString(
-                        shouldUse24HourFormat
-                    )}"
-                } else {
-                    " " + stringRes(
-                        R.string.for_time,
-                        DurationFormatter.formatShort(view!!.context, duration)
-                    )
-                }
-                res
+                DateFormatter.format(view!!.context, nextScheduledDate)
             }
-            else -> stringRes(
-                R.string.repeating_quest_next,
-                stringRes(R.string.unscheduled)
-            )
+            else -> stringRes(R.string.unscheduled)
         }
 
+    private val RepeatingQuestViewState.scheduledTimeText: String
+        get() = if (startTime != null) {
+            "${startTime.toString(shouldUse24HourFormat)} - ${endTime!!.toString(
+                shouldUse24HourFormat
+            )}"
+        } else stringRes(R.string.for_time, DurationFormatter.formatShort(view!!.context, duration))
+
     private val RepeatingQuestViewState.frequencyText
-        get() = when (repeat) {
+        get () = when (repeat) {
             RepeatingQuestViewState.RepeatType.Daily -> {
                 "Every day"
             }
@@ -347,12 +356,10 @@ class RepeatingQuestViewController(args: Bundle? = null) :
                 "Once per year"
             }
 
-            is RepeatingQuestViewState.RepeatType.EveryXDays -> {
-                repeat.frequency.let {
-                    "Every $it days"
-                }
+            RepeatingQuestViewState.RepeatType.Manual -> {
+                stringRes(R.string.manual_schedule_repeat_pattern)
             }
         }
 
-    data class ProgressViewModel(@LayoutRes val layout: Int, @ColorInt val color: Int)
+    data class ProgressViewModel(@ColorInt val color: Int)
 }

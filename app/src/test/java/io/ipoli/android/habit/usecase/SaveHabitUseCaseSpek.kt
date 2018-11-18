@@ -40,7 +40,8 @@ class SaveHabitUseCaseSpek : Spek({
                 ),
                 TestUtil.playerRepoMock(player),
                 rewardPlayerUseCase,
-                removeRewardFromPlayerUseCase
+                removeRewardFromPlayerUseCase,
+                mock()
             ).execute(
                 params
             )
@@ -62,7 +63,8 @@ class SaveHabitUseCaseSpek : Spek({
                     color = Color.LIME,
                     icon = Icon.DROP,
                     days = DayOfWeek.values().toSet(),
-                    isGood = true
+                    isGood = true,
+                    reminders = emptyList()
                 ),
                 habit = TestUtil.habit.copy(
                     id = "AAA",
@@ -85,7 +87,10 @@ class SaveHabitUseCaseSpek : Spek({
             )
 
             Verify on removeRewardFromPlayerUseCaseMock that removeRewardFromPlayerUseCaseMock.execute(
-                RemoveRewardFromPlayerUseCase.Params(r)
+                RemoveRewardFromPlayerUseCase.Params(
+                    RemoveRewardFromPlayerUseCase.Params.RewardType.GOOD_HABIT,
+                    r
+                )
             ) was called
         }
 
@@ -99,7 +104,8 @@ class SaveHabitUseCaseSpek : Spek({
                     color = Color.LIME,
                     icon = Icon.DROP,
                     days = DayOfWeek.values().toSet(),
-                    isGood = true
+                    isGood = true,
+                    reminders = emptyList()
                 ),
                 habit = TestUtil.habit.copy(
                     id = "AAA",
@@ -118,7 +124,10 @@ class SaveHabitUseCaseSpek : Spek({
             val expectedReward =
                 Reward(emptyMap(), 0, 10, 1, Quest.Bounty.None)
             `Verify not called` on removeRewardFromPlayerUseCaseMock that removeRewardFromPlayerUseCaseMock.execute(
-                RemoveRewardFromPlayerUseCase.Params(expectedReward)
+                RemoveRewardFromPlayerUseCase.Params(
+                    RemoveRewardFromPlayerUseCase.Params.RewardType.GOOD_HABIT,
+                    expectedReward
+                )
             )
         }
 
@@ -133,7 +142,8 @@ class SaveHabitUseCaseSpek : Spek({
                     color = Color.LIME,
                     icon = Icon.DROP,
                     days = DayOfWeek.values().toSet(),
-                    isGood = true
+                    isGood = true,
+                    reminders = emptyList()
                 ),
                 habit = TestUtil.habit.copy(
                     id = "AAA",
@@ -155,7 +165,10 @@ class SaveHabitUseCaseSpek : Spek({
             val expectedReward =
                 Reward(emptyMap(), 0, 10, 1, Quest.Bounty.None)
             `Verify not called` on removeRewardFromPlayerUseCaseMock that removeRewardFromPlayerUseCaseMock.execute(
-                RemoveRewardFromPlayerUseCase.Params(expectedReward)
+                RemoveRewardFromPlayerUseCase.Params(
+                    RemoveRewardFromPlayerUseCase.Params.RewardType.GOOD_HABIT,
+                    expectedReward
+                )
             )
 //            `Verify not called` on rewardPlayerUseCaseMock that rewardPlayerUseCaseMock.execute(
 //                expectedReward
@@ -172,7 +185,8 @@ class SaveHabitUseCaseSpek : Spek({
                     color = Color.LIME,
                     icon = Icon.DROP,
                     days = DayOfWeek.values().toSet(),
-                    isGood = true
+                    isGood = true,
+                    reminders = emptyList()
                 ),
                 habit = TestUtil.habit.copy(
                     id = "AAA",
@@ -202,7 +216,8 @@ class SaveHabitUseCaseSpek : Spek({
                     color = Color.LIME,
                     icon = Icon.DROP,
                     days = newDays,
-                    isGood = true
+                    isGood = true,
+                    reminders = emptyList()
                 ),
                 habit = TestUtil.habit.copy(
                     id = "AAA",

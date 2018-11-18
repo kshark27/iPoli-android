@@ -34,7 +34,7 @@ class RemoveRewardFromPlayerUseCaseSpek : Spek({
             pet = pet
         )
 
-        val reward = Reward(emptyMap(), 0,0, 0, Quest.Bounty.None)
+        val reward = Reward(emptyMap(), 0, 0, 0, Quest.Bounty.None)
 
         val levelDownScheduler = mock<LevelDownScheduler>()
 
@@ -51,6 +51,7 @@ class RemoveRewardFromPlayerUseCaseSpek : Spek({
         it("should level down") {
             val newPlayer = useCase.execute(
                 RemoveRewardFromPlayerUseCase.Params(
+                    RemoveRewardFromPlayerUseCase.Params.RewardType.QUEST,
                     reward.copy(
                         experience = 1,
                         coins = 1
@@ -66,6 +67,7 @@ class RemoveRewardFromPlayerUseCaseSpek : Spek({
             val coins = 5
             val newPlayer = useCase.execute(
                 RemoveRewardFromPlayerUseCase.Params(
+                    RemoveRewardFromPlayerUseCase.Params.RewardType.QUEST,
                     reward.copy(
                         experience = xp,
                         coins = coins
@@ -80,7 +82,12 @@ class RemoveRewardFromPlayerUseCaseSpek : Spek({
             val xp = 10
             val coins = 5
             val r = reward.copy(experience = xp, coins = coins)
-            val newPet = useCase.execute(RemoveRewardFromPlayerUseCase.Params(r)).pet
+            val newPet = useCase.execute(
+                RemoveRewardFromPlayerUseCase.Params(
+                    RemoveRewardFromPlayerUseCase.Params.RewardType.QUEST,
+                    r
+                )
+            ).pet
             val petReward = pet.removeReward(r)
             newPet.healthPoints.`should be equal to`(petReward.healthPoints)
             newPet.moodPoints.`should be equal to`(petReward.moodPoints)

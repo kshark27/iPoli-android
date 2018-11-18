@@ -130,7 +130,7 @@ object CurrencyConverterReducer : BaseViewStateReducer<CurrencyConverterViewStat
         val affordableGems = player.coins / Constants.GEM_COINS_PRICE
         val remainingGems: Int =
             if (membership.monthlyConvertedGemCap == Membership.UNLIMITED) Membership.UNLIMITED
-            else (membership.monthlyConvertedGemCap - player.statistics.gemConvertedCountForThisMonth).toInt()
+            else Math.max((membership.monthlyConvertedGemCap - player.statistics.gemConvertedCountForThisMonth).toInt(), 0)
 
         val maxGemsToBuy = if (membership.monthlyConvertedGemCap == Membership.UNLIMITED) {
             affordableGems

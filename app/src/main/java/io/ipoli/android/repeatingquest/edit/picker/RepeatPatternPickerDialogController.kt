@@ -24,10 +24,11 @@ import io.ipoli.android.common.ViewUtils
 import io.ipoli.android.common.datetime.DateUtils
 import io.ipoli.android.common.text.DateFormatter
 import io.ipoli.android.common.view.*
+import io.ipoli.android.pet.AndroidPetAvatar
 import io.ipoli.android.repeatingquest.edit.picker.RepeatPatternViewState.StateType.*
 import io.ipoli.android.repeatingquest.entity.RepeatPattern
 import io.ipoli.android.repeatingquest.entity.RepeatType
-import kotlinx.android.synthetic.main.dialog_repeating_picker.view.*
+import kotlinx.android.synthetic.main.dialog_repeat_pattern_picker.view.*
 import kotlinx.android.synthetic.main.view_dialog_header.view.*
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
@@ -61,7 +62,7 @@ class RepeatPatternPickerDialogController :
 
     @SuppressLint("InflateParams")
     override fun onCreateContentView(inflater: LayoutInflater, savedViewState: Bundle?): View {
-        val view = inflater.inflate(R.layout.dialog_repeating_picker, null)
+        val view = inflater.inflate(R.layout.dialog_repeat_pattern_picker, null)
 
         view.rpWeekDayList.layoutManager =
             LinearLayoutManager(activity!!, LinearLayoutManager.HORIZONTAL, false)
@@ -81,6 +82,8 @@ class RepeatPatternPickerDialogController :
         when (state.type) {
 
             DATA_LOADED -> {
+                val petHead = AndroidPetAvatar.valueOf(state.petAvatar.name).headImage
+                changeIcon(petHead)
                 renderStartDate(view, state)
                 initStartDateListener(view, state)
 
@@ -90,7 +93,7 @@ class RepeatPatternPickerDialogController :
                 renderForRepeatType(state, view)
 
                 view.rpPetSchedulingHint.setCompoundDrawablesWithIntrinsicBounds(
-                    ContextCompat.getDrawable(view.context, state.petAvatar!!),
+                    ContextCompat.getDrawable(view.context, petHead),
                     null,
                     null,
                     null
@@ -103,6 +106,7 @@ class RepeatPatternPickerDialogController :
                     ChangeBounds()
                 )
                 renderForRepeatType(state, view)
+                renderMessage(view, state)
             }
 
             WEEK_DAYS_CHANGED -> {
@@ -137,6 +141,36 @@ class RepeatPatternPickerDialogController :
             }
 
             else -> {
+            }
+        }
+    }
+
+    private fun renderSkipInterval(view: View, valueLabels: List<String>, selectedIndex: Int) {
+
+        view.skipEveryText.visible()
+        view.skipEvery.visible()
+
+        view.skipEvery.adapter = ArrayAdapter(
+            view.context,
+            R.layout.item_dropdown_number_spinner,
+            valueLabels
+        )
+        view.skipEvery.onItemSelectedListener = null
+        view.skipEvery.setSelection(selectedIndex)
+        view.skipEvery.post {
+            view.skipEvery.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    dispatch(RepeatPatternAction.ChangeSkipInterval(position))
+                }
+
             }
         }
     }
@@ -216,48 +250,20 @@ class RepeatPatternPickerDialogController :
             RepeatType.WEEKLY -> renderWeekly(view, state)
             RepeatType.MONTHLY -> renderMonthly(view, state)
             RepeatType.YEARLY -> renderYearly(view, state)
-            RepeatType.EVERY_X_DAYS -> renderEveryXDays(view, state)
+            RepeatType.MANUAL -> renderManual(view)
         }
     }
 
-    private fun renderEveryXDays(view: View, state: RepeatPatternViewState) {
+    private fun renderManual(view: View) {
         ViewUtils.goneViews(
             view.rpWeekDayList,
             view.rpMonthDayList,
-            view.yearlyPatternGroup,
             view.countGroup,
-            view.rpPetSchedulingHint
+            view.yearlyPatternGroup,
+            view.skipEvery,
+            view.skipEveryText,
+            view.startEndGroup
         )
-        ViewUtils.showViews(
-            view.everyXDaysPatternGroup
-        )
-
-        renderFrequencies(view, state)
-
-        val xDaysCount = view.rpEveryXDaysCount
-        xDaysCount.adapter = ArrayAdapter(
-            view.context,
-            R.layout.item_dropdown_number_spinner,
-            state.everyXDaysValues
-        )
-        xDaysCount.onItemSelectedListener = null
-        xDaysCount.setSelection(state.everyXDaysCountIndex)
-        xDaysCount.post {
-            xDaysCount.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                }
-
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    dispatch(RepeatPatternAction.ChangeEveryXDaysCount(position))
-                }
-
-            }
-        }
     }
 
     private fun renderYearly(
@@ -267,11 +273,11 @@ class RepeatPatternPickerDialogController :
         ViewUtils.goneViews(
             view.rpWeekDayList,
             view.rpMonthDayList,
-            view.countGroup,
-            view.everyXDaysPatternGroup
+            view.countGroup
         )
         ViewUtils.showViews(
-            view.yearlyPatternGroup
+            view.yearlyPatternGroup,
+            view.startEndGroup
         )
 
         renderFrequencies(view, state)
@@ -293,6 +299,9 @@ class RepeatPatternPickerDialogController :
             )
             datePickerDialog.show()
         }
+
+        view.skipEveryText.gone()
+        view.skipEvery.gone()
     }
 
     private fun renderMonthly(
@@ -301,18 +310,20 @@ class RepeatPatternPickerDialogController :
     ) {
         ViewUtils.goneViews(
             view.rpWeekDayList,
-            view.yearlyPatternGroup,
-            view.everyXDaysPatternGroup
+            view.yearlyPatternGroup
         )
         ViewUtils.showViews(
             view.rpMonthDayList,
-            view.countGroup
+            view.countGroup,
+            view.startEndGroup
         )
 
         renderFrequencies(view, state)
         renderMonthDaysCount(view, state)
         renderMonthDays(view, state)
         renderMessage(view, state)
+
+        renderSkipInterval(view, state.monthSkipLabels, state.everyXMonthsCountIndex)
     }
 
     private fun renderWeekly(
@@ -321,18 +332,20 @@ class RepeatPatternPickerDialogController :
     ) {
         ViewUtils.goneViews(
             view.rpMonthDayList,
-            view.yearlyPatternGroup,
-            view.everyXDaysPatternGroup
+            view.yearlyPatternGroup
         )
         ViewUtils.showViews(
             view.rpWeekDayList,
-            view.countGroup
+            view.countGroup,
+            view.startEndGroup
         )
 
         renderFrequencies(view, state)
         renderWeekDaysCount(view, state)
         renderWeekDays(view, state)
         renderMessage(view, state)
+
+        renderSkipInterval(view, state.weekSkipLabels, state.everyXWeeksCountIndex)
     }
 
     private fun renderDaily(
@@ -343,11 +356,13 @@ class RepeatPatternPickerDialogController :
             view.rpWeekDayList,
             view.rpMonthDayList,
             view.yearlyPatternGroup,
-            view.everyXDaysPatternGroup,
             view.countGroup
         )
+        view.startEndGroup.visible()
         renderFrequencies(view, state)
         renderMessage(view, state)
+
+        renderSkipInterval(view, state.daySkipLabels, state.everyXDaysCountIndex)
     }
 
     private fun renderMonthDays(
@@ -363,12 +378,12 @@ class RepeatPatternPickerDialogController :
         view: View,
         state: RepeatPatternViewState
     ) {
-        if (state.petSchedulingHint == null) {
+        if (state.petSchedulingHintText == null) {
             ViewUtils.goneViews(view.rpPetSchedulingHint)
 
         } else {
             ViewUtils.showViews(view.rpPetSchedulingHint)
-            view.rpPetSchedulingHint.text = state.petSchedulingHint
+            view.rpPetSchedulingHint.text = state.petSchedulingHintText
         }
     }
 
@@ -491,8 +506,7 @@ class RepeatPatternPickerDialogController :
     }
 
     override fun onHeaderViewCreated(headerView: View) {
-        headerView.dialogHeaderTitle.text = "Pick repeating pattern"
-        headerView.dialogHeaderIcon.setImageResource(R.drawable.logo)
+        headerView.dialogHeaderTitle.setText(R.string.repeat_pattern_picker_title)
     }
 
     data class WeekDayViewModel(
@@ -612,8 +626,13 @@ class RepeatPatternPickerDialogController :
             )
         }
 
-    private val RepeatPatternViewState.petSchedulingHint: String?
+    private val RepeatPatternViewState.petSchedulingHintText: String?
         get() {
+
+            if (repeatType == RepeatType.MANUAL) {
+                return stringRes(R.string.manual_schedule_hint)
+            }
+
             if (!isFlexible) {
                 return null
             }
@@ -647,4 +666,31 @@ class RepeatPatternPickerDialogController :
                 stringRes(R.string.end_of_time)
             else
                 DateFormatter.format(view!!.context, endDate)
+
+    private val RepeatPatternViewState.daySkipLabels
+        get() = everyXDaysValues.map {
+            when (it) {
+                0 -> "Day"
+                1 -> "Other day"
+                else -> "$it days"
+            }
+        }
+
+    private val RepeatPatternViewState.weekSkipLabels
+        get() = everyXWeeksValues.map {
+            when (it) {
+                0 -> "Week"
+                1 -> "Other week"
+                else -> "$it weeks"
+            }
+        }
+
+    private val RepeatPatternViewState.monthSkipLabels
+        get() = everyXMonthsValues.map {
+            when (it) {
+                0 -> "Month"
+                1 -> "Other month"
+                else -> "$it months"
+            }
+        }
 }

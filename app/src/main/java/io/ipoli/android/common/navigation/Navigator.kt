@@ -550,10 +550,18 @@ class Navigator(private val router: Router) {
 
     fun toReschedule(
         includeToday: Boolean,
+        isNewQuest: Boolean = false,
         listener: (LocalDate?, Time?, Duration<Minute>?) -> Unit,
         cancelListener: () -> Unit = {}
     ) {
-        pushDialog { RescheduleDialogController(includeToday, listener, cancelListener) }
+        pushDialog {
+            RescheduleDialogController(
+                includeToday,
+                isNewQuest,
+                listener,
+                cancelListener
+            )
+        }
     }
 
     fun toTagPicker(selectedTags: Set<Tag> = emptySet(), listener: (Set<Tag>) -> Unit) {

@@ -43,18 +43,13 @@ class ResetDateJob : FixedDailyJob(ResetDateJob.TAG) {
     ) {
         val rqs = repeatingQuestRepository.findAllActive()
         val newRqs = rqs.map {
-            val currentPeriod = it.repeatPattern.periodRangeFor(LocalDate.now())
-            val nextPeriodFirstDate = currentPeriod.end.plusDays(1)
-            val end = it.repeatPattern.periodRangeFor(nextPeriodFirstDate).end
             saveQuestsForRepeatingQuestUseCase.execute(
                 SaveQuestsForRepeatingQuestUseCase.Params(
                     repeatingQuest = it,
-                    start = LocalDate.now(),
-                    end = end
+                    start = LocalDate.now()
                 )
             ).repeatingQuest
         }
-
         repeatingQuestRepository.save(newRqs)
     }
 

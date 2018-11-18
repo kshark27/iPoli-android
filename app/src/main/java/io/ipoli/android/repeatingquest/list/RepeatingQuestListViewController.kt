@@ -1,10 +1,10 @@
 package io.ipoli.android.repeatingquest.list
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.support.annotation.ColorInt
 import android.support.annotation.ColorRes
 import android.support.v4.widget.TextViewCompat
 import android.support.v7.widget.LinearLayoutManager
@@ -23,10 +23,12 @@ import io.ipoli.android.common.text.DurationFormatter
 import io.ipoli.android.common.view.*
 import io.ipoli.android.common.view.recyclerview.MultiViewRecyclerViewAdapter
 import io.ipoli.android.common.view.recyclerview.RecyclerViewViewModel
+import io.ipoli.android.repeatingquest.entity.RepeatType
 import io.ipoli.android.repeatingquest.entity.repeatType
 import io.ipoli.android.repeatingquest.list.RepeatingQuestListViewState.StateType.CHANGED
 import kotlinx.android.synthetic.main.controller_repeating_quest_list.view.*
 import kotlinx.android.synthetic.main.item_repeating_quest.view.*
+import kotlinx.android.synthetic.main.item_repeating_quest_progress_indicator_empty.view.*
 import kotlinx.android.synthetic.main.view_empty_list.view.*
 import kotlinx.android.synthetic.main.view_loader.view.*
 
@@ -122,7 +124,8 @@ class RepeatingQuestListViewController(args: Bundle? = null) :
             val next: String,
             val completedCount: Int,
             val allCount: Int,
-            val frequency: String
+            val progress: List<ProgressViewModel>,
+            val progressText: String
         ) : RepeatingQuestItemViewModel(id)
 
         data class CompletedLabel(
@@ -134,9 +137,13 @@ class RepeatingQuestListViewController(args: Bundle? = null) :
             val name: String,
             val tags: List<TagViewModel>,
             val icon: IIcon,
-            @ColorRes val color: Int,
-            val frequency: String
+            @ColorRes val color: Int
         ) : RepeatingQuestItemViewModel(id)
+
+        data class ProgressViewModel(
+            @ColorInt val color: Int,
+            @ColorInt val strokeColor: Int
+        )
     }
 
 
@@ -160,24 +167,51 @@ class RepeatingQuestListViewController(args: Bundle? = null) :
 
                 view.rqIcon.backgroundTintList =
                     ColorStateList.valueOf(colorRes(vm.color))
-                view.rqIcon.setImageDrawable(listItemIcon(vm.icon))
+                view.rqIcon.setImageDrawable(smallListItemIcon(vm.icon))
 
                 view.rqNext.text = vm.next
-                view.rqFrequency.text = vm.frequency
 
-                val progressBar = view.rqProgressBar
-                val progress = view.rqProgress
-                ViewUtils.showViews(progressBar, progress)
-                progressBar.max = vm.allCount
-                progressBar.progress = vm.completedCount
-                progressBar.progressTintList = ColorStateList.valueOf(colorRes(vm.color))
-                @SuppressLint("SetTextI18n")
-                progress.text = "${vm.completedCount}/${vm.allCount}"
+                val inflater = LayoutInflater.from(view.context)
+                view.rqProgressContainer.removeAllViews()
+
+                if (vm.progress.size > 10 || vm.progress.isEmpty()) {
+                    view.rqProgressContainer.gone()
+                } else {
+                    view.rqProgressContainer.visible()
+                    vm.progress.forEachIndexed { index, pvm ->
+                        val progressView = inflater.inflate(
+                            R.layout.item_repeating_quest_progress_indicator_empty,
+                            view.rqProgressContainer,
+                            false
+                        )
+
+                        val progressViewEmptyBackground =
+                            progressView.indicatorDot.background as GradientDrawable
+                        progressViewEmptyBackground.setStroke(
+                            ViewUtils.dpToPx(2f, view.context).toInt(),
+                            pvm.strokeColor
+                        )
+
+                        progressView.indicatorLink.setBackgroundColor(pvm.strokeColor)
+
+                        if (index == 0) {
+                            progressView.indicatorLink.gone()
+                        }
+
+                        progressViewEmptyBackground.setColor(pvm.color)
+
+                        view.rqProgressContainer.addView(progressView)
+                    }
+                }
+
+                ViewUtils.showViews(view.rqProgressText)
+
+//                @SuppressLint("SetTextI18n")
+                view.rqProgressText.text = vm.progressText// "${vm.completedCount}/${vm.allCount}"
 
                 view.onDebounceClick {
                     navigateFromRoot().toRepeatingQuest(vm.id, VerticalChangeHandler())
                 }
-
             }
 
             registerBinder<RepeatingQuestItemViewModel.CompletedLabel>(
@@ -205,11 +239,9 @@ class RepeatingQuestListViewController(args: Bundle? = null) :
 
                 view.rqIcon.backgroundTintList =
                     ColorStateList.valueOf(colorRes(vm.color))
-                view.rqIcon.setImageDrawable(listItemIcon(vm.icon))
-                ViewUtils.hideViews(view.rqProgressBar, view.rqProgress)
+                view.rqIcon.setImageDrawable(smallListItemIcon(vm.icon))
 
                 view.rqNext.setText(R.string.completed)
-                view.rqFrequency.text = vm.frequency
 
                 view.onDebounceClick {
                     navigateFromRoot().toRepeatingQuest(vm.id, VerticalChangeHandler())
@@ -242,7 +274,6 @@ class RepeatingQuestListViewController(args: Bundle? = null) :
     private fun RepeatingQuestListViewState.toViewModels(context: Context): List<RepeatingQuestItemViewModel> {
         val (notCompleted, completed) = repeatingQuests!!.partition { !it.isCompleted }
         val vms = mutableListOf<RepeatingQuestItemViewModel>()
-        val frequencies = stringsRes(R.array.repeating_quest_frequencies)
         vms.addAll(
             notCompleted.map {
                 val next = when {
@@ -269,17 +300,65 @@ class RepeatingQuestListViewController(args: Bundle? = null) :
                     )
                 }
 
+                val rqColor = AndroidColor.valueOf(it.color.name).color500
+
+                val progress = it.periodProgress!!
+
+                val needToCompleteCount =
+                    Math.max(progress.needToCompleteCount, progress.scheduledCount)
+
+                val complete = (0 until progress.completedCount).map { _ ->
+                    RepeatingQuestItemViewModel.ProgressViewModel(
+                        color = colorRes(rqColor),
+                        strokeColor = colorRes(rqColor)
+                    )
+                }
+                val incomplete = (progress.completedCount until needToCompleteCount).map { _ ->
+                    RepeatingQuestItemViewModel.ProgressViewModel(
+                        color = colorRes(colorSurfaceResource),
+                        strokeColor = colorRes(rqColor)
+                    )
+                }
+
+                val remaining = needToCompleteCount - progress.completedCount
+
+                val lastCompletedText = if (it.lastCompletedDate != null) {
+                    DateFormatter.format(view!!.context, it.lastCompletedDate)
+                } else stringRes(R.string.never)
+
+                val progressText = when (it.repeatPattern.repeatType) {
+                    RepeatType.DAILY -> if (remaining > 0) "$remaining more this week" else "All done this week"
+                    RepeatType.WEEKLY -> if (remaining > 0) "$remaining more this week" else "All done this week"
+                    RepeatType.MONTHLY -> {
+                        if (needToCompleteCount > 0 && remaining == 0)
+                            "All done this month"
+                        else if (needToCompleteCount > 10)
+                            "${progress.completedCount}/$needToCompleteCount done $remaining more this month"
+                        else "$remaining more this month"
+                    }
+                    RepeatType.YEARLY -> if (remaining > 0) "$remaining more this year" else "All done this year"
+                    RepeatType.MANUAL -> {
+                        if (needToCompleteCount > 0 && remaining > 0)
+                            "$remaining more this week"
+                        else if (needToCompleteCount > 0)
+                            "All done this week"
+                        else "Last done: $lastCompletedText"
+
+                    }
+                }
+
                 RepeatingQuestItemViewModel.RepeatingQuestViewModel(
                     id = it.id,
                     name = it.name,
                     tags = it.tags.map { TagViewModel(it.name, it.color.androidColor.color500) },
                     icon = it.icon?.let { AndroidIcon.valueOf(it.name).icon }
                         ?: Ionicons.Icon.ion_checkmark,
-                    color = AndroidColor.valueOf(it.color.name).color500,
+                    color = rqColor,
                     next = next,
-                    completedCount = it.periodProgress!!.completedCount,
-                    allCount = it.periodProgress.allCount,
-                    frequency = frequencies[it.repeatPattern.repeatType.ordinal]
+                    completedCount = progress.completedCount,
+                    allCount = needToCompleteCount,
+                    progress = complete + incomplete,
+                    progressText = progressText
                 )
             }
         )
@@ -295,8 +374,7 @@ class RepeatingQuestListViewController(args: Bundle? = null) :
                     tags = it.tags.map { TagViewModel(it.name, it.color.androidColor.color500) },
                     icon = it.icon?.let { AndroidIcon.valueOf(it.name).icon }
                         ?: Ionicons.Icon.ion_checkmark,
-                    color = AndroidColor.valueOf(it.color.name).color500,
-                    frequency = frequencies[it.repeatPattern.repeatType.ordinal]
+                    color = AndroidColor.valueOf(it.color.name).color500
                 )
             }
         )

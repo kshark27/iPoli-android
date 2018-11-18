@@ -94,6 +94,7 @@
         <item name="colorPrimaryDark">@color/md_purple_700</item>
         <item name="colorPrimaryLight">@color/md_purple_300</item>
         <item name="colorAccent">@color/md_green_A700</item>
+        <item name="colorSectionTitle">@color/md_purple_500</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.DarkPurple.AlertDialog</item>
     </style>
 
@@ -107,6 +108,7 @@
         <item name="colorPrimaryLight">@color/md_blue_300</item>
         <item name="colorAccent">@color/md_red_A200</item>
         <item name="android:colorAccent">@color/md_red_A200</item>
+        <item name="colorSectionTitle">@color/md_blue_500</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.DarkBlue.AlertDialog</item>
     </style>
 
@@ -120,6 +122,7 @@
         <item name="colorPrimaryLight">@color/md_deep_purple_300</item>
         <item name="colorAccent">@color/md_pink_A200</item>
         <item name="android:colorAccent">@color/md_pink_A200</item>
+        <item name="colorSectionTitle">@color/md_deep_purple_500</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.DarkDeepPurple.AlertDialog</item>
     </style>
 
@@ -133,6 +136,7 @@
         <item name="colorPrimaryLight">@color/md_blue_grey_300</item>
         <item name="colorAccent">@color/md_red_A700</item>
         <item name="android:colorAccent">@color/md_red_A700</item>
+        <item name="colorSectionTitle">@color/md_blue_grey_300</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.DarkBlueGrey.AlertDialog</item>
     </style>
 
@@ -146,6 +150,7 @@
         <item name="colorPrimaryLight">@color/md_teal_400</item>
         <item name="colorAccent">@color/md_purple_A400</item>
         <item name="android:colorAccent">@color/md_purple_A400</item>
+        <item name="colorSectionTitle">@color/md_teal_500</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.DarkTeal.AlertDialog</item>
     </style>
 
@@ -159,6 +164,7 @@
         <item name="colorPrimaryLight">@color/md_orange_700</item>
         <item name="colorAccent">@color/md_deep_purple_A200</item>
         <item name="android:colorAccent">@color/md_deep_purple_A200</item>
+        <item name="colorSectionTitle">@color/md_orange_700</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.DarkOrange.AlertDialog</item>
     </style>
 
@@ -172,6 +178,7 @@
         <item name="colorPrimaryLight">@color/md_red_300</item>
         <item name="colorAccent">@color/md_red_A700</item>
         <item name="android:colorAccent">@color/md_red_A700</item>
+        <item name="colorSectionTitle">@color/md_red_400</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.DarkRed.AlertDialog</item>
     </style>
 
@@ -185,6 +192,7 @@
         <item name="colorPrimaryLight">@color/md_pink_300</item>
         <item name="colorAccent">@color/md_deep_purple_A200</item>
         <item name="android:colorAccent">@color/md_deep_purple_A200</item>
+        <item name="colorSectionTitle">@color/md_pink_400</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.DarkPink.AlertDialog</item>
     </style>
 
@@ -200,6 +208,7 @@
         <item name="colorSurface">@color/md_black</item>
         <item name="colorAccent">@color/md_teal_A700</item>
         <item name="android:colorAccent">@color/md_teal_A700</item>
+        <item name="colorSectionTitle">@color/md_teal_300</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.BlackTeal.AlertDialog</item>
     </style>
 
@@ -215,6 +224,7 @@
         <item name="colorSurface">@color/md_black</item>
         <item name="colorAccent">@color/md_red_A400</item>
         <item name="android:colorAccent">@color/md_red_A400</item>
+        <item name="colorSectionTitle">@color/md_red_500</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.BlackRed.AlertDialog</item>
     </style>
 
@@ -230,6 +240,7 @@
         <item name="colorSurface">@color/md_black</item>
         <item name="colorAccent">@color/md_blue_A400</item>
         <item name="android:colorAccent">@color/md_blue_A400</item>
+        <item name="colorSectionTitle">@color/md_blue_500</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.BlackBlue.AlertDialog</item>
     </style>
 
@@ -242,6 +253,7 @@
         <item name="colorPrimaryDark">@color/md_red_700</item>
         <item name="colorPrimaryLight">@color/md_red_300</item>
         <item name="colorAccent">@color/md_indigo_A200</item>
+        <item name="colorSectionTitle">@color/md_red_500</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.Red.AlertDialog</item>
         <item name="drawerArrowStyle">@style/WhiteDrawerIconStyle</item>
         <item name="android:navigationBarColor">@color/md_red_500</item>
@@ -256,6 +268,7 @@
         <item name="colorPrimaryDark">@color/md_pink_700</item>
         <item name="colorPrimaryLight">@color/md_pink_300</item>
         <item name="colorAccent">@color/md_deep_purple_A200</item>
+        <item name="colorSectionTitle">@color/md_pink_500</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.Pink.AlertDialog</item>
         <item name="drawerArrowStyle">@style/WhiteDrawerIconStyle</item>
         <item name="android:navigationBarColor">@color/md_pink_500</item>
@@ -270,6 +283,7 @@
         <item name="colorPrimaryDark">@color/md_blue_700</item>
         <item name="colorPrimaryLight">@color/md_blue_300</item>
         <item name="colorAccent">@color/md_red_A400</item>
+        <item name="colorSectionTitle">@color/md_blue_500</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.Blue.AlertDialog</item>
         <item name="android:datePickerDialogTheme">@style/Theme.myPoli.Blue.DatePicker</item>
         <item name="drawerArrowStyle">@style/WhiteDrawerIconStyle</item>
@@ -294,6 +308,7 @@
         <item name="colorPrimaryDark">@color/md_green_700</item>
         <item name="colorPrimaryLight">@color/md_green_300</item>
         <item name="colorAccent">@color/md_pink_A400</item>
+        <item name="colorSectionTitle">@color/md_green_500</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.Green.AlertDialog</item>
         <item name="drawerArrowStyle">@style/WhiteDrawerIconStyle</item>
         <item name="android:navigationBarColor">@color/md_green_500</item>
@@ -308,6 +323,7 @@
         <item name="colorPrimaryDark">@color/md_purple_700</item>
         <item name="colorPrimaryLight">@color/md_purple_300</item>
         <item name="colorAccent">@color/md_green_A700</item>
+        <item name="colorSectionTitle">@color/md_purple_500</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.Purple.AlertDialog</item>
         <item name="drawerArrowStyle">@style/WhiteDrawerIconStyle</item>
         <item name="android:navigationBarColor">@color/md_purple_500</item>
@@ -322,6 +338,7 @@
         <item name="colorPrimaryDark">@color/md_deep_orange_700</item>
         <item name="colorPrimaryLight">@color/md_deep_orange_300</item>
         <item name="colorAccent">@color/md_indigo_A200</item>
+        <item name="colorSectionTitle">@color/md_deep_orange_500</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.Orange.AlertDialog</item>
         <item name="drawerArrowStyle">@style/WhiteDrawerIconStyle</item>
         <item name="android:navigationBarColor">@color/md_deep_orange_500</item>
@@ -336,6 +353,7 @@
         <item name="colorPrimaryDark">@color/md_blue_grey_700</item>
         <item name="colorPrimaryLight">@color/md_blue_grey_300</item>
         <item name="colorAccent">@color/md_deep_orange_A400</item>
+        <item name="colorSectionTitle">@color/md_blue_grey_500</item>
         <item name="alertDialogTheme">@style/Theme.myPoli.Blue_Grey.AlertDialog</item>
         <item name="drawerArrowStyle">@style/WhiteDrawerIconStyle</item>
         <item name="android:navigationBarColor">@color/md_blue_grey_500</item>
@@ -628,21 +646,12 @@
 
     <style name="SectionTitle" parent="@style/TextAppearance.AppCompat.Body2">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:layout_marginStart">16dp</item>
-        <item name="android:layout_marginEnd">16dp</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:textColor">?attr/colorAccent</item>
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="AgendaSectionTitle" parent="@style/TextAppearance.AppCompat.Caption">
-        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">40dp</item>
         <item name="android:paddingStart">16dp</item>
         <item name="android:paddingEnd">16dp</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textColor">?colorSectionTitle</item>
         <item name="android:textAllCaps">true</item>
     </style>
 

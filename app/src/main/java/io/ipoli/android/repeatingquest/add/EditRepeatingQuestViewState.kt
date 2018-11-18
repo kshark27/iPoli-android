@@ -172,14 +172,16 @@ object EditRepeatingQuestReducer : BaseViewStateReducer<EditRepeatingQuestViewSt
             is EditRepeatingQuestAction.ChangeIcon -> {
                 subState.copy(
                     type = ICON_CHANGED,
-                    icon = action.icon
+                    icon = action.icon,
+                    hasChangedIcon = true
                 )
             }
 
             is EditRepeatingQuestAction.ChangeColor -> {
                 subState.copy(
                     type = COLOR_CHANGED,
-                    color = action.color
+                    color = action.color,
+                    hasChangedColor = true
                 )
             }
 
@@ -244,7 +246,6 @@ object EditRepeatingQuestReducer : BaseViewStateReducer<EditRepeatingQuestViewSt
                     name = rq.name,
                     questTags = rq.tags,
                     tags = state.dataState.tags - rq.tags,
-//                    subQuestNames = rq.subQuests.map { it.name },
                     subQuests = rq.subQuests.map {
                         UUID.randomUUID().toString() to it
                     }.toMap(),
@@ -263,7 +264,9 @@ object EditRepeatingQuestReducer : BaseViewStateReducer<EditRepeatingQuestViewSt
                     color = rq.color,
                     challenge = challenge,
                     note = rq.note,
-                    maxTagsReached = rq.tags.size >= Constants.MAX_TAGS_PER_ITEM
+                    maxTagsReached = rq.tags.size >= Constants.MAX_TAGS_PER_ITEM,
+                    hasChangedIcon = true,
+                    hasChangedColor = true
                 )
             }
 
@@ -276,7 +279,6 @@ object EditRepeatingQuestReducer : BaseViewStateReducer<EditRepeatingQuestViewSt
             is EditRepeatingQuestAction.AddSubQuest ->
                 subState.copy(
                     type = SUB_QUEST_ADDED,
-//                    subQuestNames = subState.subQuestNames + action.name,
                     newSubQuestName = action.name
                 )
 
@@ -336,12 +338,25 @@ object EditRepeatingQuestReducer : BaseViewStateReducer<EditRepeatingQuestViewSt
 
             is EditRepeatingQuestAction.AddTag -> {
                 val tag = subState.tags.first { it.name == action.tagName }
+
+                val color = if (!subState.hasChangedColor && subState.questTags.isEmpty())
+                    tag.color
+                else subState.color
+
+                val icon =
+                    if (!subState.hasChangedIcon && subState.questTags.isEmpty() && tag.icon != null)
+                        tag.icon
+                    else subState.icon
+
                 val questTags = subState.questTags + tag
+
                 subState.copy(
                     type = TAGS_CHANGED,
                     questTags = questTags,
                     tags = subState.tags - tag,
-                    maxTagsReached = questTags.size >= Constants.MAX_TAGS_PER_ITEM
+                    maxTagsReached = questTags.size >= Constants.MAX_TAGS_PER_ITEM,
+                    icon = icon,
+                    color = color
                 )
             }
 
@@ -413,7 +428,9 @@ object EditRepeatingQuestReducer : BaseViewStateReducer<EditRepeatingQuestViewSt
             ),
             challenge = null,
             note = "",
-            maxTagsReached = false
+            maxTagsReached = false,
+            hasChangedColor = false,
+            hasChangedIcon = false
         )
 
     enum class ValidationError {
@@ -429,7 +446,6 @@ data class EditRepeatingQuestViewState(
     val tags: List<Tag>,
     val questTags: List<Tag>,
     val subQuests: Map<String, SubQuest>,
-//    val subQuestNames: List<String>,
     val newSubQuestName: String,
     val startTime: Time?,
     val color: Color,
@@ -439,7 +455,9 @@ data class EditRepeatingQuestViewState(
     val challenge: Challenge?,
     val duration: Duration<Minute> = Constants.DEFAULT_QUEST_DURATION.minutes,
     val note: String,
-    val maxTagsReached: Boolean
+    val maxTagsReached: Boolean,
+    val hasChangedColor: Boolean,
+    val hasChangedIcon: Boolean
 ) : BaseViewState() {
 
     enum class StateType {
@@ -470,7 +488,6 @@ data class EditRepeatingQuestViewState(
         FIVE_PER_WEEK,
         WORK_DAYS,
         WEEKEND_DAYS,
-        EVERY_X_DAYS,
         MORE_OPTIONS
     }
 

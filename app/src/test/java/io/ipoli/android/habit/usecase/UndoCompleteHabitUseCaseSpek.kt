@@ -115,7 +115,10 @@ class UndoCompleteHabitUseCaseSpek : Spek({
                 removeRewardFromPlayerUseCaseMock
             )
             Verify on removeRewardFromPlayerUseCaseMock that removeRewardFromPlayerUseCaseMock.execute(
-                RemoveRewardFromPlayerUseCase.Params(completedEntry.reward!!)
+                RemoveRewardFromPlayerUseCase.Params(
+                    RemoveRewardFromPlayerUseCase.Params.RewardType.GOOD_HABIT,
+                    completedEntry.reward!!
+                )
             ) was called
         }
 
@@ -134,7 +137,10 @@ class UndoCompleteHabitUseCaseSpek : Spek({
                 removeRewardFromPlayerUseCaseMock
             )
             `Verify not called` on removeRewardFromPlayerUseCaseMock that removeRewardFromPlayerUseCaseMock.execute(
-                RemoveRewardFromPlayerUseCase.Params(completedEntry.reward!!)
+                RemoveRewardFromPlayerUseCase.Params(
+                    RemoveRewardFromPlayerUseCase.Params.RewardType.GOOD_HABIT,
+                    completedEntry.reward!!
+                )
             )
         }
 
@@ -153,7 +159,10 @@ class UndoCompleteHabitUseCaseSpek : Spek({
                 removeRewardFromPlayerUseCaseMock
             )
             `Verify not called` on removeRewardFromPlayerUseCaseMock that removeRewardFromPlayerUseCaseMock.execute(
-                RemoveRewardFromPlayerUseCase.Params(completedEntry.reward!!)
+                RemoveRewardFromPlayerUseCase.Params(
+                    RemoveRewardFromPlayerUseCase.Params.RewardType.GOOD_HABIT,
+                    completedEntry.reward!!
+                )
             )
         }
 

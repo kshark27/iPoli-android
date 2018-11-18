@@ -226,21 +226,27 @@ class RoomRepeatingQuestRepository(dao: RepeatingQuestDao, private val tagDao: T
             DAILY -> {
                 RepeatPattern.Daily(
                     startDate = rp.startDate.startOfDayUTC,
-                    endDate = rp.endDate?.startOfDayUTC
+                    endDate = rp.endDate?.startOfDayUTC,
+                    lastScheduledPeriodStart = rp.lastScheduledPeriodStart?.startOfDayUTC,
+                    skipEveryXPeriods = rp.skipEveryXPeriods.toInt()
                 )
             }
             WEEKLY -> {
                 RepeatPattern.Weekly(
                     daysOfWeek = rp.daysOfWeek.map { DayOfWeek.valueOf(it) }.toSet(),
                     startDate = rp.startDate.startOfDayUTC,
-                    endDate = rp.endDate?.startOfDayUTC
+                    endDate = rp.endDate?.startOfDayUTC,
+                    lastScheduledPeriodStart = rp.lastScheduledPeriodStart?.startOfDayUTC,
+                    skipEveryXPeriods = rp.skipEveryXPeriods.toInt()
                 )
             }
             MONTHLY -> {
                 RepeatPattern.Monthly(
                     daysOfMonth = rp.daysOfMonth.map { it.toInt() }.toSet(),
                     startDate = rp.startDate.startOfDayUTC,
-                    endDate = rp.endDate?.startOfDayUTC
+                    endDate = rp.endDate?.startOfDayUTC,
+                    lastScheduledPeriodStart = rp.lastScheduledPeriodStart?.startOfDayUTC,
+                    skipEveryXPeriods = rp.skipEveryXPeriods.toInt()
                 )
             }
 
@@ -253,22 +259,14 @@ class RoomRepeatingQuestRepository(dao: RepeatingQuestDao, private val tagDao: T
                 )
             }
 
-            EVERY_X_DAYS -> {
-                RepeatPattern.EveryXDays(
-                    xDays = rp.xDays!!.toInt(),
-                    startDate = rp.startDate.startOfDayUTC,
-                    endDate = rp.endDate?.startOfDayUTC
-                )
-            }
-
             FLEXIBLE_WEEKLY -> {
                 RepeatPattern.Flexible.Weekly(
                     timesPerWeek = rp.timesPerWeek!!.toInt(),
                     preferredDays = rp.preferredDays.map { DayOfWeek.valueOf(it) }.toSet(),
-                    scheduledPeriods = rp.scheduledPeriods.entries
-                        .associate { it.key.toLong().startOfDayUTC to it.value.map { it.startOfDayUTC } },
                     startDate = rp.startDate.startOfDayUTC,
-                    endDate = rp.endDate?.startOfDayUTC
+                    endDate = rp.endDate?.startOfDayUTC,
+                    lastScheduledPeriodStart = rp.lastScheduledPeriodStart?.startOfDayUTC,
+                    skipEveryXPeriods = rp.skipEveryXPeriods.toInt()
                 )
             }
 
@@ -276,12 +274,15 @@ class RoomRepeatingQuestRepository(dao: RepeatingQuestDao, private val tagDao: T
                 RepeatPattern.Flexible.Monthly(
                     timesPerMonth = rp.timesPerMonth!!.toInt(),
                     preferredDays = rp.preferredDays.map { it.toInt() }.toSet(),
-                    scheduledPeriods = rp.scheduledPeriods.entries
-                        .associate { it.key.toLong().startOfDayUTC to it.value.map { it.startOfDayUTC } },
                     startDate = rp.startDate.startOfDayUTC,
-                    endDate = rp.endDate?.startOfDayUTC
+                    endDate = rp.endDate?.startOfDayUTC,
+                    lastScheduledPeriodStart = rp.lastScheduledPeriodStart?.startOfDayUTC,
+                    skipEveryXPeriods = rp.skipEveryXPeriods.toInt()
                 )
             }
+
+            MANUAL ->
+                RepeatPattern.Manual(rp.startDate.startOfDayUTC)
         }
     }
 
@@ -320,7 +321,9 @@ class RoomRepeatingQuestRepository(dao: RepeatingQuestDao, private val tagDao: T
                 RoomRepeatPattern(
                     type = DAILY.name,
                     startDate = repeatPattern.startDate.startOfDayUTC(),
-                    endDate = repeatPattern.endDate?.startOfDayUTC()
+                    endDate = repeatPattern.endDate?.startOfDayUTC(),
+                    lastScheduledPeriodStart = repeatPattern.lastScheduledPeriodStart?.startOfDayUTC(),
+                    skipEveryXPeriods = repeatPattern.skipEveryXPeriods.toLong()
                 )
             }
             is RepeatPattern.Weekly -> {
@@ -331,7 +334,9 @@ class RoomRepeatingQuestRepository(dao: RepeatingQuestDao, private val tagDao: T
                     endDate = repeatPattern.endDate?.startOfDayUTC(),
                     daysOfWeek = repeatPattern.daysOfWeek.map {
                         it.name
-                    }
+                    },
+                    lastScheduledPeriodStart = repeatPattern.lastScheduledPeriodStart?.startOfDayUTC(),
+                    skipEveryXPeriods = repeatPattern.skipEveryXPeriods.toLong()
                 )
             }
             is RepeatPattern.Monthly -> {
@@ -339,7 +344,9 @@ class RoomRepeatingQuestRepository(dao: RepeatingQuestDao, private val tagDao: T
                     type = MONTHLY.name,
                     startDate = repeatPattern.startDate.startOfDayUTC(),
                     endDate = repeatPattern.endDate?.startOfDayUTC(),
-                    daysOfMonth = repeatPattern.daysOfMonth.map { it.toLong() }
+                    daysOfMonth = repeatPattern.daysOfMonth.map { it.toLong() },
+                    lastScheduledPeriodStart = repeatPattern.lastScheduledPeriodStart?.startOfDayUTC(),
+                    skipEveryXPeriods = repeatPattern.skipEveryXPeriods.toLong()
                 )
             }
             is RepeatPattern.Yearly -> {
@@ -348,16 +355,9 @@ class RoomRepeatingQuestRepository(dao: RepeatingQuestDao, private val tagDao: T
                     startDate = repeatPattern.startDate.startOfDayUTC(),
                     endDate = repeatPattern.endDate?.startOfDayUTC(),
                     dayOfMonth = repeatPattern.dayOfMonth.toLong(),
-                    month = repeatPattern.month.name
-                )
-            }
-
-            is RepeatPattern.EveryXDays -> {
-                RoomRepeatPattern(
-                    type = EVERY_X_DAYS.name,
-                    xDays = repeatPattern.xDays.toLong(),
-                    startDate = repeatPattern.startDate.startOfDayUTC(),
-                    endDate = repeatPattern.endDate?.startOfDayUTC()
+                    month = repeatPattern.month.name,
+                    lastScheduledPeriodStart = repeatPattern.lastScheduledPeriodStart?.startOfDayUTC(),
+                    skipEveryXPeriods = repeatPattern.skipEveryXPeriods.toLong()
                 )
             }
 
@@ -370,9 +370,8 @@ class RoomRepeatingQuestRepository(dao: RepeatingQuestDao, private val tagDao: T
                     preferredDays = repeatPattern.preferredDays.map {
                         it.name
                     },
-                    scheduledPeriods = repeatPattern.scheduledPeriods.entries
-                        .associate { it.key.startOfDayUTC().toString() to it.value.map { it.startOfDayUTC() } }
-                        .toMutableMap()
+                    lastScheduledPeriodStart = repeatPattern.lastScheduledPeriodStart?.startOfDayUTC(),
+                    skipEveryXPeriods = repeatPattern.skipEveryXPeriods.toLong()
                 )
             }
 
@@ -383,11 +382,18 @@ class RoomRepeatingQuestRepository(dao: RepeatingQuestDao, private val tagDao: T
                     endDate = repeatPattern.endDate?.startOfDayUTC(),
                     timesPerMonth = repeatPattern.timesPerMonth.toLong(),
                     preferredDays = repeatPattern.preferredDays.map { it.toString() },
-                    scheduledPeriods = repeatPattern.scheduledPeriods.entries
-                        .associate { it.key.startOfDayUTC().toString() to it.value.map { it.startOfDayUTC() } }
-                        .toMutableMap()
+                    lastScheduledPeriodStart = repeatPattern.lastScheduledPeriodStart?.startOfDayUTC(),
+                    skipEveryXPeriods = repeatPattern.skipEveryXPeriods.toLong()
                 )
             }
+
+            is RepeatPattern.Manual ->
+                RoomRepeatPattern(
+                    type = MANUAL.name,
+                    startDate = repeatPattern.startDate.startOfDayUTC(),
+                    endDate = null,
+                    skipEveryXPeriods = repeatPattern.skipEveryXPeriods.toLong()
+                )
         }
 
     private fun createDbReminder(reminder: Reminder): DbReminder {
@@ -496,6 +502,8 @@ data class RoomRepeatPattern(
     val timesPerWeek: Long? = null,
     val timesPerMonth: Long? = null,
     val preferredDays: List<String> = emptyList(),
+    val lastScheduledPeriodStart: Long? = null,
+    val skipEveryXPeriods: Long,
     val scheduledPeriods: MutableMap<String, List<Long>> = mutableMapOf(),
     val xDays: Long? = null
 )
@@ -511,11 +519,11 @@ data class DbRepeatPattern(val map: MutableMap<String, Any?> = mutableMapOf()) {
     var timesPerWeek: Long? by map
     var timesPerMonth: Long? by map
     var preferredDays: List<String> by map
-    var scheduledPeriods: MutableMap<String, List<Long>> by map
-    var xDays: Long? by map
+    var lastScheduledPeriodStart: Long? by map
+    var skipEveryXPeriods: Long by map
 
     enum class Type {
-        DAILY, WEEKLY, MONTHLY, YEARLY, FLEXIBLE_WEEKLY, FLEXIBLE_MONTHLY, EVERY_X_DAYS
+        DAILY, WEEKLY, MONTHLY, YEARLY, FLEXIBLE_WEEKLY, FLEXIBLE_MONTHLY, MANUAL
     }
 }
 
@@ -566,7 +574,7 @@ class FirestoreRepeatingQuestRepository(
                 }
 
             },
-            repeatPattern = createRepeatPattern(DbRepeatPattern(rq.repeatPattern)),
+            repeatPattern = createRepeatPattern(createDbRepeatPattern(rq)),
             subQuests = rq.subQuests.map {
                 val dsq = DbSubQuest(it)
                 SubQuest(
@@ -583,6 +591,24 @@ class FirestoreRepeatingQuestRepository(
         )
     }
 
+    private fun createDbRepeatPattern(rq: DbRepeatingQuest): DbRepeatPattern {
+        val data = rq.repeatPattern
+
+        if (!data.containsKey("lastScheduledPeriodStart")) {
+            data["lastScheduledPeriodStart"] = null
+        }
+        if (!data.containsKey("skipEveryXPeriods")) {
+            if (data.containsKey("xDays")) {
+                data["type"] = DAILY.name
+                data["skipEveryXPeriods"] = data["xDays"].toString().toInt() - 1
+            } else {
+                data["skipEveryXPeriods"] = 0
+            }
+        }
+
+        return DbRepeatPattern(data)
+    }
+
     private fun createRepeatPattern(rp: DbRepeatPattern): RepeatPattern {
         val type = valueOf(rp.type)
 
@@ -590,21 +616,27 @@ class FirestoreRepeatingQuestRepository(
             DAILY -> {
                 RepeatPattern.Daily(
                     startDate = rp.startDate.startOfDayUTC,
-                    endDate = rp.endDate?.startOfDayUTC
+                    endDate = rp.endDate?.startOfDayUTC,
+                    lastScheduledPeriodStart = rp.lastScheduledPeriodStart?.startOfDayUTC,
+                    skipEveryXPeriods = rp.skipEveryXPeriods.toInt()
                 )
             }
             WEEKLY -> {
                 RepeatPattern.Weekly(
                     daysOfWeek = rp.daysOfWeek.map { DayOfWeek.valueOf(it) }.toSet(),
                     startDate = rp.startDate.startOfDayUTC,
-                    endDate = rp.endDate?.startOfDayUTC
+                    endDate = rp.endDate?.startOfDayUTC,
+                    lastScheduledPeriodStart = rp.lastScheduledPeriodStart?.startOfDayUTC,
+                    skipEveryXPeriods = rp.skipEveryXPeriods.toInt()
                 )
             }
             MONTHLY -> {
                 RepeatPattern.Monthly(
                     daysOfMonth = rp.daysOfMonth.map { it.toInt() }.toSet(),
                     startDate = rp.startDate.startOfDayUTC,
-                    endDate = rp.endDate?.startOfDayUTC
+                    endDate = rp.endDate?.startOfDayUTC,
+                    lastScheduledPeriodStart = rp.lastScheduledPeriodStart?.startOfDayUTC,
+                    skipEveryXPeriods = rp.skipEveryXPeriods.toInt()
                 )
             }
 
@@ -613,15 +645,8 @@ class FirestoreRepeatingQuestRepository(
                     dayOfMonth = rp.dayOfMonth.toInt(),
                     month = Month.valueOf(rp.month),
                     startDate = rp.startDate.startOfDayUTC,
-                    endDate = rp.endDate?.startOfDayUTC
-                )
-            }
-
-            EVERY_X_DAYS -> {
-                RepeatPattern.EveryXDays(
-                    xDays = rp.xDays!!.toInt(),
-                    startDate = rp.startDate.startOfDayUTC,
-                    endDate = rp.endDate?.startOfDayUTC
+                    endDate = rp.endDate?.startOfDayUTC,
+                    lastScheduledPeriodStart = rp.lastScheduledPeriodStart?.startOfDayUTC
                 )
             }
 
@@ -629,10 +654,10 @@ class FirestoreRepeatingQuestRepository(
                 RepeatPattern.Flexible.Weekly(
                     timesPerWeek = rp.timesPerWeek!!.toInt(),
                     preferredDays = rp.preferredDays.map { DayOfWeek.valueOf(it) }.toSet(),
-                    scheduledPeriods = rp.scheduledPeriods.entries
-                        .associate { it.key.toLong().startOfDayUTC to it.value.map { it.startOfDayUTC } },
                     startDate = rp.startDate.startOfDayUTC,
-                    endDate = rp.endDate?.startOfDayUTC
+                    endDate = rp.endDate?.startOfDayUTC,
+                    lastScheduledPeriodStart = rp.lastScheduledPeriodStart?.startOfDayUTC,
+                    skipEveryXPeriods = rp.skipEveryXPeriods.toInt()
                 )
             }
 
@@ -640,12 +665,15 @@ class FirestoreRepeatingQuestRepository(
                 RepeatPattern.Flexible.Monthly(
                     timesPerMonth = rp.timesPerMonth!!.toInt(),
                     preferredDays = rp.preferredDays.map { it.toInt() }.toSet(),
-                    scheduledPeriods = rp.scheduledPeriods.entries
-                        .associate { it.key.toLong().startOfDayUTC to it.value.map { it.startOfDayUTC } },
                     startDate = rp.startDate.startOfDayUTC,
-                    endDate = rp.endDate?.startOfDayUTC
+                    endDate = rp.endDate?.startOfDayUTC,
+                    lastScheduledPeriodStart = rp.lastScheduledPeriodStart?.startOfDayUTC,
+                    skipEveryXPeriods = rp.skipEveryXPeriods.toInt()
                 )
             }
+
+            MANUAL ->
+                RepeatPattern.Manual(startDate = rp.startDate.startOfDayUTC)
         }
     }
 
@@ -683,6 +711,8 @@ class FirestoreRepeatingQuestRepository(
         val rp = DbRepeatPattern()
         rp.startDate = repeatPattern.startDate.startOfDayUTC()
         rp.endDate = repeatPattern.endDate?.startOfDayUTC()
+        rp.lastScheduledPeriodStart = repeatPattern.lastScheduledPeriodStart?.startOfDayUTC()
+        rp.skipEveryXPeriods = repeatPattern.skipEveryXPeriods.toLong()
 
         when (repeatPattern) {
             is RepeatPattern.Daily -> {
@@ -704,29 +734,17 @@ class FirestoreRepeatingQuestRepository(
                 rp.month = repeatPattern.month.name
             }
 
-            is RepeatPattern.EveryXDays -> {
-                rp.type = EVERY_X_DAYS.name
-                rp.xDays = repeatPattern.xDays.toLong()
-            }
-
             is RepeatPattern.Flexible.Weekly -> {
                 rp.type = FLEXIBLE_WEEKLY.name
                 rp.timesPerWeek = repeatPattern.timesPerWeek.toLong()
                 rp.preferredDays = repeatPattern.preferredDays.map {
                     it.name
                 }
-                rp.scheduledPeriods = repeatPattern.scheduledPeriods.entries
-                    .associate { it.key.startOfDayUTC().toString() to it.value.map { it.startOfDayUTC() } }
-                    .toMutableMap()
             }
             is RepeatPattern.Flexible.Monthly -> {
                 rp.type = FLEXIBLE_MONTHLY.name
                 rp.timesPerMonth = repeatPattern.timesPerMonth.toLong()
                 rp.preferredDays = repeatPattern.preferredDays.map { it.toString() }
-
-                rp.scheduledPeriods = repeatPattern.scheduledPeriods.entries
-                    .associate { it.key.startOfDayUTC().toString() to it.value.map { it.startOfDayUTC() } }
-                    .toMutableMap()
             }
         }
         return rp

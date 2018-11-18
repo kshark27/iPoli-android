@@ -84,7 +84,8 @@ class RescheduleDialogController(args: Bundle? = null) :
 
     override val reducer = RescheduleDialogReducer
 
-    private var includeToday: Boolean = true
+    private var includeToday = true
+    private var isNewQuest = false
 
     private var listener: (LocalDate?, Time?, Duration<Minute>?) -> Unit = { _, _, _ -> }
 
@@ -92,10 +93,12 @@ class RescheduleDialogController(args: Bundle? = null) :
 
     constructor(
         includeToday: Boolean,
+        isNewQuest: Boolean = false,
         listener: (LocalDate?, Time?, Duration<Minute>?) -> Unit,
         cancelListener: () -> Unit = {}
     ) : this() {
         this.includeToday = includeToday
+        this.isNewQuest = isNewQuest
         this.listener = listener
         this.cancelListener = cancelListener
     }
@@ -111,7 +114,8 @@ class RescheduleDialogController(args: Bundle? = null) :
     }
 
     override fun onHeaderViewCreated(headerView: View) {
-        headerView.dialogHeaderTitle.setText(R.string.reschedule)
+        val titleRes = if (isNewQuest) R.string.schedule_new_quest else R.string.reschedule
+        headerView.dialogHeaderTitle.setText(titleRes)
     }
 
     override fun onCreateDialog(
@@ -301,21 +305,23 @@ class RescheduleDialogController(args: Bundle? = null) :
                 )
             )
 
-            vms.add(
-                2,
-                RescheduleViewModel.ChooseStartTime(
-                    R.drawable.ic_clock_text_secondary_24dp,
-                    stringRes(R.string.start_at)
+            if (!isNewQuest) {
+                vms.add(
+                    2,
+                    RescheduleViewModel.ChooseStartTime(
+                        R.drawable.ic_clock_text_secondary_24dp,
+                        stringRes(R.string.start_at)
+                    )
                 )
-            )
 
-            vms.add(
-                3,
-                RescheduleViewModel.ChooseDuration(
-                    R.drawable.ic_sandclock_text_secondary_24dp,
-                    stringRes(R.string.change_duration)
+                vms.add(
+                    3,
+                    RescheduleViewModel.ChooseDuration(
+                        R.drawable.ic_sandclock_text_secondary_24dp,
+                        stringRes(R.string.change_duration)
+                    )
                 )
-            )
+            }
 
             return vms
         }

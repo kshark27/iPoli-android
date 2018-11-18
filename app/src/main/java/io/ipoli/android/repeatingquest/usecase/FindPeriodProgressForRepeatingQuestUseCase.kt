@@ -24,7 +24,12 @@ class FindPeriodProgressForRepeatingQuestUseCase(
                     periodRange.start,
                     periodRange.end
                 ),
-                allCount = rq.repeatPattern.periodCount
+                scheduledCount = questRepository.findCountForRepeatingQuestInPeriod(
+                    rq.id,
+                    periodRange.start,
+                    periodRange.end
+                ),
+                needToCompleteCount = rq.repeatPattern.countForCurrentPeriod
             )
         )
     }

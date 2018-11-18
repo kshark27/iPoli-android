@@ -32,6 +32,9 @@ sealed class RepeatingQuestAction : Action {
     data class Remove(val repeatingQuestId: String) : RepeatingQuestAction() {
         override fun toMap() = mapOf("repeatingQuestId" to repeatingQuestId)
     }
+
+    data class AddQuest(val repeatingQuestId: String, val date: LocalDate?, val time: Time?) :
+        RepeatingQuestAction()
 }
 
 data class RepeatingQuestViewState(
@@ -41,6 +44,7 @@ data class RepeatingQuestViewState(
     val subQuestNames: List<String>,
     val color: Color,
     val nextScheduledDate: LocalDate?,
+    val lastCompletedDate: LocalDate?,
     val totalDuration: Duration<Minute>,
     val currentStreak: Int,
     val repeat: RepeatType,
@@ -65,8 +69,8 @@ data class RepeatingQuestViewState(
         object Daily : RepeatType()
         data class Weekly(val frequency: Int) : RepeatType()
         data class Monthly(val frequency: Int) : RepeatType()
-        data class EveryXDays(val frequency: Int) : RepeatType()
         object Yearly : RepeatType()
+        object Manual : RepeatType()
     }
 }
 
@@ -117,6 +121,7 @@ object RepeatingQuestReducer : BaseViewStateReducer<RepeatingQuestViewState>() {
             subQuestNames = rq.subQuests.map { it.name },
             color = rq.color,
             nextScheduledDate = rq.nextDate,
+            lastCompletedDate = rq.lastCompletedDate,
             totalDuration = 180.minutes,
             currentStreak = 10,
             repeat = repeatTypeFor(rq.repeatPattern),
@@ -132,7 +137,7 @@ object RepeatingQuestReducer : BaseViewStateReducer<RepeatingQuestViewState>() {
         val complete = (0 until progress.completedCount).map {
             RepeatingQuestViewState.ProgressModel.COMPLETE
         }
-        val incomplete = (progress.completedCount until progress.allCount).map {
+        val incomplete = (progress.completedCount until progress.scheduledCount).map {
             RepeatingQuestViewState.ProgressModel.INCOMPLETE
         }
         return complete + incomplete
@@ -142,17 +147,17 @@ object RepeatingQuestReducer : BaseViewStateReducer<RepeatingQuestViewState>() {
         when (repeatPattern) {
             is RepeatPattern.Daily -> RepeatingQuestViewState.RepeatType.Daily
             is RepeatPattern.Weekly, is RepeatPattern.Flexible.Weekly -> RepeatingQuestViewState.RepeatType.Weekly(
-                repeatPattern.periodCount
+                repeatPattern.countForCurrentPeriod
             )
 
-            is RepeatPattern.EveryXDays -> RepeatingQuestViewState.RepeatType.EveryXDays(repeatPattern.xDays)
-
             is RepeatPattern.Monthly, is RepeatPattern.Flexible.Monthly -> RepeatingQuestViewState.RepeatType.Monthly(
-                repeatPattern.periodCount
+                repeatPattern.countForCurrentPeriod
             )
 
             is RepeatPattern.Yearly ->
                 RepeatingQuestViewState.RepeatType.Yearly
+
+            is RepeatPattern.Manual -> RepeatingQuestViewState.RepeatType.Manual
         }
 
     override fun defaultState() =
@@ -164,6 +169,7 @@ object RepeatingQuestReducer : BaseViewStateReducer<RepeatingQuestViewState>() {
             subQuestNames = emptyList(),
             color = Color.PINK,
             nextScheduledDate = null,
+            lastCompletedDate = null,
             totalDuration = 0.minutes,
             currentStreak = -1,
             repeat = RepeatingQuestViewState.RepeatType.Daily,

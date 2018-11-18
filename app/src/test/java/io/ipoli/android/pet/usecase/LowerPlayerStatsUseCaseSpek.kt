@@ -106,9 +106,9 @@ class LowerPlayerStatsUseCaseSpek : Spek({
                 }
 
                 val newPlayer = executeUseCase(questRepo)
-                newPlayer.pet.healthPoints.`should be equal to`(26)
-                newPlayer.pet.moodPoints.`should be equal to`(75)
-                newPlayer.health.current.`should be equal to`(player.health.current - 8)
+                newPlayer.pet.healthPoints.`should be equal to`(30)
+                newPlayer.pet.moodPoints.`should be equal to`(79)
+                newPlayer.health.current.`should be equal to`(player.health.current - 7)
             }
 
             it("should lower stats with medium penalty when low < duration < medium productive hours") {

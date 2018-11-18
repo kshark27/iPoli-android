@@ -356,10 +356,12 @@ interface UseCaseModule {
     val createAgendaItemsUseCase: CreateAgendaItemsUseCase
     val saveRepeatingQuestUseCase: SaveRepeatingQuestUseCase
     val findNextDateForRepeatingQuestUseCase: FindNextDateForRepeatingQuestUseCase
+    val findLastCompletedDateForRepeatingQuestUseCase: FindLastCompletedDateForRepeatingQuestUseCase
     val findPeriodProgressForRepeatingQuestUseCase: FindPeriodProgressForRepeatingQuestUseCase
     val saveQuestsForRepeatingQuestUseCase: SaveQuestsForRepeatingQuestUseCase
     val removeRepeatingQuestUseCase: RemoveRepeatingQuestUseCase
     val createRepeatingQuestHistoryUseCase: CreateRepeatingQuestHistoryUseCase
+    val addQuestToRepeatingQuestUseCase: AddQuestToRepeatingQuestUseCase
     val createPlaceholderQuestsForRepeatingQuestsUseCase: CreatePlaceholderQuestsForRepeatingQuestsUseCase
     val saveChallengeUseCase: SaveChallengeUseCase
     val saveQuestsForChallengeUseCase: SaveQuestsForChallengeUseCase
@@ -712,6 +714,9 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
             questRepository
         )
 
+    override val findLastCompletedDateForRepeatingQuestUseCase
+        get() = FindLastCompletedDateForRepeatingQuestUseCase(questRepository)
+
     override val findPeriodProgressForRepeatingQuestUseCase
         get() = FindPeriodProgressForRepeatingQuestUseCase(
             questRepository
@@ -733,9 +738,12 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
             questRepository,
             repeatingQuestRepository
         )
+
+    override val addQuestToRepeatingQuestUseCase
+        get() = AddQuestToRepeatingQuestUseCase(repeatingQuestRepository, questRepository)
+
     override val createPlaceholderQuestsForRepeatingQuestsUseCase
         get() = CreatePlaceholderQuestsForRepeatingQuestsUseCase(
-            questRepository,
             repeatingQuestRepository
         )
 
@@ -787,7 +795,7 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
         get() = FindNextDateForChallengeUseCase(questRepository)
 
     override val findChallengeProgressUseCase
-        get() = FindChallengeProgressUseCase()
+        get() = FindChallengeProgressUseCase(questRepository)
 
     override val completeChallengeUseCase
         get() = CompleteChallengeUseCase(

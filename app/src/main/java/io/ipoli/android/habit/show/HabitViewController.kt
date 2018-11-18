@@ -19,6 +19,7 @@ import io.ipoli.android.quest.schedule.summary.ScheduleSummaryViewController
 import io.ipoli.android.tag.Tag
 import kotlinx.android.synthetic.main.controller_habit.view.*
 import kotlinx.android.synthetic.main.item_quest_tag_list.view.*
+import kotlinx.android.synthetic.main.repeating_quest_progress_indicator_empty.view.*
 import org.threeten.bp.LocalDate
 import org.threeten.bp.YearMonth
 import org.threeten.bp.format.TextStyle
@@ -175,22 +176,26 @@ class HabitViewController(args: Bundle? = null) :
                 val inflater = LayoutInflater.from(view.context)
                 view.progressContainer.removeAllViews()
 
-                for (c in state.weekProgressColors) {
-                    val progressViewEmpty = inflater.inflate(
+                state.weekProgressColors.forEachIndexed { index, c ->
+                    val progressView = inflater.inflate(
                         R.layout.repeating_quest_progress_indicator_empty,
                         view.progressContainer,
                         false
                     )
-                    val progressViewEmptyBackground =
-                        progressViewEmpty.background as GradientDrawable
-                    progressViewEmptyBackground.setStroke(
-                        ViewUtils.dpToPx(1.5f, view.context).toInt(),
-                        c
+                    val indicatorView =
+                        progressView.indicatorDot.background as GradientDrawable
+                    indicatorView.setStroke(
+                        ViewUtils.dpToPx(2f, view.context).toInt(),
+                        colorRes(R.color.md_white)
                     )
 
-                    progressViewEmptyBackground.setColor(c)
+                    indicatorView.setColor(c)
 
-                    view.progressContainer.addView(progressViewEmpty)
+                    if (index == 0) {
+                        progressView.indicatorLink.gone()
+                    }
+
+                    view.progressContainer.addView(progressView)
                 }
             }
 
@@ -272,13 +277,13 @@ class HabitViewController(args: Bundle? = null) :
         get() = weekProgress.map {
             when (it) {
                 HabitViewState.WeekProgress.INCOMPLETE ->
-                    colorRes(R.color.md_red_300)
+                    colorRes(color500)
 
                 HabitViewState.WeekProgress.COMPLETE ->
-                    colorRes(color!!.androidColor.color300)
+                    colorRes(R.color.md_white)
 
                 HabitViewState.WeekProgress.TODO ->
-                    colorRes(R.color.md_white)
+                    colorRes(color500)
             }
         }
 

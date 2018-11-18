@@ -237,12 +237,33 @@ data class Quest(
 
     fun hasExceededEstimatedDuration() = timeRanges.sumBy { it.duration } >= duration
 
-    fun areAllTimeRangesCompleted() = timeRangesToComplete.isNotEmpty() &&
-        timeRangesToComplete.count { it.start != null && it.end != null } == timeRangesToComplete.size
-
     val isFromRepeatingQuest get() = repeatingQuestId != null
 
     val isFromChallenge get() = challengeId != null
+
+    companion object {
+        fun createFromRepeatingQuest(
+            repeatingQuest: RepeatingQuest,
+            scheduleDate: LocalDate? = null,
+            startTime: Time? = null
+        ) =
+            Quest(
+                name = repeatingQuest.name,
+                subQuests = repeatingQuest.subQuests,
+                color = repeatingQuest.color,
+                icon = repeatingQuest.icon,
+                startTime = startTime ?: repeatingQuest.startTime,
+                duration = repeatingQuest.duration,
+                priority = repeatingQuest.priority,
+                preferredStartTime = repeatingQuest.preferredStartTime,
+                scheduledDate = scheduleDate,
+                originalScheduledDate = scheduleDate,
+                reminders = repeatingQuest.reminders,
+                repeatingQuestId = repeatingQuest.id,
+                challengeId = repeatingQuest.challengeId,
+                tags = repeatingQuest.tags
+            )
+    }
 }
 
 data class TimeRange(
@@ -287,6 +308,7 @@ data class RepeatingQuest(
     val repeatPattern: RepeatPattern,
     val subQuests: List<SubQuest> = listOf(),
     val nextDate: LocalDate? = null,
+    val lastCompletedDate: LocalDate? = null,
     val periodProgress: PeriodProgress? = null,
     val challengeId: String? = null,
     val note: String = "",
@@ -311,9 +333,4 @@ data class RepeatingQuest(
 
     val isFixed: Boolean
         get() = !isFlexible
-
-    fun isActive(date: LocalDate = LocalDate.now()): Boolean {
-        if (end == null) return true
-        return end?.startOfDayUTC() == date.startOfDayUTC()
-    }
 }

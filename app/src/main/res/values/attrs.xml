@@ -24,6 +24,7 @@
     </declare-styleable>
     <attr name="colorPrimaryLight" format="color" />
     <attr name="colorSurface" format="color" />
+    <attr name="colorSectionTitle" format="color" />
 
     <declare-styleable name="CircleProgressBar">
         <attr name="line_count" format="integer"/>

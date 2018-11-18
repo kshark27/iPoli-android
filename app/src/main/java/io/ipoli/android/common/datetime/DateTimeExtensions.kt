@@ -61,6 +61,9 @@ fun LocalDate.daysUntil(date: LocalDate) =
 fun LocalDate.weeksUntil(date: LocalDate) =
     this.until(date, ChronoUnit.WEEKS)
 
+fun LocalDate.monthsUntil(date: LocalDate) =
+    this.until(date, ChronoUnit.MONTHS)
+
 val LocalDate.weekOfMonth get() = get(DateUtils.weekOfMonth)
 
 val LocalDate.weekOfYear get() = get(DateUtils.weekOfYear)

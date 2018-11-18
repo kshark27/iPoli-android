@@ -9,6 +9,7 @@ import io.ipoli.android.quest.Reminder
 import io.ipoli.android.repeatingquest.add.EditRepeatingQuestAction
 import io.ipoli.android.repeatingquest.add.EditRepeatingQuestViewState
 import io.ipoli.android.repeatingquest.show.RepeatingQuestAction
+import io.ipoli.android.repeatingquest.usecase.AddQuestToRepeatingQuestUseCase
 import io.ipoli.android.repeatingquest.usecase.CreateRepeatingQuestHistoryUseCase
 import io.ipoli.android.repeatingquest.usecase.RemoveRepeatingQuestUseCase
 import io.ipoli.android.repeatingquest.usecase.SaveRepeatingQuestUseCase
@@ -25,6 +26,7 @@ object RepeatingQuestSideEffectHandler : AppSideEffectHandler() {
     private val saveRepeatingQuestUseCase by required { saveRepeatingQuestUseCase }
     private val removeRepeatingQuestUseCase by required { removeRepeatingQuestUseCase }
     private val createRepeatingQuestHistoryUseCase by required { createRepeatingQuestHistoryUseCase }
+    private val addQuestToRepeatingQuestUseCase by required { addQuestToRepeatingQuestUseCase }
 
     override suspend fun doExecute(action: Action, state: AppState) {
         when (action) {
@@ -52,9 +54,17 @@ object RepeatingQuestSideEffectHandler : AppSideEffectHandler() {
             is EditRepeatingQuestAction.Save ->
                 saveRepeatingQuest(state, action.newSubQuestNames)
 
-
             is RepeatingQuestAction.Remove ->
                 removeRepeatingQuestUseCase.execute(RemoveRepeatingQuestUseCase.Params(action.repeatingQuestId))
+
+            is RepeatingQuestAction.AddQuest ->
+                addQuestToRepeatingQuestUseCase.execute(
+                    AddQuestToRepeatingQuestUseCase.Params(
+                        action.repeatingQuestId,
+                        action.date,
+                        action.time
+                    )
+                )
         }
     }
 
@@ -95,4 +105,5 @@ object RepeatingQuestSideEffectHandler : AppSideEffectHandler() {
             || action is EditRepeatingQuestAction.SaveNew
             || action is RepeatingQuestAction.Remove
             || action is RepeatingQuestAction.Load
+            || action is RepeatingQuestAction.AddQuest
 }
