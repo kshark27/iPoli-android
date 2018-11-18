@@ -74,7 +74,29 @@ class SaveRepeatingQuestUseCase(
             )
         } else {
             questRepository.removeAllNotCompletedForRepeating(repeatingQuest.id, LocalDate.now())
-            saveQuestsFor(repeatingQuest)
+
+            val rp = repeatingQuest.repeatPattern
+            val newRepeatPattern = when (rp) {
+                is RepeatPattern.Daily -> rp.copy(lastScheduledPeriodStart = null)
+                is RepeatPattern.Weekly -> rp.copy(
+                    lastScheduledPeriodStart = null
+                )
+                is RepeatPattern.Monthly -> rp.copy(
+                    lastScheduledPeriodStart = null
+                )
+                is RepeatPattern.Flexible.Weekly -> rp.copy(
+                    lastScheduledPeriodStart = null
+                )
+                is RepeatPattern.Flexible.Monthly -> rp.copy(
+                    lastScheduledPeriodStart = null
+                )
+                is RepeatPattern.Yearly -> rp.copy(
+                    lastScheduledPeriodStart = null
+                )
+                is RepeatPattern.Manual -> rp
+            }
+
+            saveQuestsFor(repeatingQuest.copy(repeatPattern = newRepeatPattern))
         }
         reminderScheduler.schedule()
         return repeatingQuestRepository.save(rq)

@@ -4,14 +4,12 @@ import io.ipoli.android.common.UseCase
 import io.ipoli.android.common.persistence.EntityReminder
 import io.ipoli.android.common.persistence.EntityReminderRepository
 import io.ipoli.android.habit.persistence.HabitRepository
-import io.ipoli.android.quest.job.ReminderScheduler
 import org.threeten.bp.LocalDate
 import java.util.*
 
 class SaveHabitRemindersUseCase(
     private val habitRepository: HabitRepository,
-    private val entityReminderRepository: EntityReminderRepository,
-    private val reminderScheduler: ReminderScheduler
+    private val entityReminderRepository: EntityReminderRepository
 ) : UseCase<SaveHabitRemindersUseCase.Params, Unit> {
 
     override fun execute(parameters: Params) {
@@ -33,7 +31,6 @@ class SaveHabitRemindersUseCase(
         }
 
         entityReminderRepository.save(entityReminders)
-        reminderScheduler.schedule()
     }
 
     data class Params(val today: LocalDate = LocalDate.now())

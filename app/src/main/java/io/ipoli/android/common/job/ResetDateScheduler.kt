@@ -21,6 +21,7 @@ class ResetDateJob : FixedDailyJob(ResetDateJob.TAG) {
         val repeatingQuestRepository by kap.required { repeatingQuestRepository }
         val saveQuestsForRepeatingQuestUseCase by kap.required { saveQuestsForRepeatingQuestUseCase }
         val saveHabitRemindersUseCase by kap.required { saveHabitRemindersUseCase }
+        val reminderScheduler by kap.required { reminderScheduler }
         kap.inject(MyPoliApp.backgroundModule(context))
 
         scheduleQuestsForRepeatingQuests(
@@ -29,6 +30,8 @@ class ResetDateJob : FixedDailyJob(ResetDateJob.TAG) {
         )
 
         saveHabitRemindersUseCase.execute(SaveHabitRemindersUseCase.Params())
+
+        reminderScheduler.schedule()
 
         GlobalScope.launch(Dispatchers.Main) {
             AppWidgetUtil.updateAgendaWidget(context)

@@ -1060,8 +1060,7 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
     override val saveHabitRemindersUseCase
         get() = SaveHabitRemindersUseCase(
             habitRepository,
-            entityReminderRepository,
-            reminderScheduler
+            entityReminderRepository
         )
 }
 

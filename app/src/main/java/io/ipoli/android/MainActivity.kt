@@ -32,6 +32,7 @@ import io.ipoli.android.common.view.playerTheme
 import io.ipoli.android.player.auth.AuthAction
 import io.ipoli.android.player.data.Membership
 import io.ipoli.android.player.view.RevivePopup
+import io.ipoli.android.repeatingquest.usecase.SaveQuestsForRepeatingQuestUseCase
 import io.ipoli.android.store.powerup.AndroidPowerUp
 import io.ipoli.android.store.powerup.PowerUp
 import io.ipoli.android.store.powerup.buy.BuyPowerUpDialogController
@@ -60,6 +61,9 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
     private val sharedPreferences by required { sharedPreferences }
     private val unlockAchievementsUseCase by required { unlockAchievementsUseCase }
     private val resetDateScheduler by required { resetDateScheduler }
+    private val repeatingQuestRepository by required { repeatingQuestRepository }
+    private val saveQuestsForRepeatingQuestUseCase by required { saveQuestsForRepeatingQuestUseCase }
+    private val reminderScheduler by required { reminderScheduler }
 
     private val stateStore by required { stateStore }
     private val dataExporter by required { dataExporter }
@@ -272,6 +276,8 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
             }
             unlockAchievementsUseCase.execute(UnlockAchievementsUseCase.Params(p))
             resetDateScheduler.schedule()
+            scheduleQuestsForRepeatingQuests()
+            reminderScheduler.schedule()
             if (p.isLoggedIn()) {
                 try {
                     dataExporter.exportNewData()
@@ -280,6 +286,19 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
                 }
             }
         }
+    }
+
+    private fun scheduleQuestsForRepeatingQuests() {
+        val rqs = repeatingQuestRepository.findAllActive()
+        val newRqs = rqs.map {
+            saveQuestsForRepeatingQuestUseCase.execute(
+                SaveQuestsForRepeatingQuestUseCase.Params(
+                    repeatingQuest = it,
+                    start = LocalDate.now()
+                )
+            ).repeatingQuest
+        }
+        repeatingQuestRepository.save(newRqs)
     }
 
     private fun shouldShowQuickAdd(startIntent: Intent) =
