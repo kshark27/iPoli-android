@@ -208,7 +208,7 @@ data class Player(
     fun updatePreferences(preferences: Preferences) =
         copy(preferences = preferences)
 
-    fun addHealthPoints(healthPoints: Int) =
+    private fun addHealthPoints(healthPoints: Int) =
         copy(
             health = health.copy(
                 current = Math.min(health.current + healthPoints, health.max)
@@ -220,7 +220,7 @@ data class Player(
             health = health.copy(current = Math.max(health.current - points, 0))
         )
 
-    fun addExperience(experience: Int): Player {
+    private fun addExperience(experience: Int): Player {
         val newXp = experience + this.experience
         return copy(
             experience = newXp,
@@ -396,9 +396,6 @@ data class Player(
 
     fun currentDate(dateTime: LocalDateTime = LocalDateTime.now()) =
         currentDate(dateTime, preferences.resetDayTime)
-
-    fun datesSpan(dateTime: LocalDateTime = LocalDateTime.now()) =
-        datesSpan(dateTime, preferences.resetDayTime)
 
     fun addReward(reward: Reward) =
         addHealthPoints(reward.healthPoints)

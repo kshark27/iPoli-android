@@ -27,7 +27,7 @@
 
                 <TextView
                     style="@style/SectionTitle"
-                    android:layout_marginStart="32dp"
+                    android:layout_marginStart="16dp"
                     android:text="@string/settings_general_title" />
 
                 <LinearLayout
@@ -206,7 +206,7 @@
 
                 <TextView
                     style="@style/SectionTitle"
-                    android:layout_marginStart="32dp"
+                    android:layout_marginStart="16dp"
                     android:text="@string/calendar" />
 
                 <LinearLayout
@@ -285,7 +285,7 @@
 
                 <TextView
                     style="@style/SectionTitle"
-                    android:layout_marginStart="32dp"
+                    android:layout_marginStart="16dp"
                     android:text="@string/settings_plan_day" />
 
                 <LinearLayout
@@ -426,7 +426,7 @@
 
                 <TextView
                     style="@style/SectionTitle"
-                    android:layout_marginStart="32dp"
+                    android:layout_marginStart="16dp"
                     android:text="@string/settings_sync_calendars" />
 
                 <RelativeLayout
@@ -502,7 +502,7 @@
 
                 <TextView
                     style="@style/SectionTitle"
-                    android:layout_marginStart="32dp"
+                    android:layout_marginStart="16dp"
                     android:text="@string/settings_about_title" />
 
                 <LinearLayout

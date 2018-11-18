@@ -1,6 +1,5 @@
 package io.ipoli.android.common
 
-import io.ipoli.android.pet.usecase.LowerPlayerStatsUseCase
 import io.ipoli.android.player.data.Player
 import io.ipoli.android.quest.Quest
 

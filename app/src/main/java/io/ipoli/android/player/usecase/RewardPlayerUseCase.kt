@@ -37,11 +37,14 @@ open class RewardPlayerUseCase(
 
         const val HIGH_REWARD_LIMIT = 12
 
-        val QUEST_HP_BASE_REWARDS = intArrayOf(1, 2, 3)
+        val QUEST_HP_BASE_REWARDS = intArrayOf(0, 1)
 
         val QUEST_XP_BASE_REWARDS = intArrayOf(2, 5, 7, 10, 15)
         val QUEST_COINS_BASE_REWARDS = intArrayOf(1, 2, 3, 4)
         val QUEST_ATTRIBUTE_BASE_REWARDS = intArrayOf(1, 2, 3, 4)
+
+        val HABIT_HP_BASE_REWARDS = intArrayOf(0, 1)
+        val BAD_HABIT_HP_BASE_REWARDS = intArrayOf(3, 5, 7)
 
         val HABIT_XP_BASE_REWARDS = intArrayOf(1, 2, 4, 5)
         val HABIT_COINS_BASE_REWARDS = intArrayOf(1, 2)
@@ -87,7 +90,7 @@ open class RewardPlayerUseCase(
 
                 val entry = habit.history[parameters.playerDate]!!
 
-                entry.reward ?: createRewardForHabit(habit, player, player.rank)
+                entry.reward ?: createRewardForBadHabit()
             }
 
             is Params.ForDailyChallenge -> {
@@ -259,8 +262,25 @@ open class RewardPlayerUseCase(
             booster = booster
         )
 
-        return Reward(attrs, 0, xp, coins, bounty)
+        return Reward(
+            attributePoints = attrs,
+            healthPoints = health(booster.healthPointsPercentage, HABIT_HP_BASE_REWARDS),
+            experience = xp,
+            coins = coins,
+            bounty = bounty
+        )
     }
+
+    private fun createRewardForBadHabit() =
+        Reward(
+            attributePoints = emptyMap(),
+            healthPoints = BAD_HABIT_HP_BASE_REWARDS[createRandom().nextInt(
+                BAD_HABIT_HP_BASE_REWARDS.size
+            )],
+            experience = 0,
+            coins = 0,
+            bounty = Quest.Bounty.None
+        )
 
     private fun createRewardForQuest(
         quest: Quest,

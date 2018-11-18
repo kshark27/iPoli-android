@@ -346,7 +346,7 @@ interface UseCaseModule {
     val unlockPresetChallengeUseCase: UnlockPresetChallengeUseCase
     val splitDurationForPomodoroTimerUseCase: SplitDurationForPomodoroTimerUseCase
     val findPlayerLevelUseCase: FindPlayerLevelUseCase
-    val lowerPlayerStatsUseCase: LowerPlayerStatsUseCase
+    val applyDamageToPlayerUseCase: ApplyDamageToPlayerUseCase
     val completeTimeRangeUseCase: CompleteTimeRangeUseCase
     val cancelTimerUseCase: CancelTimerUseCase
     val addPomodoroUseCase: AddPomodoroUseCase
@@ -695,10 +695,13 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
     override val findPlayerLevelUseCase
         get() = FindPlayerLevelUseCase(playerRepository)
 
-    override val lowerPlayerStatsUseCase
-        get() = LowerPlayerStatsUseCase(
+    override val applyDamageToPlayerUseCase
+        get() = ApplyDamageToPlayerUseCase(
             questRepository,
-            playerRepository
+            playerRepository,
+            habitRepository,
+            dailyChallengeRepository,
+            CalculateHabitStreakUseCase()
         )
 
     override val saveRepeatingQuestUseCase

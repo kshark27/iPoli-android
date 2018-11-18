@@ -191,7 +191,7 @@ interface Constants {
         val DEFAULT_PET_MP = 80
         val XP_BONUS_PERCENTAGE_OF_HP = 20.0
         val COINS_BONUS_PERCENTAGE_OF_HP = 10.0
-        val QUEST_BOUNTY_DROP_PERCENTAGE = 12.0
+        val QUEST_BOUNTY_DROP_PERCENTAGE = 10.0
 
         val XP_TO_PET_HP_RATIO = 13.2
         val XP_TO_PET_MOOD_RATIO = 11.1

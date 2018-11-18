@@ -7,7 +7,7 @@ import io.ipoli.android.achievement.usecase.UpdatePlayerStatsUseCase
 import io.ipoli.android.common.di.BackgroundModule
 import io.ipoli.android.common.notification.QuickDoNotificationUtil
 import io.ipoli.android.common.view.AppWidgetUtil
-import io.ipoli.android.pet.usecase.LowerPlayerStatsUseCase
+import io.ipoli.android.pet.usecase.ApplyDamageToPlayerUseCase
 import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
@@ -19,7 +19,7 @@ class ResetDayJob : FixedDailyJob(ResetDayJob.TAG) {
 
         val kap = Kapsule<BackgroundModule>()
         val playerRepository by kap.required { playerRepository }
-        val lowerPlayerStatsUseCase by kap.required { lowerPlayerStatsUseCase }
+        val applyDamageToPlayerUseCase by kap.required { applyDamageToPlayerUseCase }
         val updatePlayerStatsUseCase by kap.required { updatePlayerStatsUseCase }
         val sharedPreferences by kap.required { sharedPreferences }
         kap.inject(MyPoliApp.backgroundModule(context))
@@ -28,7 +28,7 @@ class ResetDayJob : FixedDailyJob(ResetDayJob.TAG) {
 
         val oldPet = player.pet
 
-        val newPlayer = lowerPlayerStatsUseCase.execute(LowerPlayerStatsUseCase.Params())
+        val newPlayer = applyDamageToPlayerUseCase.execute(ApplyDamageToPlayerUseCase.Params()).player
         val newPet = newPlayer.pet
 
         if (oldPet.isDead != newPet.isDead) {

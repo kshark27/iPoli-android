@@ -14,6 +14,7 @@ import org.amshove.kluent.*
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
+import kotlin.text.Typography.less
 
 /**
  * Created by Venelin Valkov <venelin@io.ipoli.io>
@@ -78,8 +79,7 @@ class RewardPlayerUseCaseSpek : Spek({
         it("should give reward to the Pet") {
             val newPet =
                 executeUseCase(RewardPlayerUseCase.Params.ForQuest(TestUtil.quest, player)).pet
-            newPet.healthPoints.`should be greater than`(pet.healthPoints)
-            newPet.moodPoints.`should be greater than`(pet.moodPoints)
+            newPet.healthPoints.`should not be less than`(pet.healthPoints)
         }
 
         it("should not add bounty to Inventory") {
