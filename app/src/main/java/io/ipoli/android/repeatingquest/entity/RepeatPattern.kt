@@ -19,15 +19,7 @@ sealed class RepeatPattern {
 
     val doEveryXPeriods get() = skipEveryXPeriods + 1
 
-    val countForCurrentPeriod: Int
-        get() {
-            val periodRange = periodRangeFor(LocalDate.now())
-            return createPlaceholderDates(
-                periodRange.start,
-                periodRange.end,
-                skipScheduled = false
-            ).size
-        }
+    abstract val countInPeriod: Int
 
     abstract fun periodRangeFor(date: LocalDate): PeriodRange
 
@@ -65,6 +57,8 @@ sealed class RepeatPattern {
         override val lastScheduledPeriodStart: LocalDate? = null,
         override val skipEveryXPeriods: Int = 0
     ) : RepeatPattern() {
+
+        override val countInPeriod get() = DayOfWeek.values().size
 
         override fun createPlaceholderDates(
             startDate: LocalDate,
@@ -133,6 +127,8 @@ sealed class RepeatPattern {
         override val lastScheduledPeriodStart: LocalDate? = null
     ) : RepeatPattern() {
 
+        override val countInPeriod = 1
+
         override val skipEveryXPeriods: Int = 0
 
         override fun createPlaceholderDates(
@@ -198,6 +194,8 @@ sealed class RepeatPattern {
         override val lastScheduledPeriodStart: LocalDate? = null,
         override val skipEveryXPeriods: Int = 0
     ) : RepeatPattern() {
+
+        override val countInPeriod get() = daysOfWeek.size
 
         override fun createPlaceholderDates(
             startDate: LocalDate,
@@ -270,6 +268,8 @@ sealed class RepeatPattern {
         override val lastScheduledPeriodStart: LocalDate? = null,
         override val skipEveryXPeriods: Int = 0
     ) : RepeatPattern() {
+
+        override val countInPeriod get() = daysOfMonth.size
 
         override fun createPlaceholderDates(
             startDate: LocalDate,
@@ -346,6 +346,8 @@ sealed class RepeatPattern {
             override val skipEveryXPeriods: Int = 0
         ) : Flexible() {
 
+            override val countInPeriod get() = timesPerWeek
+
             override fun createPlaceholderDates(
                 startDate: LocalDate,
                 endDate: LocalDate,
@@ -404,6 +406,8 @@ sealed class RepeatPattern {
             override val lastScheduledPeriodStart: LocalDate? = null,
             override val skipEveryXPeriods: Int
         ) : Flexible() {
+
+            override val countInPeriod get() = timesPerMonth
 
             override fun createPlaceholderDates(
                 startDate: LocalDate,
@@ -465,6 +469,8 @@ sealed class RepeatPattern {
         override val lastScheduledPeriodStart: LocalDate? = null
 
         override val skipEveryXPeriods: Int = 0
+
+        override val countInPeriod = 0
 
         override fun periodRangeFor(date: LocalDate) =
             PeriodRange(

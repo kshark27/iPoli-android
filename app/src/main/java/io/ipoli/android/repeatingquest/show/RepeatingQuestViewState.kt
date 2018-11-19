@@ -147,11 +147,11 @@ object RepeatingQuestReducer : BaseViewStateReducer<RepeatingQuestViewState>() {
         when (repeatPattern) {
             is RepeatPattern.Daily -> RepeatingQuestViewState.RepeatType.Daily
             is RepeatPattern.Weekly, is RepeatPattern.Flexible.Weekly -> RepeatingQuestViewState.RepeatType.Weekly(
-                repeatPattern.countForCurrentPeriod
+                repeatPattern.countInPeriod
             )
 
             is RepeatPattern.Monthly, is RepeatPattern.Flexible.Monthly -> RepeatingQuestViewState.RepeatType.Monthly(
-                repeatPattern.countForCurrentPeriod
+                repeatPattern.countInPeriod
             )
 
             is RepeatPattern.Yearly ->

@@ -500,7 +500,7 @@ class PickOnboardItemsViewController(args: Bundle? = null) :
                 R.layout.item_onboard_repeating_quest
             ) { vm, view, _ ->
                 view.rqName.text = vm.name
-                view.rqRepeatPattern.text = "${vm.repeatingQuest.repeatPattern.countForCurrentPeriod} x week"
+                view.rqRepeatPattern.text = "${vm.repeatingQuest.repeatPattern.countInPeriod} x week"
 
                 view.rqRepeatPattern.setCompoundDrawablesRelativeWithIntrinsicBounds(
                     IconicsDrawable(view.context)

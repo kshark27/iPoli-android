@@ -13,15 +13,15 @@ object RepeatPatternFormatter {
         when (repeatPattern) {
             is RepeatPattern.Daily -> context.getString(R.string.every_day)
             is RepeatPattern.Weekly, is RepeatPattern.Flexible.Weekly ->
-                if (repeatPattern.countForCurrentPeriod == 1)
+                if (repeatPattern.countInPeriod == 1)
                     context.getString(R.string.once_a_week)
                 else
-                    context.getString(R.string.times_a_week, repeatPattern.countForCurrentPeriod)
+                    context.getString(R.string.times_a_week, repeatPattern.countInPeriod)
             is RepeatPattern.Monthly, is RepeatPattern.Flexible.Monthly ->
-                if (repeatPattern.countForCurrentPeriod == 1)
+                if (repeatPattern.countInPeriod == 1)
                     context.getString(R.string.once_a_month)
                 else
-                    context.getString(R.string.times_a_month, repeatPattern.countForCurrentPeriod)
+                    context.getString(R.string.times_a_month, repeatPattern.countInPeriod)
             is RepeatPattern.Yearly -> context.getString(R.string.once_a_year)
             is RepeatPattern.Manual -> context.getString(R.string.manual_schedule_repeat_pattern)
         }
