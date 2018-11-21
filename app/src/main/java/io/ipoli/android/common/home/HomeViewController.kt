@@ -329,6 +329,9 @@ class HomeViewController(args: Bundle? = null) :
 
         val tagItems = mutableListOf<MenuItem>()
         state.tags.forEachIndexed { index, tag ->
+            if (index + 1 >= TAG_IDS.size) {
+                return@forEachIndexed
+            }
             tagItems.add(
                 createTagForNavigationDrawer(
                     view = view,

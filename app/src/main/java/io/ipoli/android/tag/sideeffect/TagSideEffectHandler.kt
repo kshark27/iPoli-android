@@ -96,7 +96,7 @@ object TagSideEffectHandler : AppSideEffectHandler() {
         tagId: String
     ) {
         val tags = state.dataState.tags
-        if (tags.size >= Constants.MAX_FAVORITE_TAGS) {
+        if (tags.filter { it.isFavorite }.size >= Constants.MAX_FAVORITE_TAGS) {
             dispatch(TagAction.TagCountLimitReached)
         } else {
             favoriteTagUseCase.execute(FavoriteTagUseCase.Params.WithTagId(tagId))
