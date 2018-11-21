@@ -173,6 +173,7 @@ class OnboardViewController(args: Bundle? = null) :
         }
 
         view.positiveButton.dispatchOnClick {
+            view.positiveButton.isEnabled = false
             eventLogger.logEvent("onboard_get_started")
             OnboardAction.GetStarted
         }
@@ -221,9 +222,10 @@ class OnboardViewController(args: Bundle? = null) :
                         view.tutorialProgressLabel.text = stringRes(R.string.all_done)
                         view.tutorialProgress.animateProgressFromCurrentValue(100)
                         view.typewriterText.animationCompleteCallback = {
+                            view.positiveButton.isEnabled = true
                             view.positiveButton.text = stringRes(R.string.dialog_lets_go)
                             view.positiveButton.visible()
-                            view.positiveButton.setOnClickListener {
+                            view.positiveButton.onDebounceClick {
                                 eventLogger.logEvent(
                                     "onboard_survey_help",
                                     mapOf("answers" to state.adventures?.map { it.name }?.joinToString())

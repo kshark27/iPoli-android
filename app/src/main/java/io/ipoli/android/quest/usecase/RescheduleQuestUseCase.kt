@@ -20,7 +20,7 @@ class RescheduleQuestUseCase(
 
         val shouldMoveToBucket =
             parameters.scheduledDate == null && parameters.startTime == null && parameters.duration == null
-        return if (shouldMoveToBucket || parameters.scheduledDate != null) {
+        return if (shouldMoveToBucket || (parameters.scheduledDate != null && parameters.startTime == null)) {
             changeDate(quest!!, parameters.scheduledDate)
         } else if (parameters.startTime != null) {
             changeTime(quest!!, parameters.scheduledDate, parameters.startTime)
