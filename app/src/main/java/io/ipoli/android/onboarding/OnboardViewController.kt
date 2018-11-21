@@ -9,7 +9,6 @@ import android.text.style.StrikethroughSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.bluelinelabs.conductor.changehandler.SimpleSwapChangeHandler
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.mikepenz.community_material_typeface_library.CommunityMaterial
@@ -251,7 +250,7 @@ class OnboardViewController(args: Bundle? = null) :
 
             OnboardViewState.StateType.SHOW_HOME -> {
                 showShortToast(R.string.welcome_hero)
-                navigateFromRoot().replaceWithHome(SimpleSwapChangeHandler())
+                navigateFromRoot().setHome()
             }
 
             else -> {
