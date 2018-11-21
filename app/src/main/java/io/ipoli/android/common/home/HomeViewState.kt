@@ -111,7 +111,7 @@ object HomeReducer : BaseViewStateReducer<HomeViewState>() {
         progress = 0,
         maxProgress = 0,
         tags = listOf(),
-        showTags = true,
+        showTags = false,
         selectedTagIndex = null,
         bucketListQuestCount = 0
     )

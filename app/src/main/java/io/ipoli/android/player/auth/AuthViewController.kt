@@ -7,9 +7,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.annotation.ColorRes
-import android.support.annotation.DrawableRes
-import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -17,10 +14,7 @@ import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler
 import com.bluelinelabs.conductor.changehandler.SimpleSwapChangeHandler
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.crashlytics.android.Crashlytics
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
@@ -33,18 +27,10 @@ import io.ipoli.android.R
 import io.ipoli.android.common.LoaderDialogController
 import io.ipoli.android.common.redux.android.ReduxViewController
 import io.ipoli.android.common.view.*
-import io.ipoli.android.common.view.recyclerview.BaseRecyclerViewAdapter
-import io.ipoli.android.common.view.recyclerview.RecyclerViewViewModel
-import io.ipoli.android.common.view.recyclerview.SimpleViewHolder
-import io.ipoli.android.onboarding.OnboardData
 import io.ipoli.android.player.auth.AuthViewState.StateType.*
 import io.ipoli.android.player.auth.error.SignInError
-import io.ipoli.android.player.data.AndroidAvatar
-import io.ipoli.android.player.data.Avatar
 import kotlinx.android.synthetic.main.controller_auth.view.*
-import kotlinx.android.synthetic.main.item_auth_avatar.view.*
 import space.traversal.kapsule.required
-
 
 /**
  * Created by Polina Zhelyazkova <polina@mypoli.fun>
@@ -53,13 +39,17 @@ import space.traversal.kapsule.required
 class AuthViewController(args: Bundle? = null) :
     ReduxViewController<AuthAction, AuthViewState, AuthReducer>(args) {
 
-    private val RC_SIGN_IN = 123
+    companion object {
+        private const val RC_SIGN_IN = 123
+    }
 
     override val reducer = AuthReducer
 
     private val sharedPreferences by required { sharedPreferences }
 
     private var loader: LoaderDialogController? = null
+
+    private var isSigningUp = false
 
     private val usernameWatcher: TextWatcher = object : TextWatcher {
 
@@ -78,10 +68,8 @@ class AuthViewController(args: Bundle? = null) :
 
     }
 
-    private var onboardData: OnboardData? = null
-
-    constructor(onboardData: OnboardData?) : this() {
-        this.onboardData = onboardData
+    constructor(isSigningUp: Boolean) : this() {
+        this.isSigningUp = isSigningUp
     }
 
     override fun onCreateView(
@@ -93,9 +81,11 @@ class AuthViewController(args: Bundle? = null) :
 
         registerForActivityResult(RC_SIGN_IN)
 
-        view.avatarList.layoutManager =
-            LinearLayoutManager(activity!!, LinearLayoutManager.HORIZONTAL, false)
-        view.avatarList.adapter = AvatarAdapter()
+        if (isSigningUp) {
+            view.loginTitle.text = "Join thousands of Heroes"
+        } else {
+            view.loginTitle.text = "Sign in"
+        }
 
         view.username.setCompoundDrawablesRelativeWithIntrinsicBounds(
             usernameIcon, null, null, null
@@ -143,8 +133,7 @@ class AuthViewController(args: Bundle? = null) :
                 view.startJourney.isClickable = false
                 dispatch(
                     AuthAction.CompleteSetup(
-                        view.username.text.toString(),
-                        state.playerAvatar
+                        view.username.text.toString()
                     )
                 )
                 showLoader()
@@ -158,7 +147,7 @@ class AuthViewController(args: Bundle? = null) :
             }
 
             SHOW_LOGIN -> {
-                renderLoginViews(view, state)
+                renderLoginViews(view)
 
                 view.googleSignIn.onDebounceClick {
                     showLoader()
@@ -174,11 +163,6 @@ class AuthViewController(args: Bundle? = null) :
                         RC_SIGN_IN
                     )
                 }
-
-                view.anonymousSignUp.onDebounceClick {
-                    dispatch(AuthAction.ContinueAsGuest)
-                    showShortToast(R.string.welcome_hero)
-                }
             }
 
             SHOW_SETUP -> {
@@ -186,24 +170,16 @@ class AuthViewController(args: Bundle? = null) :
                 view.username.setSelection(state.username.length)
                 view.loginContainer.invisible()
                 view.setupContainer.visible()
-                renderPlayerAvatars(view, state)
-                view.signUpHeadline.setText(R.string.choose_your_avatar)
             }
 
             SWITCH_TO_SETUP -> {
                 view.username.setText(state.username)
                 view.username.setSelection(state.username.length)
                 hideLoader()
-                renderPlayerAvatars(view, state)
                 playShowLoginAnimation(view) {
                     view.loginContainer.invisible()
                     view.loginPet.invisible()
-                    view.signUpHeadline.setText(R.string.choose_your_avatar)
                 }
-            }
-
-            AVATAR_CHANGED -> {
-                renderPlayerAvatars(view, state)
             }
 
             USERNAME_VALIDATION_ERROR -> {
@@ -232,12 +208,6 @@ class AuthViewController(args: Bundle? = null) :
                     startHomeViewController()
                     maybeShowInviteDialog()
                 }
-            }
-
-            GUEST_CREATED -> {
-                hideLoader()
-                startHomeViewController()
-                sharedPreferences.edit().remove(Constants.KEY_INVITE_PLAYER_ID).apply()
             }
 
             EXISTING_PLAYER_LOGGED_IN -> {
@@ -271,16 +241,6 @@ class AuthViewController(args: Bundle? = null) :
         }
     }
 
-    private fun renderPlayerAvatars(
-        view: View,
-        state: AuthViewState
-    ) {
-        Glide.with(view.context).load(state.playerAvatarImage)
-            .apply(RequestOptions.circleCropTransform())
-            .into(view.playerAvatar)
-        (view.avatarList.adapter as AvatarAdapter).updateAll(state.avatarViewModels)
-    }
-
     private fun hideLoader() {
         loader?.dismiss()
         loader = null
@@ -291,12 +251,8 @@ class AuthViewController(args: Bundle? = null) :
         loader?.show(router, "loader")
     }
 
-    private fun renderLoginViews(view: View, state: AuthViewState) {
+    private fun renderLoginViews(view: View) {
         view.setupContainer.visibility = View.INVISIBLE
-        if (state.isGuest)
-            view.guestGroup.goneViews()
-        else
-            view.guestGroup.showViews()
         view.loginPet.visible = true
         view.signUpHeadline.setText(R.string.welcome_hero)
     }
@@ -398,7 +354,7 @@ class AuthViewController(args: Bundle? = null) :
         }
     }
 
-    override fun onCreateLoadAction() = AuthAction.Load(onboardData)
+    override fun onCreateLoadAction() = AuthAction.Load
 
     override fun onAttach(view: View) {
         super.onAttach(view)
@@ -412,50 +368,4 @@ class AuthViewController(args: Bundle? = null) :
         view.username.removeTextChangedListener(usernameWatcher)
         super.onDetach(view)
     }
-
-    data class AvatarViewModel(
-        val name: String,
-        @DrawableRes val image: Int,
-        @ColorRes val backgroundColor: Int,
-        val isSelected: Boolean,
-        val avatar: Avatar
-    ) : RecyclerViewViewModel {
-        override val id: String
-            get() = avatar.name
-
-    }
-
-    inner class AvatarAdapter :
-        BaseRecyclerViewAdapter<AvatarViewModel>(R.layout.item_auth_avatar) {
-
-        override fun onBindViewModel(vm: AvatarViewModel, view: View, holder: SimpleViewHolder) {
-            view.avatarName.text = vm.name
-            view.avatarImage.setBackgroundResource(vm.backgroundColor)
-            view.avatarImage.setImageResource(vm.image)
-            if (!vm.isSelected) {
-                view.avatarImage.dispatchOnClick { AuthAction.ChangeAvatar(vm.avatar) }
-                view.avatarImageSelected.gone()
-            } else {
-                view.avatarImage.setOnClickListener(null)
-                view.avatarImageSelected.visible()
-            }
-        }
-
-    }
-
-    private val AuthViewState.playerAvatarImage: Int
-        get() = AndroidAvatar.valueOf(playerAvatar.name).image
-
-    private val AuthViewState.avatarViewModels: List<AvatarViewModel>
-        get() = avatars.map {
-            val androidAvatar = AndroidAvatar.valueOf(it.name)
-            AvatarViewModel(
-                name = stringRes(androidAvatar.avatarName),
-                image = androidAvatar.image,
-                backgroundColor = androidAvatar.backgroundColor,
-                isSelected = it == playerAvatar,
-                avatar = it
-            )
-        }
-
 }

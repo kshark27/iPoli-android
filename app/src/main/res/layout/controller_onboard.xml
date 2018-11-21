@@ -1,72 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/md_light_blue_500">
+    android:background="?android:colorBackground">
 
-    <Button
-        android:id="@+id/onboardExistingPlayer"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/onboard_existing_player"
-        android:textColor="@color/md_white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/onboardPager"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/getStartedContainer"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="32dp"
-        app:layout_constraintBottom_toTopOf="@+id/onboardDivider"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/rounded_rectangle_surface_background"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/onboardExistingPlayer" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.75">
+
+        <ImageView
+            android:id="@+id/playerAvatar"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/white_circular_background"
+            android:elevation="6dp"
+            android:scaleType="fitCenter"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/petImage"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            android:layout_marginStart="56dp"
+            android:layout_marginTop="16dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/white_circular_background"
+            android:elevation="6dp"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="@+id/playerAvatar"
+            app:layout_constraintTop_toTopOf="@+id/playerAvatar" />
+
+        <ImageView
+            android:id="@+id/petStateImage"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            android:adjustViewBounds="true"
+            android:elevation="6dp"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/petImage"
+            app:layout_constraintEnd_toEndOf="@+id/petImage"
+            app:layout_constraintStart_toStartOf="@+id/petImage"
+            app:layout_constraintTop_toTopOf="@+id/petImage" />
+
+        <TextView
+            android:id="@+id/petName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintEnd_toEndOf="@+id/petImage"
+            app:layout_constraintStart_toStartOf="@+id/petImage"
+            app:layout_constraintTop_toBottomOf="@+id/petImage" />
+
+        <TextView
+            android:id="@+id/getStartedLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="Get Started"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/playerAvatar" />
+
+        <TextView
+            android:id="@+id/tutorialProgressLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="1 of 4 done"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintEnd_toStartOf="@+id/tutorialProgress"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/getStartedLabel" />
+
+        <ProgressBar
+            android:id="@+id/tutorialProgress"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:max="100"
+            android:progress="33"
+            android:progressDrawable="@drawable/onboard_progress_bar"
+            app:layout_constraintBottom_toBottomOf="@+id/tutorialProgressLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tutorialProgressLabel"
+            app:layout_constraintTop_toTopOf="@+id/tutorialProgressLabel" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/tutorialSteps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tutorialProgressLabel" />
+    </android.support.constraint.ConstraintLayout>
 
     <View
-        android:id="@+id/onboardDivider"
+        android:id="@+id/backgroundOverlay"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/md_light_text_50"
-        app:layout_constraintBottom_toTopOf="@+id/onboardSkip" />
+        android:layout_height="match_parent"
+        android:background="@color/md_dark_text_38" />
 
-    <Button
-        android:id="@+id/onboardSkip"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+    <ImageView
+        android:id="@+id/logo"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/skip"
-        android:textColor="@color/md_white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_height="130dp"
+        android:adjustViewBounds="true"
+        android:cropToPadding="true"
+        android:paddingBottom="32dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/logo"
+        app:layout_constraintBottom_toTopOf="@+id/textBubble"
+        app:layout_constraintEnd_toEndOf="@+id/textBubble"
+        app:layout_constraintTop_toTopOf="@+id/textBubble" />
 
-    <Button
-        android:id="@+id/onboardNext"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/textBubble"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/next"
-        android:textColor="@color/md_white"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/rounded_rectangle_surface_background"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-    <ProgressBar
-        android:id="@+id/onboardProgress"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="0dp"
-        android:layout_height="16dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:max="5"
-        android:progressDrawable="@drawable/onboard_progress_bar"
-        app:layout_constraintBottom_toBottomOf="@id/onboardSkip"
-        app:layout_constraintEnd_toStartOf="@id/onboardNext"
-        app:layout_constraintStart_toEndOf="@id/onboardSkip"
-        app:layout_constraintTop_toTopOf="@id/onboardSkip"
-        tools:progress="2" />
+        <io.ipoli.android.common.view.widget.TypewriterTextView
+            android:id="@+id/typewriterText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/positiveButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/positiveButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="Get started"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/typewriterText" />
+
+    </android.support.constraint.ConstraintLayout>
 
 
 </android.support.constraint.ConstraintLayout>

@@ -113,7 +113,7 @@
     <string name="exact_date">Choose date…</string>
     <string name="sign_in_button">Sign in</string>
     <string name="continue_as_guest">Continue as Guest*</string>
-    <string name="guest_sign_up_warning">* When using Guest login your data is NOT stored to the cloud. Use other sign up options for cloud-based, multi-device synchronization!</string>
+    <string name="sign_in_benefits">Signing in allows you to back up all your data in the cloud so you can use your myPoli account on all your devices</string>
     <string name="sign_in_internet">myPoli needs internet to sign you in!</string>
     <string name="sign_in_loading_dialog_title">Letting you in</string>
     <string name="sign_in_loading_dialog_message">I hope that this will be quick and painless</string>
@@ -653,6 +653,7 @@
     <string name="empty_bucket_list_text">Tasks without a scheduled date will be put here. myPoli will help you schedule and get them done!</string>
     <string name="valid_username">All good</string>
     <string name="choose_your_avatar">Choose Your Avatar</string>
+    <string name="choose_username">Choose username</string>
     <string name="color_pack_unlocked">Enjoy your new colors</string>
     <string name="icon_pack_unlocked">Enjoy your new icons</string>
     <string name="quest_added">Quest added</string>
@@ -1285,4 +1286,20 @@ These are your physical and mental characteristics.\n\n
     <string name="manual_schedule_repeat_pattern">Every date I schedule</string>
     <string name="manual_schedule_hint">You will schedule this Repeating Quest manually</string>
     <string name="never">Never</string>
+    <string name="choose_avatar">Choose your Avatar</string>
+    <string name="choose_pet">Choose your Pet</string>
+    <string name="choose_adventure">Where do you need help?</string>
+    <string name="steps_done">%1$d of %2$d done</string>
+    <string name="all_done">All done</string>
+    <string name="adventure_chores">Chores</string>
+    <string name="adventure_chores_description">Get on top of your errands</string>
+    <string name="adventure_work">Work</string>
+    <string name="adventure_work_description"><![CDATA[Stay focused & get more done]]></string>
+    <string name="adventure_learning">Learning</string>
+    <string name="adventure_learning_description"><![CDATA[Learn new skills & remember more]]></string>
+    <string name="adventure_fitness">Fitness</string>
+    <string name="adventure_fitness_description"><![CDATA[Be fit & complete your workouts]]></string>
+    <string name="adventure_family_time"><![CDATA[Family & friends time]]></string>
+    <string name="adventure_family_time_description"><![CDATA[Spend more time with family & friends]]></string>
+    <string name="onboard_intro">Ahem… *finishing its biscuit*. Hey there, rookie! The war against the Evil Snail is raging and I am really busy! I\'ll explain everything later. Let me help you get started. *Looking for another biscuit*</string>
 </resources>

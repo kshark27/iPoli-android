@@ -8,22 +8,17 @@ import io.ipoli.android.common.AppSideEffectHandler
 import io.ipoli.android.common.AppState
 import io.ipoli.android.common.LoadDataAction
 import io.ipoli.android.common.redux.Action
-import io.ipoli.android.habit.data.Habit
-import io.ipoli.android.habit.predefined.PredefinedHabit
-import io.ipoli.android.onboarding.OnboardData
+import io.ipoli.android.onboarding.OnboardAction
 import io.ipoli.android.pet.Pet
 import io.ipoli.android.pet.PetAvatar
 import io.ipoli.android.player.auth.AuthAction
-import io.ipoli.android.player.auth.AuthViewState
 import io.ipoli.android.player.auth.UsernameValidator
 import io.ipoli.android.player.data.AuthProvider
 import io.ipoli.android.player.data.Avatar
 import io.ipoli.android.player.data.Player
-import io.ipoli.android.player.data.Player.AttributeType.*
 import io.ipoli.android.quest.Color
 import io.ipoli.android.quest.Icon
-import io.ipoli.android.quest.RepeatingQuest
-import io.ipoli.android.repeatingquest.usecase.SaveRepeatingQuestUseCase
+import io.ipoli.android.quest.Quest
 import io.ipoli.android.tag.Tag
 import org.threeten.bp.LocalDate
 import space.traversal.kapsule.required
@@ -38,7 +33,7 @@ object AuthSideEffectHandler : AppSideEffectHandler() {
     private val eventLogger by required { eventLogger }
     private val playerRepository by required { playerRepository }
     private val tagRepository by required { tagRepository }
-    private val habitRepository by required { habitRepository }
+    private val questRepository by required { questRepository }
     private val sharedPreferences by required { sharedPreferences }
     private val removeExpiredPowerUpsScheduler by required { removeExpiredPowerUpsScheduler }
     private val checkMembershipStatusScheduler by required { checkMembershipStatusScheduler }
@@ -46,11 +41,11 @@ object AuthSideEffectHandler : AppSideEffectHandler() {
     private val updateAchievementProgressScheduler by required { updateAchievementProgressScheduler }
     private val resetDayScheduler by required { resetDayScheduler }
     private val resetDateScheduler by required { resetDateScheduler }
-    private val saveRepeatingQuestUseCase by required { saveRepeatingQuestUseCase }
     private val dataImporter by required { dataImporter }
     private val dataExporter by required { dataExporter }
 
-    override fun canHandle(action: Action) = action is AuthAction
+    override fun canHandle(action: Action) =
+        action is AuthAction || action is OnboardAction.CreateGuestPlayer
 
     override suspend fun doExecute(action: Action, state: AppState) {
 
@@ -64,7 +59,7 @@ object AuthSideEffectHandler : AppSideEffectHandler() {
                     isGuest = player!!.authProvider == null
                     hasUsername = !player.username.isNullOrEmpty()
                 }
-                dispatch(AuthAction.Loaded(hasPlayer, isGuest, hasUsername, action.onboardData))
+                dispatch(AuthAction.Loaded(hasPlayer, isGuest, hasUsername))
             }
 
             is AuthAction.UserAuthenticated -> {
@@ -80,14 +75,10 @@ object AuthSideEffectHandler : AppSideEffectHandler() {
                         loginNewPlayerFromGuest(user)
 
                     action.isNew && !isCurrentlyGuest ->
-                        createNewPlayer(user, state.stateFor(AuthViewState::class.java))
+                        createNewPlayer(user)
 
                     else -> loginExistingPlayer()
                 }
-            }
-
-            is AuthAction.ContinueAsGuest -> {
-                createGuestPlayer(state.stateFor(AuthViewState::class.java))
             }
 
             is AuthAction.CompleteSetup -> {
@@ -108,8 +99,7 @@ object AuthSideEffectHandler : AppSideEffectHandler() {
                     val player = playerRepository.find()!!
                     playerRepository.save(
                         player.copy(
-                            username = action.username,
-                            avatar = action.avatar
+                            username = action.username
                         )
                     )
                     playerRepository.addUsername(action.username)
@@ -134,6 +124,9 @@ object AuthSideEffectHandler : AppSideEffectHandler() {
                     dispatch(AuthAction.UsernameValid)
                 }
             }
+
+            is OnboardAction.CreateGuestPlayer ->
+                createGuestPlayer(action.playerAvatar, action.petAvatar, action.petName)
         }
     }
 
@@ -214,13 +207,18 @@ object AuthSideEffectHandler : AppSideEffectHandler() {
         )
 
     private fun createNewPlayer(
-        user: FirebaseUser,
-        state: AuthViewState
+        user: FirebaseUser
     ) {
-
         val displayName = if (user.displayName != null) user.displayName!! else ""
 
-        saveNewPlayerData(state, user.uid, createAuthProvider(user), displayName)
+        saveNewPlayerData(
+            playerId = user.uid,
+            auth = createAuthProvider(user),
+            displayName = displayName,
+            playerAvatar = Avatar.AVATAR_00,
+            petAvatar = Constants.DEFAULT_PET_AVATAR,
+            petName = Constants.DEFAULT_PET_NAME
+        )
         dispatch(AuthAction.ShowSetUp)
     }
 
@@ -234,51 +232,42 @@ object AuthSideEffectHandler : AppSideEffectHandler() {
             authProviders.first()
         }
 
-        val auth = when {
-
-            authProvider.providerId == FacebookAuthProvider.PROVIDER_ID ->
+        return when (authProvider.providerId) {
+            FacebookAuthProvider.PROVIDER_ID ->
                 createFacebookAuthProvider(authProvider, user)
 
-            authProvider.providerId == GoogleAuthProvider.PROVIDER_ID ->
+            GoogleAuthProvider.PROVIDER_ID ->
                 createGoogleAuthProvider(authProvider, user)
 
             else -> throw IllegalStateException("Unknown Auth provider")
         }
-        return auth
     }
 
     private fun createGuestPlayer(
-        state: AuthViewState
+        playerAvatar: Avatar,
+        petAvatar: PetAvatar,
+        petName: String
     ) {
-        saveNewPlayerData(state, UUID.randomUUID().toString(), null, "")
+        saveNewPlayerData(
+            playerId = UUID.randomUUID().toString(),
+            auth = null,
+            displayName = "",
+            playerAvatar = playerAvatar,
+            petAvatar = petAvatar,
+            petName = petName
+        )
         prepareAppStart()
         dispatch(AuthAction.GuestCreated)
     }
 
     private fun saveNewPlayerData(
-        state: AuthViewState,
-        playerId: String,
-        auth: AuthProvider?,
-        displayName: String
-    ) {
-        val petAvatar = state.petAvatar ?: Constants.DEFAULT_PET_AVATAR
-        val petName =
-            if (state.petName.isNullOrBlank()) Constants.DEFAULT_PET_NAME else state.petName!!
-
-        val tags =
-            savePlayerWithTags(playerId, auth, displayName, petName, petAvatar, state.playerAvatar)
-        saveRepeatingQuests(state.repeatingQuests, tags)
-        saveHabits(state.habits, tags)
-    }
-
-    private fun savePlayerWithTags(
         playerId: String,
         auth: AuthProvider?,
         displayName: String,
-        petName: String,
+        playerAvatar: Avatar,
         petAvatar: PetAvatar,
-        playerAvatar: Avatar
-    ): List<Tag> {
+        petName: String
+    ) {
         val player = Player(
             id = playerId,
             authProvider = auth,
@@ -291,70 +280,45 @@ object AuthSideEffectHandler : AppSideEffectHandler() {
             rank = Player.Rank.NOVICE,
             nextRank = Player.Rank.APPRENTICE
         )
-
         val newPlayer = playerRepository.save(player)
         savePlayerId(playerId)
 
-        return saveDefaultTags(newPlayer)
-    }
+        val tags = saveDefaultTags(newPlayer)
 
-    private fun saveRepeatingQuests(
-        repeatingQuests: Set<Pair<RepeatingQuest, OnboardData.Tag?>>,
-        tags: List<Tag>
-    ) {
-        repeatingQuests.forEach {
-            val rq = it.first
-            val ts = it.second?.let { onboardTag ->
-                listOf(tags.first { t -> t.name.toUpperCase() == onboardTag.name })
-            } ?: listOf()
-            saveRepeatingQuestUseCase.execute(
-                SaveRepeatingQuestUseCase.Params(
-                    name = rq.name,
-                    subQuestNames = rq.subQuests.map { sq -> sq.name },
-                    color = rq.color,
-                    icon = rq.icon,
-                    tags = ts,
-                    startTime = rq.startTime,
-                    duration = rq.duration,
-                    reminders = rq.reminders,
-                    repeatPattern = rq.repeatPattern
+        val learningTag = tags.first { it.name == "Learning" }
+
+        questRepository.save(
+            listOf(
+                Quest(
+                    name = "Swipe to -> to complete me",
+                    color = Color.GREEN,
+                    icon = Icon.BOOK,
+                    duration = 10,
+                    scheduledDate = LocalDate.now(),
+                    tags = listOf(learningTag)
+                ),
+                Quest(
+                    name = "Swipe to <- to reschedule me",
+                    color = Color.BLUE,
+                    icon = Icon.BOOK,
+                    duration = 10,
+                    scheduledDate = LocalDate.now(),
+                    tags = listOf(learningTag)
                 )
             )
-        }
-    }
-
-    private fun saveHabits(
-        habits: Set<Pair<PredefinedHabit, OnboardData.Tag?>>,
-        tags: List<Tag>
-    ) {
-        habits.forEach {
-            val h = it.first
-            val ts = it.second?.let { onboardTag ->
-                listOf(tags.first { t -> t.name.toUpperCase() == onboardTag.name })
-            } ?: listOf()
-
-            habitRepository.save(
-                Habit(
-                    name = h.name,
-                    color = h.color,
-                    icon = h.icon,
-                    tags = ts,
-                    isGood = h.isGood,
-                    timesADay = h.timesADay,
-                    days = h.days,
-                    streak = Habit.Streak(0, 0),
-                    preferenceHistory = Habit.PreferenceHistory(
-                        days = sortedMapOf(LocalDate.now() to h.days),
-                        timesADay = sortedMapOf(LocalDate.now() to h.timesADay)
-                    )
-                )
-            )
-        }
+        )
     }
 
     private fun saveDefaultTags(player: Player): List<Tag> {
+
         val tags = tagRepository.save(
             listOf(
+                Tag(
+                    name = "Learning",
+                    color = Color.BLUE,
+                    icon = Icon.BOOK,
+                    isFavorite = true
+                ),
                 Tag(
                     name = "Personal",
                     color = Color.ORANGE,
@@ -372,23 +336,43 @@ object AuthSideEffectHandler : AppSideEffectHandler() {
                     color = Color.GREEN,
                     icon = Icon.FLOWER,
                     isFavorite = true
+                ),
+                Tag(
+                    name = "Fun",
+                    color = Color.PURPLE,
+                    icon = Icon.GAME_CONTROLLER,
+                    isFavorite = true
+                ),
+                Tag(
+                    name = "Chores",
+                    color = Color.BLUE_GREY,
+                    icon = Icon.BROOM,
+                    isFavorite = true
                 )
             )
         )
 
-        val personalTag = tags.first { it.name == "Personal" }
-        val workTag = tags.first { it.name == "Work" }
-        val wellnessTag = tags.first { it.name == "Wellness" }
+        val wellness = tags.first { it.name == "Wellness" }
+        val work = tags.first { it.name == "Work" }
+        val funTag = tags.first { it.name == "Fun" }
+        val learning = tags.first { it.name == "Learning" }
+        val chores = tags.first { it.name == "Chores" }
+        val personal = tags.first { it.name == "Personal" }
 
         playerRepository.save(
             player
-                .addTagToAttribute(STRENGTH, wellnessTag)
-                .addTagToAttribute(INTELLIGENCE, workTag)
-                .addTagToAttribute(CHARISMA, personalTag)
-                .addTagToAttribute(EXPERTISE, workTag)
-                .addTagToAttribute(WELL_BEING, wellnessTag)
-                .addTagToAttribute(WELL_BEING, personalTag)
-                .addTagToAttribute(WILLPOWER, workTag)
+                .addTagToAttribute(Player.AttributeType.STRENGTH, wellness)
+                .addTagToAttribute(Player.AttributeType.INTELLIGENCE, work)
+                .addTagToAttribute(Player.AttributeType.INTELLIGENCE, learning)
+                .addTagToAttribute(Player.AttributeType.INTELLIGENCE, funTag)
+                .addTagToAttribute(Player.AttributeType.CHARISMA, personal)
+                .addTagToAttribute(Player.AttributeType.EXPERTISE, work)
+                .addTagToAttribute(Player.AttributeType.EXPERTISE, learning)
+                .addTagToAttribute(Player.AttributeType.WELL_BEING, wellness)
+                .addTagToAttribute(Player.AttributeType.WELL_BEING, personal)
+                .addTagToAttribute(Player.AttributeType.WILLPOWER, learning)
+                .addTagToAttribute(Player.AttributeType.WILLPOWER, work)
+                .addTagToAttribute(Player.AttributeType.WILLPOWER, chores)
         )
 
         return tags
@@ -409,13 +393,13 @@ object AuthSideEffectHandler : AppSideEffectHandler() {
                 val user = FirebaseAuth.getInstance().currentUser!!
 
                 val displayName = if (user.displayName != null) user.displayName!! else ""
-                savePlayerWithTags(
-                    user.uid,
-                    createAuthProvider(user),
-                    displayName,
-                    Constants.DEFAULT_PET_NAME,
-                    Constants.DEFAULT_PET_AVATAR,
-                    Avatar.AVATAR_00
+                saveNewPlayerData(
+                    playerId = user.uid,
+                    auth = createAuthProvider(user),
+                    displayName = displayName,
+                    playerAvatar = Avatar.AVATAR_00,
+                    petAvatar = Constants.DEFAULT_PET_AVATAR,
+                    petName = Constants.DEFAULT_PET_NAME
                 )
                 dispatch(AuthAction.ShowSetUp)
             }

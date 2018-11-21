@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/md_light_blue_500">
+
+    <Button
+        android:id="@+id/appTourExistingPlayer"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/onboard_existing_player"
+        android:textColor="@color/md_light_text_70"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/appTourPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toTopOf="@+id/appTourDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appTourExistingPlayer" />
+
+    <View
+        android:id="@+id/appTourDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/md_light_text_50"
+        app:layout_constraintBottom_toTopOf="@+id/appTourSkip" />
+
+    <Button
+        android:id="@+id/appTourSkip"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/skip"
+        android:textColor="@color/md_light_text_50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/appTourNext"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/next"
+        android:textColor="@color/md_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/appTourProgress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="8dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:max="5"
+        android:progressDrawable="@drawable/app_tour_progress_bar"
+        app:layout_constraintBottom_toBottomOf="@id/appTourSkip"
+        app:layout_constraintEnd_toStartOf="@id/appTourNext"
+        app:layout_constraintStart_toEndOf="@id/appTourSkip"
+        app:layout_constraintTop_toTopOf="@id/appTourSkip"
+        tools:progress="2" />
+
+</android.support.constraint.ConstraintLayout>

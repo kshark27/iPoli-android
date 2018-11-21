@@ -1,10 +1,10 @@
 package io.ipoli.android.onboarding.scenes
 
+import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.*
-import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import io.ipoli.android.R
@@ -466,7 +466,7 @@ class PickOnboardItemsViewController(args: Bundle? = null) :
                 habits = state.habits
             )
 
-            navigate().setAuth(onboardData = onboardData, changeHandler = HorizontalChangeHandler())
+//            navigate().setAuth(onboardData = onboardData, changeHandler = HorizontalChangeHandler())
         }
     }
 
@@ -500,6 +500,7 @@ class PickOnboardItemsViewController(args: Bundle? = null) :
                 R.layout.item_onboard_repeating_quest
             ) { vm, view, _ ->
                 view.rqName.text = vm.name
+                @SuppressLint("SetTextI18n")
                 view.rqRepeatPattern.text = "${vm.repeatingQuest.repeatPattern.countInPeriod} x week"
 
                 view.rqRepeatPattern.setCompoundDrawablesRelativeWithIntrinsicBounds(

@@ -18,6 +18,8 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.text.SpannableString
+import android.text.style.StrikethroughSpan
 import android.view.*
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
@@ -168,6 +170,7 @@ class TodayViewController(args: Bundle? = null) :
                     dispatch(TodayAction.CompleteQuest(questId(viewHolder)))
                     view.questItems.adapter.notifyItemChanged(viewHolder.adapterPosition)
                 } else {
+                    view.questItems.adapter.notifyItemChanged(viewHolder.adapterPosition)
                     navigate()
                         .toReschedule(
                             includeToday = false,
@@ -175,7 +178,6 @@ class TodayViewController(args: Bundle? = null) :
                                 dispatch(TodayAction.RescheduleQuest(questId, date, time, duration))
                             },
                             cancelListener = {
-                                view.questItems.adapter.notifyItemChanged(viewHolder.adapterPosition)
                             }
                         )
                 }
@@ -976,7 +978,10 @@ class TodayViewController(args: Bundle? = null) :
             view: View,
             holder: SimpleViewHolder
         ) {
-            view.questName.text = vm.name
+
+            val span = SpannableString(vm.name)
+            span.setSpan(StrikethroughSpan(), 0, vm.name.length, 0)
+            view.questName.text = span
 
             view.questIcon.backgroundTintList =
                 ColorStateList.valueOf(colorRes(vm.color))

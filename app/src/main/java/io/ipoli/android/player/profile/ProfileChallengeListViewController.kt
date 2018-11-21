@@ -83,7 +83,7 @@ class ProfileChallengeListViewController(args: Bundle? = null) :
                 view.loginMessageContainer.visible()
                 view.loginMessage.setText(R.string.challenges_sign_in)
                 view.loginButton.onDebounceClick {
-                    navigateFromRoot().toAuth(null)
+                    navigateFromRoot().toAuth(isSigningUp = true)
                 }
             }
 

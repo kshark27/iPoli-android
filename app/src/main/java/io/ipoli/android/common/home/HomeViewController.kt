@@ -258,10 +258,7 @@ class HomeViewController(args: Bundle? = null) :
 
     private fun showAuth() {
         navigate()
-            .toAuth(
-                onboardData = null,
-                changeHandler = VerticalChangeHandler()
-            )
+            .toAuth(isSigningUp = false)
     }
 
     override fun render(state: HomeViewState, view: View) {

@@ -36,8 +36,9 @@
         android:id="@+id/loginContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
         android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:visibility="visible"
         app:cardBackgroundColor="@color/md_red_500"
         app:cardCornerRadius="2dp"
         app:cardElevation="10dp"
@@ -55,10 +56,9 @@
                 android:id="@+id/loginTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="24dp"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="24dp"
-                android:text="Join thousands of heroes!"
+                android:layout_marginEnd="24dp"
                 android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1"
                 android:textColor="@color/md_white"
@@ -82,9 +82,9 @@
                 android:id="@+id/or"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
                 android:text="or"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="@color/md_white"
@@ -104,47 +104,27 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/or" />
 
-            <Button
-                android:id="@+id/anonymousSignUp"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="32dp"
-                android:text="@string/continue_as_guest"
-                android:textColor="@color/md_light_text_70"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/facebookSignIn" />
-
             <TextView
-                android:id="@+id/guestDescription"
+                android:id="@+id/signInBenefitsDescription"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/guest_sign_up_warning"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:text="@string/sign_in_benefits"
                 android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                android:textColor="@color/md_light_text_50"
+                android:textColor="@color/md_light_text_70"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/anonymousSignUp" />
+                app:layout_constraintTop_toBottomOf="@+id/facebookSignIn" />
 
             <android.support.constraint.Group
                 android:id="@+id/signUpContent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:constraint_referenced_ids="or,googleSignIn,loginTitle,facebookSignIn" />
-
-            <android.support.constraint.Group
-                android:id="@+id/guestGroup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:constraint_referenced_ids="guestDescription,anonymousSignUp" />
         </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.CardView>
 
@@ -152,9 +132,9 @@
         android:id="@+id/setupContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
         android:layout_marginTop="32dp"
-        android:visibility="visible"
+        android:layout_marginBottom="32dp"
+        android:visibility="invisible"
         app:cardBackgroundColor="@color/md_red_500"
         app:cardCornerRadius="2dp"
         app:cardElevation="10dp"
@@ -168,58 +148,43 @@
             android:layout_height="match_parent"
             android:paddingBottom="16dp">
 
-
-            <ImageView
-                android:id="@+id/playerAvatar"
-                android:layout_width="76dp"
-                android:layout_height="76dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="16dp"
+            <TextView
+                android:id="@+id/usernameHint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/white_circular_background"
-                android:scaleType="fitCenter"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="16dp"
+                android:text="Choose Username"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/md_white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/avatarHint"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:text="Your Avatar"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                android:textColor="@color/md_light_text_70"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/playerAvatar" />
 
             <EditText
                 android:id="@+id/username"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="@color/md_white"
-                android:drawablePadding="8dp"
                 android:drawableStart="@drawable/ic_user_black_24dp"
+                android:drawablePadding="8dp"
                 android:gravity="center_vertical"
                 android:hint="@string/username"
                 android:includeFontPadding="false"
                 android:inputType="textPersonName"
                 android:maxLength="20"
-                android:paddingBottom="8dp"
-                android:paddingEnd="8dp"
                 android:paddingStart="8dp"
                 android:paddingTop="8dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/avatarHint" />
+                app:layout_constraintTop_toBottomOf="@+id/usernameHint" />
 
             <TextView
                 android:id="@+id/usernameLengthHint"
@@ -236,8 +201,8 @@
                 android:id="@+id/usernameValidationHint"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
                 android:text="@string/username_format_hint"
                 android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                 android:textColor="@color/md_light_text_70"
@@ -246,17 +211,6 @@
                 app:layout_constraintStart_toStartOf="@+id/username"
                 app:layout_constraintTop_toBottomOf="@+id/username" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/avatarList"
-                android:layout_width="0dp"
-                android:layout_height="100dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="32dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/usernameValidationHint" />
-
             <Button
                 android:id="@+id/startJourney"
                 style="@style/Widget.AppCompat.Button.Colored"
@@ -264,21 +218,18 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:backgroundTint="@color/md_indigo_A200"
-                android:paddingEnd="32dp"
                 android:paddingStart="32dp"
+                android:paddingEnd="32dp"
                 android:text="Start your journey"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/avatarList" />
-
+                app:layout_constraintTop_toBottomOf="@+id/usernameValidationHint" />
 
             <android.support.constraint.Group
                 android:id="@+id/setupContent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="visible"
-                app:constraint_referenced_ids="playerAvatar, username, avatarList, startJourney,usernameValidationHint,usernameLengthHint,avatarHint" />
-
+                app:constraint_referenced_ids="username, startJourney, usernameValidationHint, usernameLengthHint" />
 
         </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.CardView>
@@ -287,10 +238,9 @@
         android:id="@+id/signUpHeadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
-        android:text="myPoli"
+        android:layout_marginEnd="32dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textColor="@color/md_white"
         app:layout_constraintEnd_toEndOf="parent"

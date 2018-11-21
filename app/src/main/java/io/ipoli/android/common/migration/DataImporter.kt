@@ -105,12 +105,12 @@ class DataImporter(private val appContext: Context) : Injects<BackgroundModule> 
     private fun importData(): Player {
         localDatabase.clearAllTables()
 
-        val fp = FirestorePlayerRepository(remoteDatabase).find()!!
-        playerRepository.save(fp)
-
         val ft = FirestoreTagRepository(remoteDatabase).findAllNotRemoved()
         val validTagIds = ft.map { it.id }.toSet()
         tagRepository.save(ft)
+
+        val fp = FirestorePlayerRepository(remoteDatabase).find()!!
+        playerRepository.save(fp)
 
         val fh = FirestoreHabitRepository(remoteDatabase)
             .findAllNotRemoved()

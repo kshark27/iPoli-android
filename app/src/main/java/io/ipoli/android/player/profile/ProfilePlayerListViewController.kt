@@ -77,7 +77,7 @@ class ProfilePlayerListViewController(args: Bundle? = null) :
                 view.loginMessageContainer.visible()
                 view.loginMessage.setText(R.string.friends_sign_in)
                 view.loginButton.onDebounceClick {
-                    navigateFromRoot().toAuth(null)
+                    navigateFromRoot().toAuth(isSigningUp = true)
                 }
             }
 

@@ -123,6 +123,7 @@ class AgendaViewController(args: Bundle? = null) :
                                 )
                             )
                         } else if (direction == ItemTouchHelper.START) {
+                            view.agendaList.adapter.notifyItemChanged(viewHolder.adapterPosition)
                             val a = view.agendaList.adapter as AgendaAdapter
                             val vm =
                                 a.getItemAt<AgendaViewModel.QuestViewModel>(viewHolder.adapterPosition)
@@ -140,7 +141,6 @@ class AgendaViewController(args: Bundle? = null) :
                                         )
                                     },
                                     cancelListener = {
-                                        view.agendaList.adapter.notifyItemChanged(viewHolder.adapterPosition)
                                     }
                                 )
                         }

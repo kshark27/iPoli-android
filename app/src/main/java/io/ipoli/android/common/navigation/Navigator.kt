@@ -57,15 +57,20 @@ import io.ipoli.android.habit.predefined.PredefinedHabitListViewController
 import io.ipoli.android.habit.reminder.HabitReminderPickerDialogController
 import io.ipoli.android.habit.show.HabitViewController
 import io.ipoli.android.note.NotePickerDialogController
-import io.ipoli.android.onboarding.OnboardData
+import io.ipoli.android.onboarding.AppTourViewController
 import io.ipoli.android.onboarding.OnboardViewController
+import io.ipoli.android.onboarding.dialogs.OnboardAdventurePickerDialogController
+import io.ipoli.android.onboarding.dialogs.OnboardAvatarPickerDialogController
+import io.ipoli.android.onboarding.dialogs.OnboardPetPickerDialogController
 import io.ipoli.android.onboarding.scenes.PickOnboardItemsViewController
+import io.ipoli.android.pet.PetAvatar
 import io.ipoli.android.pet.PetViewController
 import io.ipoli.android.pet.store.PetStoreViewController
 import io.ipoli.android.planday.PlanDayViewController
 import io.ipoli.android.planday.RescheduleDialogController
 import io.ipoli.android.player.attribute.AttributeListViewController
 import io.ipoli.android.player.auth.AuthViewController
+import io.ipoli.android.player.data.Avatar
 import io.ipoli.android.player.data.Player
 import io.ipoli.android.player.profile.EditProfileDialogController
 import io.ipoli.android.player.profile.FriendProfileViewController
@@ -107,8 +112,15 @@ import org.threeten.bp.LocalDate
 
 class Navigator(private val router: Router) {
 
-    fun setOnboard() {
-        setController({ OnboardViewController() })
+    fun setAppTour() {
+        setController({ AppTourViewController() })
+    }
+
+    fun toOnboard() {
+        pushController(
+            { OnboardViewController() },
+            HorizontalChangeHandler()
+        )
     }
 
     fun setMigration(playerId: String, playerSchemaVersion: Int) {
@@ -181,16 +193,16 @@ class Navigator(private val router: Router) {
         pushController({ AchievementListViewController() }, changeHandler)
     }
 
-    fun toAuth(onboardData: OnboardData?, changeHandler: ControllerChangeHandler? = null) {
-        pushController({ AuthViewController(onboardData) }, changeHandler)
+    fun toAuth(isSigningUp: Boolean) {
+        pushController({ AuthViewController(isSigningUp) }, SimpleSwapChangeHandler())
     }
 
     fun toDailyChallenge() {
         pushController({ DailyChallengeViewController() }, VerticalChangeHandler())
     }
 
-    fun setAuth(onboardData: OnboardData? = null, changeHandler: ControllerChangeHandler? = null) {
-        setController({ AuthViewController(onboardData) }, changeHandler)
+    fun setAuth(isSigningUp: Boolean) {
+        setController({ AuthViewController(isSigningUp) }, SimpleSwapChangeHandler())
     }
 
     fun toEditQuest(
@@ -652,6 +664,24 @@ class Navigator(private val router: Router) {
     ) {
         pushDialog {
             HabitReminderPickerDialogController(reminder, listener)
+        }
+    }
+
+    fun toOnboardAvatarPicker(listener: (Avatar) -> Unit) {
+        pushDialog {
+            OnboardAvatarPickerDialogController(listener)
+        }
+    }
+
+    fun toOnboardPetPicker(listener: (PetAvatar, String) -> Unit) {
+        pushDialog {
+            OnboardPetPickerDialogController(listener)
+        }
+    }
+
+    fun toOnboardAdventurePicker(listener: (List<OnboardAdventurePickerDialogController.Adventure>) -> Unit) {
+        pushDialog {
+            OnboardAdventurePickerDialogController(listener)
         }
     }
 

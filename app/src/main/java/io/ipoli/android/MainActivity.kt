@@ -139,7 +139,7 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
             return
         }
 
-        Navigator(router).setOnboard()
+        Navigator(router).setAppTour()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -269,7 +269,7 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
             val p = playerRepository.find()!!
             GlobalScope.launch(Dispatchers.Main) {
                 if (p.isLoggedIn() && p.username.isNullOrEmpty()) {
-                    Navigator(router).setAuth()
+                    Navigator(router).setAuth(isSigningUp = false)
                 } else if (Random().nextInt(10) == 1 && p.membership == Membership.NONE) {
                     showPremiumSnackbar()
                 }
@@ -359,22 +359,29 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
     }
 
     override suspend fun execute(action: Action, state: AppState, dispatcher: Dispatcher) {
-        withContext(Dispatchers.Main) {
-            when (action) {
-                is ShowBuyPowerUpAction ->
-                    showPowerUpDialog(action.powerUp)
 
-                is TagAction.TagCountLimitReached ->
+        when (action) {
+            is ShowBuyPowerUpAction ->
+                withContext(Dispatchers.Main) {
+                    showPowerUpDialog(action.powerUp)
+                }
+
+            is TagAction.TagCountLimitReached ->
+                withContext(Dispatchers.Main) {
                     Toast.makeText(
                         this@MainActivity,
                         R.string.max_tag_count_reached,
                         Toast.LENGTH_LONG
                     ).show()
+                }
 
-                is HomeAction.ShowPlayerSetup ->
-                    Navigator(router).setAuth()
+            is HomeAction.ShowPlayerSetup ->
+                withContext(Dispatchers.Main) {
+                    Navigator(router).setAuth(isSigningUp = true)
+                }
 
-                is DataLoadedAction.PlayerChanged -> {
+            is DataLoadedAction.PlayerChanged ->
+                withContext(Dispatchers.Main) {
                     val editor = sharedPreferences.edit()
                     val player = action.player
                     editor
@@ -382,7 +389,7 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
                         .putInt(Constants.KEY_SCHEMA_VERSION, player.schemaVersion)
                         .apply()
                 }
-            }
+
         }
     }
 
@@ -419,7 +426,6 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
             || action === TagAction.TagCountLimitReached
             || action === HomeAction.ShowPlayerSetup
             || action === AuthAction.PlayerSetupCompleted
-            || action === AuthAction.GuestCreated
             || action is DataLoadedAction.PlayerChanged
 
     companion object {
