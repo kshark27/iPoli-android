@@ -39,30 +39,29 @@ class ApplyDamageToPlayerUseCase(
         val resetDayTime = player.preferences.resetDayTime
 
         val today = parameters.today
+        val yesterday = today.minusDays(1)
+
+        val yesterdayQuests = questRepository.findScheduledAt(yesterday)
 
         val quests = mutableListOf<Quest>()
         val habits = mutableListOf<Habit>()
 
-        val todayQuests = questRepository.findScheduledAt(today)
-
-        val yesterday = today.minusDays(1)
         val yesterdayStart = yesterday.atTime(resetDayTime.toLocalTime())
         val todayStart = today.atTime(0, 0)
         val todayEnd = today.atTime(resetDayTime.toLocalTime())
 
         val primaryDate = when {
-            resetDayTime == Time.atHours(0) -> today
+            resetDayTime == Time.atHours(0) -> yesterday
             Duration.between(yesterdayStart, todayStart) >
                 Duration.between(todayStart, todayEnd) -> yesterday
             else -> today
         }
 
         if (resetDayTime == Time.atHours(0)) {
-            quests.addAll(todayQuests)
+            quests.addAll(yesterdayQuests)
         } else {
 
-            val yesterdayQuests = questRepository.findScheduledAt(yesterday)
-
+            val todayQuests = questRepository.findScheduledAt(today)
             val (todayScheduled, todayUnscheduled) = todayQuests.partition { it.isScheduled }
             val (yesterdayScheduled, yesterdayUnscheduled) = yesterdayQuests.partition { it.isScheduled }
 
