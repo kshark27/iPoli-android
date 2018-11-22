@@ -14,7 +14,6 @@ import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import com.bluelinelabs.conductor.changehandler.SimpleSwapChangeHandler
 import com.crashlytics.android.Crashlytics
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
@@ -306,7 +305,7 @@ class AuthViewController(args: Bundle? = null) :
     }
 
     private fun startHomeViewController() {
-        navigateFromRoot().replaceWithHome(SimpleSwapChangeHandler())
+        navigateFromRoot().setHome()
     }
 
     private fun startSignUpForProvider(provider: AuthUI.IdpConfig): Intent {
