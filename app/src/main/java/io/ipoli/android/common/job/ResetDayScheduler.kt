@@ -11,6 +11,7 @@ import io.ipoli.android.pet.usecase.ApplyDamageToPlayerUseCase
 import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
+import org.threeten.bp.LocalDate
 import space.traversal.kapsule.Kapsule
 
 class ResetDayJob : FixedDailyJob(ResetDayJob.TAG) {
@@ -22,13 +23,15 @@ class ResetDayJob : FixedDailyJob(ResetDayJob.TAG) {
         val applyDamageToPlayerUseCase by kap.required { applyDamageToPlayerUseCase }
         val updatePlayerStatsUseCase by kap.required { updatePlayerStatsUseCase }
         val sharedPreferences by kap.required { sharedPreferences }
+        val questRepository by kap.required { questRepository }
         kap.inject(MyPoliApp.backgroundModule(context))
 
         val player = playerRepository.find()!!
 
         val oldPet = player.pet
 
-        val newPlayer = applyDamageToPlayerUseCase.execute(ApplyDamageToPlayerUseCase.Params()).player
+        val newPlayer =
+            applyDamageToPlayerUseCase.execute(ApplyDamageToPlayerUseCase.Params()).player
         val newPet = newPlayer.pet
 
         if (oldPet.isDead != newPet.isDead) {
@@ -44,10 +47,14 @@ class ResetDayJob : FixedDailyJob(ResetDayJob.TAG) {
             sharedPreferences.edit().putBoolean(Constants.KEY_PLAYER_DEAD, true).commit()
         }
 
+        val todayQuests = questRepository.findScheduledAt(LocalDate.now())
+
         GlobalScope.launch(Dispatchers.Main) {
 
-            if (newPlayer.isDead) {
+            if (newPlayer.preferences.isQuickDoNotificationEnabled && newPlayer.isDead) {
                 QuickDoNotificationUtil.showDefeated(context)
+            } else if (newPlayer.preferences.isQuickDoNotificationEnabled) {
+                QuickDoNotificationUtil.update(context, todayQuests)
             }
 
             AppWidgetUtil.updateAgendaWidget(context)

@@ -14,7 +14,7 @@ object BucketListSideEffectHandler : AppSideEffectHandler() {
 
     override suspend fun doExecute(action: Action, state: AppState) {
         when (action) {
-            BucketListAction.Load ->
+            is BucketListAction.Load ->
                 dispatch(
                     BucketListAction.ItemsChanged(
                         createBucketListItemsUseCase.execute(

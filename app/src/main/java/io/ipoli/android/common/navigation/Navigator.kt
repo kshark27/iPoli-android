@@ -10,6 +10,7 @@ import com.bluelinelabs.conductor.changehandler.SimpleSwapChangeHandler
 import com.bluelinelabs.conductor.changehandler.VerticalChangeHandler
 import com.google.firebase.auth.FirebaseAuth
 import io.ipoli.android.Constants
+import io.ipoli.android.R.id.showCompleted
 import io.ipoli.android.achievement.list.AchievementListViewController
 import io.ipoli.android.challenge.QuestPickerViewController
 import io.ipoli.android.challenge.add.AddChallengeViewController
@@ -37,6 +38,7 @@ import io.ipoli.android.common.datetime.Day
 import io.ipoli.android.common.datetime.Duration
 import io.ipoli.android.common.datetime.Minute
 import io.ipoli.android.common.datetime.Time
+import io.ipoli.android.common.dialog.FilterDialogController
 import io.ipoli.android.common.feedback.WebUrlViewController
 import io.ipoli.android.common.home.HomeViewController
 import io.ipoli.android.common.migration.MigrationViewController
@@ -75,6 +77,7 @@ import io.ipoli.android.player.data.Player
 import io.ipoli.android.player.profile.EditProfileDialogController
 import io.ipoli.android.player.profile.FriendProfileViewController
 import io.ipoli.android.player.profile.ProfileViewController
+import io.ipoli.android.player.view.RevivePlayerDialogController
 import io.ipoli.android.quest.Color
 import io.ipoli.android.quest.CompletedQuestViewController
 import io.ipoli.android.quest.Icon
@@ -683,6 +686,20 @@ class Navigator(private val router: Router) {
         pushDialog {
             OnboardAdventurePickerDialogController(listener)
         }
+    }
+
+    fun toFilter(
+        showCompleted: Boolean,
+        selectedTags: Set<Tag> = emptySet(),
+        listener: (Boolean, Set<Tag>) -> Unit
+    ) {
+        pushDialog {
+            FilterDialogController(showCompleted, selectedTags, listener)
+        }
+    }
+
+    fun toRevivePlayer() {
+        pushDialog { RevivePlayerDialogController() }
     }
 
     private inline fun <reified C : Controller> pushDialog(createDialogController: () -> C) {

@@ -68,8 +68,12 @@ class OnboardAvatarPickerDialogController(args: Bundle? = null) : BaseDialogCont
         dialogBuilder: AlertDialog.Builder,
         contentView: View,
         savedViewState: Bundle?
-    ): AlertDialog = dialogBuilder
-        .create()
+    ): AlertDialog =
+        dialogBuilder
+            .setNeutralButton(R.string.no_one) { _, _ ->
+                listener(Avatar.AVATAR_00)
+            }
+            .create()
 
     data class AvatarViewModel(
         @DrawableRes val image: Int,

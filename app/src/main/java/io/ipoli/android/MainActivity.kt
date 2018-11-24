@@ -31,7 +31,6 @@ import io.ipoli.android.common.view.Debounce
 import io.ipoli.android.common.view.playerTheme
 import io.ipoli.android.player.auth.AuthAction
 import io.ipoli.android.player.data.Membership
-import io.ipoli.android.player.view.RevivePopup
 import io.ipoli.android.repeatingquest.usecase.SaveQuestsForRepeatingQuestUseCase
 import io.ipoli.android.store.powerup.AndroidPowerUp
 import io.ipoli.android.store.powerup.PowerUp
@@ -311,10 +310,10 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
 
     override fun onResume() {
         super.onResume()
-        stateStore.addSideEffectHandler(this)
         if (sharedPreferences.getBoolean(Constants.KEY_PLAYER_DEAD, false)) {
-            RevivePopup().show(this)
+            Navigator(rootRouter).toRevivePlayer()
         }
+        stateStore.addSideEffectHandler(this)
     }
 
     override fun onPause() {
@@ -382,9 +381,11 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
 
             is DataLoadedAction.PlayerChanged ->
                 withContext(Dispatchers.Main) {
-                    val editor = sharedPreferences.edit()
                     val player = action.player
-                    editor
+                    if (player.isDead) {
+                        Navigator(router).toRevivePlayer()
+                    }
+                    sharedPreferences.edit()
                         .putString(Constants.KEY_TIME_FORMAT, player.preferences.timeFormat.name)
                         .putInt(Constants.KEY_SCHEMA_VERSION, player.schemaVersion)
                         .apply()

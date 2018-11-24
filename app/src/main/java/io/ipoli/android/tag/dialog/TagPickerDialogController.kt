@@ -1,5 +1,6 @@
 package io.ipoli.android.tag.dialog
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
@@ -64,7 +65,7 @@ object TagPickerReducer : BaseViewStateReducer<TagPickerViewState>() {
                 subState.copy(
                     type = DATA_LOADED,
                     petAvatar = it.pet.avatar,
-                    tags = state.dataState.tags.sortedByDescending { it.isFavorite },
+                    tags = state.dataState.tags.sortedByDescending { t -> t.isFavorite },
                     selectedTags = action.selectedTags
                 )
             } ?: subState.copy(
@@ -164,11 +165,11 @@ class TagPickerDialogController(args: Bundle? = null) :
         this.listener = listener
     }
 
+    @SuppressLint("InflateParams")
     override fun onCreateContentView(inflater: LayoutInflater, savedViewState: Bundle?): View {
         val view = inflater.inflate(R.layout.dialog_tag_picker, null)
         view.tagList.layoutManager = LinearLayoutManager(activity!!)
         view.tagList.adapter = FavouriteTagAdapter()
-
         return view
     }
 
@@ -274,9 +275,7 @@ class TagPickerDialogController(args: Bundle? = null) :
                     dispatch(TagPickerAction.RemoveTag(vm.tag))
                 }
             }
-
         }
-
     }
 
     private val TagPickerViewState.viewModels: List<TagViewModel>

@@ -29,7 +29,7 @@ class BootCompleteReceiver : AsyncBroadcastReceiver() {
                 GlobalScope.launch(Dispatchers.Main) {
                     AppWidgetUtil.updateAgendaWidget(context)
                     AppWidgetUtil.updateHabitWidget(context)
-                    if (p.isDead) {
+                    if (p.isDead && p.preferences.isQuickDoNotificationEnabled) {
                         QuickDoNotificationUtil.showDefeated(context)
                     } else {
                         if (p.preferences.isQuickDoNotificationEnabled) {

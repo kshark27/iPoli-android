@@ -68,14 +68,15 @@ object LoadAllDataSideEffectHandler : AppSideEffectHandler() {
                 updateQuestWidgets()
             }
 
-            if (sharedPreferences.getBoolean(Constants.KEY_PLAYER_DEAD, false)) {
-                QuickDoNotificationUtil.showDefeated(MyPoliApp.instance)
-            } else if (sharedPreferences.getBoolean(
-                    Constants.KEY_QUICK_DO_NOTIFICATION_ENABLED,
-                    Constants.DEFAULT_QUICK_DO_NOTIFICATION_ENABLED
-                )
-            ) {
+            val isQuickDoEnabled = sharedPreferences.getBoolean(
+                Constants.KEY_QUICK_DO_NOTIFICATION_ENABLED,
+                Constants.DEFAULT_QUICK_DO_NOTIFICATION_ENABLED
+            )
 
+            if (isQuickDoEnabled && sharedPreferences.getBoolean(Constants.KEY_PLAYER_DEAD, false)
+            ) {
+                QuickDoNotificationUtil.showDefeated(MyPoliApp.instance)
+            } else if (isQuickDoEnabled) {
                 QuickDoNotificationUtil.update(
                     MyPoliApp.instance,
                     action.quests

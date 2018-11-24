@@ -34,15 +34,10 @@ class CompleteQuestReceiver : AsyncBroadcastReceiver() {
             )
         ) {
             val todayQuests = questRepository.findScheduledAt(LocalDate.now())
-
             QuickDoNotificationUtil.update(context, todayQuests)
-            GlobalScope.launch(Dispatchers.Main) {
-                updateUIElements(context)
-            }
-        } else {
-            GlobalScope.launch(Dispatchers.Main) {
-                updateUIElements(context)
-            }
+        }
+        GlobalScope.launch(Dispatchers.Main) {
+            updateUIElements(context)
         }
     }
 

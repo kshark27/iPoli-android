@@ -97,6 +97,8 @@ interface QuestRepository : CollectionRepository<Quest> {
         startDate: LocalDate = LocalDate.now()
     )
 
+    fun removeAllUnscheduledCompleted()
+
     fun findNotCompletedNotForChallengeNotRepeating(
         challengeId: String,
         start: LocalDate = LocalDate.now()
@@ -376,6 +378,9 @@ abstract class QuestDao : BaseDao<RoomQuest>() {
         date: Long
     ): List<RoomQuest>
 
+    @Query("SELECT * FROM quests WHERE completedAtDate IS NOT NULL AND scheduledDate IS NULL")
+    abstract fun findAllUnscheduledCompleted(): List<RoomQuest>
+
     @Query(
         """
         SELECT quests.*
@@ -618,6 +623,13 @@ class RoomQuestRepository(
     override fun removeAllNotCompletedForRepeating(repeatingQuestId: String, startDate: LocalDate) {
         val rqs = dao.findAllNotCompletedForRepeating(repeatingQuestId, startDate.startOfDayUTC())
         removeWithRepeatingQuestIdAndReminders(rqs.map { it.id })
+    }
+
+    override fun removeAllUnscheduledCompleted() {
+        val qs = dao.findAllUnscheduledCompleted()
+        val qIds = qs.map { it.id }
+        dao.remove(qIds)
+        purgeReminders(qIds)
     }
 
     @Transaction

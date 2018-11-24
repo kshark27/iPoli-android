@@ -329,5 +329,8 @@ interface Constants {
         const val DEFAULT_AUTO_POSTING_ENABLED = true
 
         val DEFAULT_AGENDA_START_SCREEN = Player.Preferences.AgendaScreen.AGENDA
+
+        const val KEY_BUCKET_LIST_SHOW_COMPLETED = "BUCKET_LIST_SHOW_COMPLETED"
+        const val DEFAULT_BUCKET_LIST_SHOW_COMPLETED = true
     }
 }

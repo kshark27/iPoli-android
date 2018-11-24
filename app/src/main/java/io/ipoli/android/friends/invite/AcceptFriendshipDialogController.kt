@@ -85,8 +85,10 @@ data class AcceptFriendshipViewState(
     enum class StateType { LOADING, PLAYER_DATA_LOADED, ALREADY_FRIENDS }
 }
 
-class AcceptFriendshipDialogController :
-    ReduxDialogController<AcceptFriendshipAction, AcceptFriendshipViewState, AcceptFriendshipReducer> {
+class AcceptFriendshipDialogController(args: Bundle? = null) :
+    ReduxDialogController<AcceptFriendshipAction, AcceptFriendshipViewState, AcceptFriendshipReducer>(
+        args
+    ) {
 
     override val reducer = AcceptFriendshipReducer
 
@@ -97,8 +99,6 @@ class AcceptFriendshipDialogController :
     ) : this() {
         this.invitePlayerId = invitePlayerId
     }
-
-    constructor(args: Bundle? = null) : super(args)
 
     @SuppressLint("InflateParams")
     override fun onCreateContentView(inflater: LayoutInflater, savedViewState: Bundle?): View {

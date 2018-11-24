@@ -61,12 +61,11 @@ object PlayerSideEffectHandler : AppSideEffectHandler() {
 
             is ReviveAction -> {
                 val p = playerRepository.find()!!
+                sharedPreferences.edit().putBoolean(Constants.KEY_PLAYER_DEAD, false).commit()
                 if (!p.isDead) {
                     return
                 }
                 playerRepository.save(p.revive())
-
-                sharedPreferences.edit().putBoolean(Constants.KEY_PLAYER_DEAD, false).commit()
 
                 GlobalScope.launch(Dispatchers.Main) {
                     state.dataState.todayQuests?.let {

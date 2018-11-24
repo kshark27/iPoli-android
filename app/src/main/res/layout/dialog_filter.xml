@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/DialogContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <Switch
+        android:id="@+id/showCompleted"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="Show Completed" />
+
+    <TextView
+        style="@style/SectionTitle"
+        android:text="Tags" />
+
+    <Switch
+        android:id="@+id/showAllTags"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="Show all Tags" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/tagList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

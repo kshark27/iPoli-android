@@ -122,9 +122,10 @@ class RescheduleDialogController(args: Bundle? = null) :
         dialogBuilder: AlertDialog.Builder,
         contentView: View,
         savedViewState: Bundle?
-    ): AlertDialog = dialogBuilder
-        .setNegativeButton(R.string.cancel, null)
-        .create()
+    ): AlertDialog =
+        dialogBuilder
+            .setNegativeButton(R.string.cancel, null)
+            .create()
 
     override fun onCreateLoadAction() = RescheduleDialogAction.Load(includeToday)
 

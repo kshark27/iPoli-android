@@ -39,6 +39,7 @@ object EditQuestSideEffectHandler : AppSideEffectHandler() {
     private val rescheduleQuestUseCase by required { rescheduleQuestUseCase }
     private val removeQuestUseCase by required { removeQuestUseCase }
     private val undoRemoveQuestUseCase by required { undoRemoveQuestUseCase }
+    private val removeAllCompletedFromBucketListUseCase by required { removeAllCompletedFromBucketListUseCase }
 
     override suspend fun doExecute(action: Action, state: AppState) {
         when (action) {
@@ -192,6 +193,9 @@ object EditQuestSideEffectHandler : AppSideEffectHandler() {
 
             is BucketListAction.UndoRemoveQuest ->
                 undoRemoveQuestUseCase.execute(action.questId)
+
+            is BucketListAction.RemoveAllCompleted ->
+                removeAllCompletedFromBucketListUseCase.execute(Unit)
         }
     }
 

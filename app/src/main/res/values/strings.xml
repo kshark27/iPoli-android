@@ -1302,4 +1302,10 @@ These are your physical and mental characteristics.\n\n
     <string name="adventure_family_time"><![CDATA[Family & friends time]]></string>
     <string name="adventure_family_time_description"><![CDATA[Spend more time with family & friends]]></string>
     <string name="onboard_intro">Ahem… *finishing its biscuit*. Hey there, rookie! The war against the Evil Snail is raging and I am really busy! I\'ll explain everything later. Let me help you get started. *Looking for another biscuit*</string>
+    <string name="apply">Apply</string>
+    <string name="dialog_filter_title">Filter your Quests</string>
+    <string name="filter">Filter</string>
+    <string name="remove_completed">Remove completed</string>
+    <string name="dialog_remove_completed_quests_confirmation_message">Do you really want to remove all completed Quests?</string>
+    <string name="no_one">No one</string>
 </resources>

@@ -10,14 +10,13 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.SpannableString
 import android.text.style.StrikethroughSpan
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.TextView
 import com.bluelinelabs.conductor.RouterTransaction
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler
 import com.mikepenz.iconics.typeface.IIcon
 import com.mikepenz.ionicons_typeface_library.Ionicons
+import io.ipoli.android.Constants
 import io.ipoli.android.R
 import io.ipoli.android.common.ViewUtils
 import io.ipoli.android.common.datetime.daysUntil
@@ -33,18 +32,25 @@ import io.ipoli.android.quest.CompletedQuestViewController
 import io.ipoli.android.quest.Quest
 import io.ipoli.android.quest.bucketlist.usecase.CreateBucketListItemsUseCase
 import io.ipoli.android.quest.schedule.addquest.AddQuestAnimationHelper
+import io.ipoli.android.tag.Tag
 import kotlinx.android.synthetic.main.controller_bucket_list.view.*
 import kotlinx.android.synthetic.main.item_agenda_quest.view.*
 import kotlinx.android.synthetic.main.view_empty_list.view.*
 import kotlinx.android.synthetic.main.view_loader.view.*
 import org.threeten.bp.LocalDate
+import space.traversal.kapsule.required
 
 class BucketListViewController(args: Bundle? = null) :
     ReduxViewController<BucketListAction, BucketListViewState, BucketListReducer>(args) {
 
     override val reducer = BucketListReducer
 
+    private val sharedPreferences by required { sharedPreferences }
+
     private lateinit var addQuestAnimationHelper: AddQuestAnimationHelper
+
+    private var showCompleted = true
+    private var selectedTags = emptySet<Tag>()
 
     override var helpConfig: HelpConfig? =
         HelpConfig(R.string.help_dialog_bucket_list_title, R.string.help_dialog_bucket_list_message)
@@ -57,7 +63,7 @@ class BucketListViewController(args: Bundle? = null) :
         setHasOptionsMenu(true)
         val view = container.inflate(R.layout.controller_bucket_list)
 
-        view.questList.layoutManager = LinearLayoutManager(activity!!)
+        view.questList.layoutManager = LinearLayoutManager(view.context)
         view.questList.adapter = QuestAdapter()
 
         val swipeHandler = object : MultiViewTypeSwipeCallback(
@@ -93,7 +99,14 @@ class BucketListViewController(args: Bundle? = null) :
                                 .toReschedule(
                                     includeToday = true,
                                     listener = { date, time, duration ->
-                                        dispatch(BucketListAction.RescheduleQuest(questId, date, time, duration))
+                                        dispatch(
+                                            BucketListAction.RescheduleQuest(
+                                                questId,
+                                                date,
+                                                time,
+                                                duration
+                                            )
+                                        )
                                     },
                                     cancelListener = {
                                         view.questList.adapter.notifyItemChanged(viewHolder.adapterPosition)
@@ -157,6 +170,11 @@ class BucketListViewController(args: Bundle? = null) :
 
         initAddQuest(view)
 
+        showCompleted = sharedPreferences.getBoolean(
+            Constants.KEY_BUCKET_LIST_SHOW_COMPLETED,
+            Constants.DEFAULT_BUCKET_LIST_SHOW_COMPLETED
+        )
+
         return view
     }
 
@@ -194,7 +212,36 @@ class BucketListViewController(args: Bundle? = null) :
         toolbarTitle = stringRes(R.string.title_bucket_list)
     }
 
-    override fun onCreateLoadAction() = BucketListAction.Load
+    override fun onCreateLoadAction() = BucketListAction.Load(showCompleted)
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.bucket_list_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.actionFilter) {
+            navigate().toFilter(showCompleted, selectedTags) { sc, st ->
+                sharedPreferences
+                    .edit()
+                    .putBoolean(Constants.KEY_BUCKET_LIST_SHOW_COMPLETED, sc)
+                    .apply()
+                showCompleted = sc
+                selectedTags = st
+                dispatch(BucketListAction.Filter(sc, st))
+            }
+            return true
+        } else if (item.itemId == R.id.actionRemoveCompleted) {
+            navigate().toConfirmation(
+                stringRes(R.string.dialog_confirmation_title),
+                stringRes(R.string.dialog_remove_completed_quests_confirmation_message)
+            ) {
+                dispatch(BucketListAction.RemoveAllCompleted)
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
 
     override fun render(state: BucketListViewState, view: View) {
         when (state.type) {
@@ -366,7 +413,7 @@ class BucketListViewController(args: Bundle? = null) :
     }
 
     private val BucketListViewState.itemViewModels: List<ItemViewModel>
-        get() = items.map {
+        get() = visibleItems.map {
             when (it) {
                 is CreateBucketListItemsUseCase.BucketListItem.QuestItem -> {
 

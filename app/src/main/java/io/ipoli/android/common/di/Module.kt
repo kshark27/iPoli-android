@@ -319,6 +319,7 @@ interface UseCaseModule {
     val saveQuestUseCase: SaveQuestUseCase
     val removeQuestUseCase: RemoveQuestUseCase
     val undoRemoveQuestUseCase: UndoRemovedQuestUseCase
+    val removeAllCompletedFromBucketListUseCase: RemoveAllCompletedFromBucketListUseCase
     val findQuestsToRemindUseCase: FindQuestsToRemindUseCase
     val findHabitsToRemindUseCase: FindHabitsToRemindUseCase
     val snoozeQuestUseCase: SnoozeQuestUseCase
@@ -600,6 +601,10 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
             questRepository,
             reminderScheduler
         )
+
+    override val removeAllCompletedFromBucketListUseCase
+        get() = RemoveAllCompletedFromBucketListUseCase(questRepository)
+
     override val findQuestsToRemindUseCase get() = FindQuestsToRemindUseCase(questRepository)
     override val findHabitsToRemindUseCase get() = FindHabitsToRemindUseCase(habitRepository)
     override val snoozeQuestUseCase get() = SnoozeQuestUseCase(questRepository, reminderScheduler)
