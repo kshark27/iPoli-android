@@ -13,6 +13,7 @@ import io.ipoli.android.R
 import io.ipoli.android.common.ViewUtils
 import io.ipoli.android.common.redux.android.ReduxViewController
 import io.ipoli.android.common.view.*
+import io.ipoli.android.habit.data.Habit
 import io.ipoli.android.habit.show.HabitViewState.StateType.DATA_CHANGED
 import io.ipoli.android.habit.show.HabitViewState.StateType.TOGGLE_FUTURE_DATE_ERROR
 import io.ipoli.android.quest.schedule.summary.ScheduleSummaryViewController
@@ -309,8 +310,11 @@ class HabitViewController(args: Bundle? = null) :
 
     private val HabitViewState.timesADayText
         get() =
-            if (timesADay == 1) stringRes(R.string.time_a_day)
-            else stringRes(R.string.times_a_day, timesADay!!)
+            when (timesADay) {
+                Habit.UNLIMITED_TIMES_A_DAY -> stringRes(R.string.unlimited_times_a_day)
+                1 -> stringRes(R.string.time_a_day)
+                else -> stringRes(R.string.times_a_day, timesADay!!)
+            }
 
 
 }

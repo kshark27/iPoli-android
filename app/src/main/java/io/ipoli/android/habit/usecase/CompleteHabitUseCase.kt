@@ -37,7 +37,7 @@ class CompleteHabitUseCase(
 
         val date = parameters.date
 
-        require(!habit!!.isCompletedForDate(date))
+        require(habit!!.canCompleteMoreForDate(date))
 
         val history = habit.history.toMutableMap()
 
@@ -56,54 +56,70 @@ class CompleteHabitUseCase(
         }
 
         val newHabit = if (isCompleted) {
-            if (habit.isGood) {
-                val reward = rewardPlayerUseCase.execute(
-                    RewardPlayerUseCase.Params.ForHabit(
-                        habit.copy(history = history),
-                        playerDate = date,
-                        player = player
+            when {
+                habit.isUnlimited -> {
+                    val reward = rewardPlayerUseCase.execute(
+                        RewardPlayerUseCase.Params.ForHabit(
+                            habit.copy(history = history),
+                            playerDate = date,
+                            player = player
+                        )
+                    ).reward
+                    val h = saveHabit(habit, history)
+                    rewardScheduler.schedule(
+                        reward = reward,
+                        type = RewardScheduler.Type.HABIT,
+                        entityId = habit.id
                     )
-                ).reward
-                history[date] = history[date]!!.copy(
-                    reward = reward
-                )
-                val h = saveHabit(habit, history)
 
-                rewardScheduler.schedule(
-                    reward = reward,
-                    type = RewardScheduler.Type.HABIT,
-                    entityId = habit.id
-                )
-
-                addPostIfHabitIsPublic(h, date)
-
-                h
-
-            } else {
-                val reward = rewardPlayerUseCase.execute(
-                    RewardPlayerUseCase.Params.ForBadHabit(
-                        habit.copy(history = history),
-                        playerDate = date,
-                        player = player
+                    addPostIfHabitIsPublic(h, date)
+                    h
+                }
+                habit.isGood -> {
+                    val reward = rewardPlayerUseCase.execute(
+                        RewardPlayerUseCase.Params.ForHabit(
+                            habit.copy(history = history),
+                            playerDate = date,
+                            player = player
+                        )
+                    ).reward
+                    history[date] = history[date]!!.copy(
+                        reward = reward
                     )
-                ).reward
-                history[date] = history[date]!!.copy(
-                    reward = reward
-                )
-                val h = saveHabit(habit, history)
-                rewardScheduler.schedule(
-                    reward = reward.copy(
-                        experience = -reward.experience,
-                        coins = -reward.coins,
-                        attributePoints = reward.attributePoints.map {
-                            it.key to -it.value
-                        }.toMap()
-                    ),
-                    isPositive = false,
-                    type = RewardScheduler.Type.HABIT,
-                    entityId = habit.id
-                )
-                h
+                    val h = saveHabit(habit, history)
+
+                    rewardScheduler.schedule(
+                        reward = reward,
+                        type = RewardScheduler.Type.HABIT,
+                        entityId = habit.id
+                    )
+
+                    addPostIfHabitIsPublic(h, date)
+                    h
+                }
+                else -> {
+                    val reward = rewardPlayerUseCase.execute(
+                        RewardPlayerUseCase.Params.ForBadHabit(
+                            habit.copy(history = history),
+                            playerDate = date,
+                            player = player
+                        )
+                    ).reward
+                    val h = saveHabit(habit, history)
+                    rewardScheduler.schedule(
+                        reward = reward.copy(
+                            experience = -reward.experience,
+                            coins = -reward.coins,
+                            attributePoints = reward.attributePoints.map {
+                                it.key to -it.value
+                            }.toMap()
+                        ),
+                        isPositive = false,
+                        type = RewardScheduler.Type.HABIT,
+                        entityId = habit.id
+                    )
+                    h
+                }
             }
         } else {
             saveHabit(habit, history)

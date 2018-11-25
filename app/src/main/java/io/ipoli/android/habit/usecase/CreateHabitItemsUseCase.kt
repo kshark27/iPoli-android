@@ -13,7 +13,7 @@ class CreateHabitItemsUseCase :
         val habits = parameters.habits.sortedWith(
             compareByDescending<Habit> { it.shouldBeDoneOn(currentDate) }
                 .thenBy { it.isCompletedForDate(currentDate) }
-                .thenByDescending { it.timesADay }
+                .thenByDescending { if (it.isUnlimited) 1 else it.timesADay }
                 .thenByDescending { it.isGood }
         )
 
@@ -28,6 +28,7 @@ class CreateHabitItemsUseCase :
                             habit = it,
                             isCompleted = if (it.isGood) isCompleted else !isCompleted,
                             completedCount = it.completedCountForDate(currentDate),
+                            canBeCompletedMoreTimes = it.canCompleteMoreForDate(currentDate),
                             isBestStreak = it.streak.best != 0 && it.streak.best == it.streak.current
                         )
                     } +
@@ -47,6 +48,7 @@ class CreateHabitItemsUseCase :
                             habit = it,
                             isCompleted = if (it.isGood) isCompleted else !isCompleted,
                             completedCount = it.completedCountForDate(currentDate),
+                            canBeCompletedMoreTimes = it.canCompleteMoreForDate(currentDate),
                             isBestStreak = it.streak.best != 0 && it.streak.best == it.streak.current
                         )
                     }
@@ -71,6 +73,7 @@ class CreateHabitItemsUseCase :
         data class Today(
             val habit: Habit,
             val isCompleted: Boolean,
+            val canBeCompletedMoreTimes: Boolean,
             val completedCount: Int,
             val isBestStreak: Boolean
         ) : HabitItem()

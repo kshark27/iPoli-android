@@ -104,7 +104,7 @@ class SaveHabitUseCase(
     ): Habit {
         val p = player ?: playerRepository.find()!!
         val date = LocalDate.now()
-        if (!habit.shouldBeDoneOn(date)) {
+        if (!habit.shouldBeDoneOn(date) || timesADay == Habit.UNLIMITED_TIMES_A_DAY) {
             return habit
         }
 
@@ -112,9 +112,8 @@ class SaveHabitUseCase(
 
         if (completedCountForDate >= timesADay) {
 
-            val reward =
-                rewardPlayerUseCase.execute(RewardPlayerUseCase.Params.ForHabit(habit, date, p))
-                    .reward
+            val params = RewardPlayerUseCase.Params.ForHabit(habit, date, p)
+            val reward = rewardPlayerUseCase.execute(params).reward
 
             val history = habit.history.toMutableMap()
 

@@ -641,7 +641,7 @@
     <style name="EditSimpleDivider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
-        <item name="android:background">@color/md_light_text_50</item>
+        <item name="android:background">@color/md_light_text_38</item>
     </style>
 
     <style name="SectionTitle" parent="@style/TextAppearance.AppCompat.Body2">

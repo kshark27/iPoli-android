@@ -13,6 +13,7 @@ import org.amshove.kluent.`should be equal to`
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
 
 /**
@@ -23,6 +24,7 @@ class ApplyDamageToPlayerUseCaseSpek : Spek({
     describe("ApplyDamageToPlayerUseCase") {
 
         val today = LocalDate.now()
+        val yesterday = today.minusDays(1)
 
         val quest = Quest(
             name = "",
@@ -33,7 +35,11 @@ class ApplyDamageToPlayerUseCaseSpek : Spek({
 
         fun executeUseCase(
             questRepository: QuestRepository,
-            player: Player = TestUtil.player,
+            player: Player = TestUtil.player.copy(
+                preferences = TestUtil.player.preferences.copy(
+                    planDays = DayOfWeek.values().toSet()
+                )
+            ),
             date: LocalDate = today
         ) =
             ApplyDamageToPlayerUseCase(
@@ -54,21 +60,21 @@ class ApplyDamageToPlayerUseCaseSpek : Spek({
 
         it("should apply damage for single Quest") {
             val r = executeUseCase(questRepository = mock { _ ->
-                on { findScheduledAt(today) } doAnswer {
+                on { findScheduledAt(yesterday) } doAnswer {
                     listOf(quest)
                 }
             })
-            r.totalDamage.`should be equal to`(ApplyDamageToPlayerUseCase.QUEST_BASE_DAMAGE)
+            r.totalDamage.`should be equal to`(ApplyDamageToPlayerUseCase.QUEST_BASE_DAMAGE + ApplyDamageToPlayerUseCase.PRODUCTIVE_DAY_DAMAGE)
         }
 
         it("should apply damage for Quest from Challenge") {
             val r = executeUseCase(questRepository = mock { _ ->
-                on { findScheduledAt(today) } doAnswer {
+                on { findScheduledAt(yesterday) } doAnswer {
                     listOf(quest.copy(challengeId = "123"))
                 }
             })
             val expectedDamage =
-                ApplyDamageToPlayerUseCase.QUEST_BASE_DAMAGE + ApplyDamageToPlayerUseCase.CHALLENGE_DAMAGE
+                ApplyDamageToPlayerUseCase.QUEST_BASE_DAMAGE + ApplyDamageToPlayerUseCase.CHALLENGE_DAMAGE + ApplyDamageToPlayerUseCase.PRODUCTIVE_DAY_DAMAGE
             r.totalDamage.`should be equal to`(expectedDamage)
         }
 

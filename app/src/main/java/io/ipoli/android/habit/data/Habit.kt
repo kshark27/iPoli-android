@@ -44,11 +44,20 @@ data class Habit(
         val timesADay: SortedMap<LocalDate, Int>
     )
 
+    fun canCompleteMoreForDate(date: LocalDate) =
+        if (isUnlimited || !isGood)
+            true
+        else
+            !isCompletedForDate(date)
+
     fun completedCountForDate(date: LocalDate) =
         if (history.containsKey(date)) history[date]!!.completedCount else 0
 
     fun isCompletedForDate(date: LocalDate) =
-        completedCountForDate(date) >= requiredTimesToComplete(date)
+        if (isUnlimited)
+            completedCountForDate(date) > 0
+        else
+            completedCountForDate(date) >= requiredTimesToComplete(date)
 
     private fun requiredTimesToComplete(date: LocalDate) =
         if (preferenceHistory.timesADay.size == 1) {
@@ -82,7 +91,13 @@ data class Habit(
 
     val isFromChallenge get() = challengeId != null
 
+    val isUnlimited get() = isGood && timesADay == UNLIMITED_TIMES_A_DAY
+
     data class Streak(val current: Int, val best: Int)
+
+    companion object {
+        const val UNLIMITED_TIMES_A_DAY = -1
+    }
 }
 
 data class CompletedEntry(

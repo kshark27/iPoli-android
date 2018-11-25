@@ -1253,6 +1253,7 @@ These are your physical and mental characteristics.\n\n
     <string name="membership_benefit_convert_gems_count">Convert up to %d Gems per month</string>
     <string name="membership_benefit_convert_unlimited_gems">Convert Unlimited Gems per month</string>
     <string name="unlimited">Unlimited</string>
+    <string name="unlimited_times_a_day">Unlimited per day</string>
     <string name="converter_no_more_gems_message">You have no gems left to convert this month</string>
     <string name="converter_remaining_gems_message">You have %d gems left to convert this month</string>
     <string name="gems_converted_this_month">Gems converted\nthis month</string>

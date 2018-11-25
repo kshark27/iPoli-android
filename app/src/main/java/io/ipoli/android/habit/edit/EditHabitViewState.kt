@@ -235,11 +235,15 @@ object EditHabitReducer : BaseViewStateReducer<EditHabitViewState>() {
                 subState.copy(
                     type = TIMES_A_DAY_CHANGED,
                     timesADay = newTimesADay,
-                    maxRemindersReached = newTimesADay <= subState.reminders.size,
-                    reminders = if (subState.reminders.size > newTimesADay)
-                        subState.reminders.subList(0, newTimesADay)
-                    else
-                        subState.reminders
+                    maxRemindersReached = if(newTimesADay == Habit.UNLIMITED_TIMES_A_DAY) false else newTimesADay <= subState.reminders.size,
+                    reminders = when {
+                        newTimesADay == Habit.UNLIMITED_TIMES_A_DAY -> subState.reminders
+                        subState.reminders.size > newTimesADay -> subState.reminders.subList(
+                            0,
+                            newTimesADay
+                        )
+                        else -> subState.reminders
+                    }
                 )
             }
 
@@ -250,7 +254,7 @@ object EditHabitReducer : BaseViewStateReducer<EditHabitViewState>() {
                 subState.copy(
                     type = REMINDERS_CHANGED,
                     reminders = newReminders,
-                    maxRemindersReached = newReminders.size == subState.timesADay
+                    maxRemindersReached = if(subState.timesADay == Habit.UNLIMITED_TIMES_A_DAY) false else newReminders.size == subState.timesADay
                 )
             }
 
@@ -338,7 +342,7 @@ object EditHabitReducer : BaseViewStateReducer<EditHabitViewState>() {
                 timesADay = habit.timesADay,
                 days = habit.days.toSet(),
                 reminders = habit.reminders,
-                maxRemindersReached = habit.reminders.size == habit.timesADay,
+                maxRemindersReached = if(habit.isUnlimited) false else habit.reminders.size == habit.timesADay,
                 isEditing = true,
                 hasChangedColor = true,
                 hasChangedIcon = true
@@ -355,13 +359,13 @@ object EditHabitReducer : BaseViewStateReducer<EditHabitViewState>() {
         tags = emptyList(),
         days = DayOfWeek.values().toSet(),
         isGood = true,
-        timesADay = 1,
+        timesADay = Habit.UNLIMITED_TIMES_A_DAY,
         color = Color.GREEN,
         icon = Icon.FLOWER,
         challenge = null,
         note = "",
         maxTagsReached = false,
-        timesADayValues = (1..Constants.MAX_HABIT_TIMES_A_DAY).toList(),
+        timesADayValues = listOf(Habit.UNLIMITED_TIMES_A_DAY) + (1..Constants.MAX_HABIT_TIMES_A_DAY).toList(),
         reminders = emptyList(),
         maxRemindersReached = false,
         isEditing = false,

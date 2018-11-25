@@ -508,7 +508,8 @@ class EditHabitViewController(args: Bundle? = null) :
 
     private val EditHabitViewState.timesADayList: List<String>
         get() = timesADayValues.map {
-            if (it == 1) stringRes(R.string.time_a_day)
+            if (it == Habit.UNLIMITED_TIMES_A_DAY) stringRes(R.string.unlimited_times_a_day)
+            else if (it == 1) stringRes(R.string.time_a_day)
             else stringRes(R.string.times_a_day, it)
         }
 

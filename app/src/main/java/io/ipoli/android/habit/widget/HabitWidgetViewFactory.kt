@@ -139,13 +139,8 @@ class HabitWidgetViewsFactory(private val context: Context) :
 
                 setOnClickFillInIntent(
                     R.id.habitProgressContainer,
-                    if (isCompleted) {
-                        if (it.isGood) createUndoCompleteHabitIntent(it.id)
-                        else createCompleteHabitIntent(it.id)
-                    } else {
-                        if (it.isGood) createCompleteHabitIntent(it.id)
-                        else createUndoCompleteHabitIntent(it.id)
-                    }
+                    if (it.canCompleteMoreForDate(today)) createCompleteHabitIntent(it.id)
+                    else createUndoCompleteHabitIntent(it.id)
                 )
             }
         }

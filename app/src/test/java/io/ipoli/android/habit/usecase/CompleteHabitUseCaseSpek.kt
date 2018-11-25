@@ -125,6 +125,41 @@ class CompleteHabitUseCaseSpek : Spek({
             habit.history[today]!!.completedCount.`should be`(1)
         }
 
+        it("should not be able to complete more when done once") {
+            val today = LocalDate.now()
+            val h = executeUseCase(
+                TestUtil.habit.copy(
+                    timesADay = 1
+                ),
+                today
+            )
+            h.canCompleteMoreForDate(today).`should be false`()
+        }
+
+
+        describe("unlimited") {
+
+            it("should be marked as complete when done once") {
+                val today = LocalDate.now()
+                val h = executeUseCase(
+                    TestUtil.habit.copy(
+                        timesADay = Habit.UNLIMITED_TIMES_A_DAY
+                    ), today
+                )
+                h.isCompletedForDate(today).`should be true`()
+            }
+
+            it("should be able to complete more when done once") {
+                val today = LocalDate.now()
+                val h = executeUseCase(
+                    TestUtil.habit.copy(
+                        timesADay = Habit.UNLIMITED_TIMES_A_DAY
+                    ), today
+                )
+                h.canCompleteMoreForDate(today).`should be true`()
+            }
+        }
+
         describe("Rewards") {
 
             it("should give rewards") {
@@ -154,7 +189,7 @@ class CompleteHabitUseCaseSpek : Spek({
                 ce.reward.`should be null`()
             }
 
-            it("should assign rewards if negative") {
+            it("should not give rewards if is bad") {
                 val today = LocalDate.now()
                 val habit = executeUseCase(
                     TestUtil.habit.copy(
@@ -163,9 +198,20 @@ class CompleteHabitUseCaseSpek : Spek({
                     LocalDate.now()
                 )
                 val ce = habit.history[today]!!
-                val r = ce.reward!!
-                r.coins.`should be greater than`(0)
-                r.experience.`should be greater than`(0)
+                ce.reward.`should be null`()
+            }
+
+            it("should not give rewards if completed and unlimited") {
+                val today = LocalDate.now()
+                val habit = executeUseCase(
+                    TestUtil.habit.copy(
+                        isGood = true,
+                        timesADay = Habit.UNLIMITED_TIMES_A_DAY
+                    ),
+                    LocalDate.now()
+                )
+                val ce = habit.history[today]!!
+                ce.reward.`should be null`()
             }
         }
     }

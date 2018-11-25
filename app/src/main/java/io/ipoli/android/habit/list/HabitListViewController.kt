@@ -137,7 +137,10 @@ class HabitListViewController(args: Bundle? = null) :
             val progress: Int,
             val maxProgress: Int,
             val isCompleted: Boolean,
+            val canBeCompletedMoreTimes: Boolean,
             val isGood: Boolean,
+            val completedCount: Int,
+            val showCompletedCount: Boolean,
             val habit: Habit
         ) : ItemViewModel(id)
 
@@ -178,6 +181,14 @@ class HabitListViewController(args: Bundle? = null) :
 
                 renderName(view, vm.name, vm.isGood)
                 renderIcon(view, vm.icon, if (vm.isCompleted) R.color.md_white else vm.color)
+
+                if (vm.showCompletedCount) {
+                    view.habitCompletedToday.visible()
+                    view.habitCompletedToday.text = "x${vm.completedCount}"
+                } else {
+                    view.habitCompletedToday.gone()
+                }
+
                 renderStreak(
                     view = view,
                     streak = vm.streak,
@@ -228,14 +239,18 @@ class HabitListViewController(args: Bundle? = null) :
                         startCompleteAnimation(view, vm)
                     } else {
                         dispatch(
-                            if (vm.isGood) HabitListAction.CompleteHabit(vm.id)
+                            if (vm.canBeCompletedMoreTimes) HabitListAction.CompleteHabit(vm.id)
                             else HabitListAction.UndoCompleteHabit(vm.id)
                         )
                     }
                 }
 
                 view.habitCompletedBackground.onDebounceClick {
-                    startUndoCompleteAnimation(view, vm)
+                    if (vm.canBeCompletedMoreTimes) {
+                        dispatch(HabitListAction.CompleteHabit(vm.id))
+                    } else {
+                        startUndoCompleteAnimation(view, vm)
+                    }
                 }
             }
 
@@ -355,8 +370,10 @@ class HabitListViewController(args: Bundle? = null) :
                     renderTimesADayProgress(view, vm.progress - 1, vm.maxProgress)
 
                     dispatch(
-                        if (vm.isGood) HabitListAction.UndoCompleteHabit(vm.id)
-                        else HabitListAction.CompleteHabit(vm.id)
+                        if (vm.canBeCompletedMoreTimes)
+                            HabitListAction.CompleteHabit(vm.id)
+                        else
+                            HabitListAction.UndoCompleteHabit(vm.id)
                     )
                 }
             })
@@ -387,7 +404,7 @@ class HabitListViewController(args: Bundle? = null) :
                     )
                     view.habitStreak.setTextColor(colorRes(R.color.md_white))
                     dispatch(
-                        if (vm.isGood) HabitListAction.CompleteHabit(vm.id)
+                        if (vm.canBeCompletedMoreTimes) HabitListAction.CompleteHabit(vm.id)
                         else HabitListAction.UndoCompleteHabit(vm.id)
                     )
                 }
@@ -417,10 +434,13 @@ class HabitListViewController(args: Bundle? = null) :
                             timesADay = habit.timesADay,
                             isCompleted = it.isCompleted,
                             isGood = habit.isGood,
+                            canBeCompletedMoreTimes = it.canBeCompletedMoreTimes,
                             streak = habit.streak.current,
                             isBestStreak = it.isBestStreak,
                             progress = it.completedCount,
                             maxProgress = habit.timesADay,
+                            completedCount = it.completedCount,
+                            showCompletedCount = it.habit.isUnlimited && it.completedCount > 1,
                             habit = habit
                         )
                     }

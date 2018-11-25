@@ -57,7 +57,7 @@ import kotlinx.android.synthetic.main.controller_home.view.*
 import kotlinx.android.synthetic.main.controller_today.view.*
 import kotlinx.android.synthetic.main.item_agenda_event.view.*
 import kotlinx.android.synthetic.main.item_agenda_quest.view.*
-import kotlinx.android.synthetic.main.item_habit_list.view.*
+import kotlinx.android.synthetic.main.item_today_habit.view.*
 import kotlinx.android.synthetic.main.item_today_profile_attribute.view.*
 import kotlinx.android.synthetic.main.view_fab.view.*
 import kotlinx.android.synthetic.main.view_profile_pet.view.*
@@ -751,13 +751,24 @@ class TodayViewController(args: Bundle? = null) :
         val progress: Int,
         val maxProgress: Int,
         val isCompleted: Boolean,
-        val isGood: Boolean
+        val canBeCompletedMoreTimes: Boolean,
+        val isGood: Boolean,
+        val completedCount: Int,
+        val showCompletedCount: Boolean
     ) : RecyclerViewViewModel
 
     inner class HabitListAdapter :
         BaseRecyclerViewAdapter<HabitViewModel>(R.layout.item_today_habit) {
         override fun onBindViewModel(vm: HabitViewModel, view: View, holder: SimpleViewHolder) {
             renderName(view, vm.name, vm.isGood)
+
+            if (vm.showCompletedCount) {
+                view.habitCompletedToday.visible()
+                view.habitCompletedToday.text = "x${vm.completedCount}"
+            } else {
+                view.habitCompletedToday.gone()
+            }
+
             renderIcon(view, vm.icon, if (vm.isCompleted) R.color.md_white else vm.color)
             renderStreak(
                 view = view,
@@ -809,14 +820,18 @@ class TodayViewController(args: Bundle? = null) :
                     startCompleteAnimation(view, vm)
                 } else {
                     dispatch(
-                        if (vm.isGood) TodayAction.CompleteHabit(vm.id)
+                        if (vm.canBeCompletedMoreTimes) TodayAction.CompleteHabit(vm.id)
                         else TodayAction.UndoCompleteHabit(vm.id)
                     )
                 }
             }
 
             view.habitCompletedBackground.onDebounceClick {
-                startUndoCompleteAnimation(view, vm)
+                if (vm.canBeCompletedMoreTimes) {
+                    dispatch(TodayAction.CompleteHabit(vm.id))
+                } else {
+                    startUndoCompleteAnimation(view, vm)
+                }
             }
         }
 
@@ -918,8 +933,10 @@ class TodayViewController(args: Bundle? = null) :
                     renderTimesADayProgress(view, vm.progress - 1, vm.maxProgress)
 
                     dispatch(
-                        if (vm.isGood) TodayAction.UndoCompleteHabit(vm.id)
-                        else TodayAction.CompleteHabit(vm.id)
+                        if (vm.canBeCompletedMoreTimes)
+                            TodayAction.CompleteHabit(vm.id)
+                        else
+                            TodayAction.UndoCompleteHabit(vm.id)
                     )
                 }
             })
@@ -950,7 +967,7 @@ class TodayViewController(args: Bundle? = null) :
                     )
                     view.habitStreak.setTextColor(colorRes(R.color.md_white))
                     dispatch(
-                        if (vm.isGood) TodayAction.CompleteHabit(vm.id)
+                        if (vm.canBeCompletedMoreTimes) TodayAction.CompleteHabit(vm.id)
                         else TodayAction.UndoCompleteHabit(vm.id)
                     )
                 }
@@ -1115,11 +1132,15 @@ class TodayViewController(args: Bundle? = null) :
                     icon = habit.icon.androidIcon.icon,
                     timesADay = habit.timesADay,
                     isCompleted = it.isCompleted,
+                    canBeCompletedMoreTimes = it.canBeCompletedMoreTimes,
                     isGood = habit.isGood,
                     streak = habit.streak.current,
                     isBestStreak = it.isBestStreak,
                     progress = it.completedCount,
-                    maxProgress = habit.timesADay
+                    maxProgress = if (habit.isUnlimited) 1
+                    else habit.timesADay,
+                    completedCount = it.completedCount,
+                    showCompletedCount = it.habit.isUnlimited && it.completedCount > 1
                 )
             }
 

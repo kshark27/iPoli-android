@@ -52,6 +52,19 @@
         app:layout_constraintStart_toStartOf="@+id/habitProgress"
         app:layout_constraintTop_toTopOf="@+id/habitProgress" />
 
+    <TextView
+        android:id="@+id/habitCompletedToday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textColor="@color/md_white"
+        app:layout_constraintBottom_toTopOf="@+id/habitIcon"
+        app:layout_constraintEnd_toEndOf="@+id/habitProgress"
+        app:layout_constraintStart_toStartOf="@+id/habitProgress"
+        app:layout_constraintTop_toTopOf="@+id/habitProgress"
+        tools:text="3" />
+
     <ImageView
         android:id="@+id/habitIcon"
         android:layout_width="32dp"
@@ -62,7 +75,6 @@
         app:layout_constraintTop_toTopOf="@+id/habitProgress"
         app:layout_constraintVertical_bias="0.43"
         tools:src="@drawable/drawer_achievement_trophy" />
-
 
     <TextView
         android:id="@+id/habitStreak"

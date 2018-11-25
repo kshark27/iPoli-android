@@ -50,6 +50,10 @@ open class RewardPlayerUseCase(
         val HABIT_COINS_BASE_REWARDS = intArrayOf(1, 2)
         val HABIT_ATTRIBUTE_BASE_REWARDS = intArrayOf(0, 1, 2)
 
+        val UNLIMITED_HABIT_XP_BASE_REWARDS = intArrayOf(1, 2, 4)
+        val UNLIMITED_HABIT_COINS_BASE_REWARDS = intArrayOf(1)
+        val UNLIMITED_HABIT_ATTRIBUTE_BASE_REWARDS = intArrayOf(0, 1)
+
         val DC_XP_BASE_REWARDS = intArrayOf(10, 12, 15, 20)
         val DC_COINS_BASE_REWARDS = intArrayOf(5, 7, 9, 10)
 
@@ -251,14 +255,20 @@ open class RewardPlayerUseCase(
         rank: Player.Rank
     ): Reward {
         val booster = TotalBonusBooster.forHabit(habit, player, rank)
-        val xp = experience(booster.experiencePercentage, HABIT_XP_BASE_REWARDS)
-        val coins = coins(booster.coinsPercentage, HABIT_COINS_BASE_REWARDS)
+        val xp = experience(
+            booster.experiencePercentage,
+            if (habit.isUnlimited) UNLIMITED_HABIT_XP_BASE_REWARDS else HABIT_XP_BASE_REWARDS
+        )
+        val coins = coins(
+            booster.coinsPercentage,
+            if (habit.isUnlimited) UNLIMITED_HABIT_COINS_BASE_REWARDS else HABIT_COINS_BASE_REWARDS
+        )
         val bounty = Quest.Bounty.None
 
         val attrs = attributePoints(
             tags = habit.tags,
             player = player,
-            rewards = HABIT_ATTRIBUTE_BASE_REWARDS,
+            rewards = if (habit.isUnlimited) UNLIMITED_HABIT_ATTRIBUTE_BASE_REWARDS else HABIT_ATTRIBUTE_BASE_REWARDS,
             booster = booster
         )
 
@@ -324,7 +334,7 @@ open class RewardPlayerUseCase(
                 .filter { it.tags.contains(t) }
                 .forEach {
                     val pos = it.tags.indexOf(t)
-                    val rewardPool = rewards.size - pos
+                    val rewardPool = Math.max(rewards.size - pos, 2)
 
                     val reward = attributePoints(it.type, rewards, rewardPool, booster)
 

@@ -99,16 +99,17 @@ object HabitSideEffectHandler : AppSideEffectHandler() {
                 val date = action.date
                 if (date > LocalDate.now()) return
                 val habit = state.dataState.habits!!.first { it.id == action.habitId }
-                if (habit.isCompletedForDate(date))
+                if (habit.canCompleteMoreForDate(date))
+                    completeHabitUseCase.execute(
+                        CompleteHabitUseCase.Params(
+                            habitId = action.habitId,
+                            date = date
+                        )
+                    )
+                else
                     undoCompleteHabitUseCase.execute(
                         UndoCompleteHabitUseCase.Params(habitId = action.habitId, date = date)
                     )
-                else completeHabitUseCase.execute(
-                    CompleteHabitUseCase.Params(
-                        habitId = action.habitId,
-                        date = date
-                    )
-                )
 
             }
 
