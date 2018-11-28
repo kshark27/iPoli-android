@@ -26,13 +26,10 @@ import io.ipoli.android.common.privacy.PrivacyPolicyViewController
 import io.ipoli.android.common.redux.Action
 import io.ipoli.android.common.redux.Dispatcher
 import io.ipoli.android.common.redux.SideEffectHandler
-import io.ipoli.android.common.view.AppWidgetUtil
 import io.ipoli.android.common.view.Debounce
 import io.ipoli.android.common.view.playerTheme
 import io.ipoli.android.player.auth.AuthAction
 import io.ipoli.android.player.data.Membership
-import io.ipoli.android.repeatingquest.usecase.SaveQuestsForRepeatingQuestUseCase
-import io.ipoli.android.store.powerup.AndroidPowerUp
 import io.ipoli.android.store.powerup.PowerUp
 import io.ipoli.android.store.powerup.buy.BuyPowerUpDialogController
 import io.ipoli.android.store.powerup.middleware.ShowBuyPowerUpAction
@@ -60,9 +57,7 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
     private val sharedPreferences by required { sharedPreferences }
     private val unlockAchievementsUseCase by required { unlockAchievementsUseCase }
     private val resetDateScheduler by required { resetDateScheduler }
-    private val repeatingQuestRepository by required { repeatingQuestRepository }
-    private val saveQuestsForRepeatingQuestUseCase by required { saveQuestsForRepeatingQuestUseCase }
-    private val reminderScheduler by required { reminderScheduler }
+    private val planDayScheduler by required { planDayScheduler }
 
     private val stateStore by required { stateStore }
     private val dataExporter by required { dataExporter }
@@ -107,6 +102,9 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
             startApp()
             stateStore.dispatch(LoadDataAction.All)
             checkForFriendInvite(intent)
+            if (sharedPreferences.getBoolean(Constants.KEY_SHOULD_REVIEW_DAY, false)) {
+                Navigator(rootRouter).toReviewDay()
+            }
             return
         }
 
@@ -175,9 +173,7 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
                     PowerUp.Type.valueOf(intent.getStringExtra(Constants.POWER_UP_EXTRA_KEY))
 
                 router.pushController(
-                    RouterTransaction.with(BuyPowerUpDialogController(powerUp) {
-                        AppWidgetUtil.updateHabitWidget(this)
-                    })
+                    RouterTransaction.with(BuyPowerUpDialogController(powerUp))
                         .pushChangeHandler(FadeChangeHandler(false))
                         .popChangeHandler(FadeChangeHandler(false))
                 )
@@ -195,6 +191,9 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
         }
 
         checkForFriendInvite(intent)
+        if (sharedPreferences.getBoolean(Constants.KEY_SHOULD_REVIEW_DAY, false)) {
+            navigator.toReviewDay()
+        }
     }
 
     private fun getInvitePlayerId(intent: Intent) =
@@ -245,9 +244,7 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
         } else if (intent.action == ACTION_SHOW_UNLOCK_POWER_UP) {
             showHome(navigator)
             val powerUp = PowerUp.Type.valueOf(intent.getStringExtra(Constants.POWER_UP_EXTRA_KEY))
-            showPowerUpDialog(powerUp) {
-                AppWidgetUtil.updateHabitWidget(this)
-            }
+            showPowerUpDialog(powerUp)
         } else if (intent.action == ACTION_ADD_POST) {
             navigator.toAddPost(
                 questId = intent.getStringExtra(Constants.QUEST_ID_EXTRA_KEY),
@@ -275,8 +272,7 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
             }
             unlockAchievementsUseCase.execute(UnlockAchievementsUseCase.Params(p))
             resetDateScheduler.schedule()
-            scheduleQuestsForRepeatingQuests()
-            reminderScheduler.schedule()
+            planDayScheduler.schedule()
             if (p.isLoggedIn()) {
                 try {
                     dataExporter.exportNewData()
@@ -285,19 +281,6 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
                 }
             }
         }
-    }
-
-    private fun scheduleQuestsForRepeatingQuests() {
-        val rqs = repeatingQuestRepository.findAllActive()
-        val newRqs = rqs.map {
-            saveQuestsForRepeatingQuestUseCase.execute(
-                SaveQuestsForRepeatingQuestUseCase.Params(
-                    repeatingQuest = it,
-                    start = LocalDate.now()
-                )
-            ).repeatingQuest
-        }
-        repeatingQuestRepository.save(newRqs)
     }
 
     private fun shouldShowQuickAdd(startIntent: Intent) =
@@ -310,9 +293,6 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
 
     override fun onResume() {
         super.onResume()
-        if (sharedPreferences.getBoolean(Constants.KEY_PLAYER_DEAD, false)) {
-            Navigator(rootRouter).toRevivePlayer()
-        }
         stateStore.addSideEffectHandler(this)
     }
 
@@ -352,7 +332,7 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
                 Constants.MEMBERSHIP_TRIAL_PERIOD_DAYS
             ),
             Snackbar.LENGTH_INDEFINITE
-        ).setAction(R.string.go_premium, Debounce.clickListener { _ ->
+        ).setAction(R.string.join_now, Debounce.clickListener { _ ->
             Navigator(router).toMembership()
         }).show()
     }
@@ -394,32 +374,8 @@ class MainActivity : AppCompatActivity(), Injects<UIModule>, SideEffectHandler<A
         }
     }
 
-    private fun showPowerUpDialog(powerUp: PowerUp.Type, onBought: (() -> Unit) = {}) {
-        Navigator(router).toBuyPowerUp(powerUp) { result ->
-            when (result) {
-                BuyPowerUpDialogController.Result.TooExpensive ->
-                    Toast.makeText(
-                        this,
-                        R.string.power_up_too_expensive,
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                is BuyPowerUpDialogController.Result.Bought -> {
-                    Toast.makeText(
-                        this,
-                        getString(
-                            R.string.power_up_bought,
-                            getString(AndroidPowerUp.valueOf(result.powerUp.name).title)
-                        ),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    onBought()
-                }
-
-                is BuyPowerUpDialogController.Result.UnlockAll ->
-                    Navigator(router).toMembership(FadeChangeHandler())
-            }
-        }
+    private fun showPowerUpDialog(powerUp: PowerUp.Type) {
+        Navigator(router).toBuyPowerUp(powerUp)
     }
 
     override fun canHandle(action: Action) =

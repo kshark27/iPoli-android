@@ -1,16 +1,12 @@
 package io.ipoli.android.pet.usecase
 
 import io.ipoli.android.common.UseCase
-import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.dailychallenge.data.persistence.DailyChallengeRepository
 import io.ipoli.android.habit.data.Habit
-import io.ipoli.android.habit.persistence.HabitRepository
 import io.ipoli.android.habit.usecase.CalculateHabitStreakUseCase
 import io.ipoli.android.player.data.Player
 import io.ipoli.android.player.persistence.PlayerRepository
 import io.ipoli.android.quest.Quest
-import io.ipoli.android.quest.data.persistence.QuestRepository
-import org.threeten.bp.Duration
 import org.threeten.bp.LocalDate
 import java.util.*
 
@@ -19,9 +15,7 @@ import java.util.*
  * on 11/30/17.
  */
 class ApplyDamageToPlayerUseCase(
-    private val questRepository: QuestRepository,
     private val playerRepository: PlayerRepository,
-    private val habitRepository: HabitRepository,
     private val dailyChallengeRepository: DailyChallengeRepository,
     private val calculateHabitStreakUseCase: CalculateHabitStreakUseCase,
     private val randomSeed: Long = System.currentTimeMillis()
@@ -36,82 +30,31 @@ class ApplyDamageToPlayerUseCase(
             return Result(player, 0, 0, 0)
         }
 
-        val resetDayTime = player.preferences.resetDayTime
-
-        val today = parameters.today
-        val yesterday = today.minusDays(1)
-
-        val yesterdayQuests = questRepository.findScheduledAt(yesterday)
-
-        val quests = mutableListOf<Quest>()
-        val habits = mutableListOf<Habit>()
-
-        val yesterdayStart = yesterday.atTime(resetDayTime.toLocalTime())
-        val todayStart = today.atTime(0, 0)
-        val todayEnd = today.atTime(resetDayTime.toLocalTime())
-
-        val primaryDate = when {
-            resetDayTime == Time.atHours(0) -> yesterday
-            Duration.between(yesterdayStart, todayStart) >
-                Duration.between(todayStart, todayEnd) -> yesterday
-            else -> today
-        }
-
-        if (resetDayTime == Time.atHours(0)) {
-            quests.addAll(yesterdayQuests)
-        } else {
-
-            val todayQuests = questRepository.findScheduledAt(today)
-            val (todayScheduled, todayUnscheduled) = todayQuests.partition { it.isScheduled }
-            val (yesterdayScheduled, yesterdayUnscheduled) = yesterdayQuests.partition { it.isScheduled }
-
-            if (primaryDate == yesterday) {
-                quests.addAll(yesterdayUnscheduled)
-            } else {
-                quests.addAll(todayUnscheduled)
-            }
-
-            quests.addAll(yesterdayScheduled.filter { it.startTime!! >= resetDayTime })
-            quests.addAll(todayScheduled.filter { it.startTime!! < resetDayTime })
-        }
-
-        habits.addAll(
-            habitRepository
-                .findAllNotRemoved()
-                .filter {
-                    it.isGood && it.shouldBeDoneOn(primaryDate)
-                }
-        )
-
         val dcQuestIds =
-            dailyChallengeRepository.findForDate(primaryDate)?.questIds?.toSet() ?: emptySet()
-        val isPlanDay = player.preferences.planDays.contains(primaryDate.dayOfWeek)
+            dailyChallengeRepository.findForDate(parameters.date)?.questIds?.toSet() ?: emptySet()
+        val isPlanDay = player.preferences.planDays.contains(parameters.date.dayOfWeek)
 
-        val questDamage = quests.sumBy {
-            if (it.isCompleted) {
-                0
-            } else {
-                var dmg = QUEST_BASE_DAMAGE
+        val questDamage = parameters.quests.sumBy {
 
-                if (isPlanDay)
-                    dmg += PRODUCTIVE_DAY_DAMAGE
+            var dmg = QUEST_BASE_DAMAGE
 
-                if (it.isFromRepeatingQuest)
-                    dmg += REPEATING_QUEST_DAMAGE
+            if (isPlanDay)
+                dmg += PRODUCTIVE_DAY_DAMAGE
 
-                if (it.isFromChallenge)
-                    dmg += CHALLENGE_DAMAGE
+            if (it.isFromRepeatingQuest)
+                dmg += REPEATING_QUEST_DAMAGE
 
-                if (dcQuestIds.contains(it.id))
-                    dmg += DAILY_CHALLENGE_DAMAGE
-                dmg
-            }
+            if (it.isFromChallenge)
+                dmg += CHALLENGE_DAMAGE
+
+            if (dcQuestIds.contains(it.id))
+                dmg += DAILY_CHALLENGE_DAMAGE
+            dmg
         }
 
-        val habitDamage = habits.sumBy {
-            if (it.isCompletedForDate(primaryDate)) {
-                0
-            } else {
+        val habitDamage = parameters.habits
+            .filter { !it.isCompletedForDate(parameters.date) }
+            .sumBy {
                 var dmg = HABIT_BASE_DAMAGE
 
                 if (isPlanDay)
@@ -123,7 +66,7 @@ class ApplyDamageToPlayerUseCase(
                 val streak = calculateHabitStreakUseCase.execute(
                     CalculateHabitStreakUseCase.Params(
                         it,
-                        primaryDate
+                        parameters.date
                     )
                 )
 
@@ -133,7 +76,6 @@ class ApplyDamageToPlayerUseCase(
                     HABIT_LOW_STREAK_DAMAGE
                 dmg
             }
-        }
 
         val totalDamage = questDamage + habitDamage
 
@@ -184,7 +126,7 @@ class ApplyDamageToPlayerUseCase(
 
     private fun createRandom() = Random(randomSeed)
 
-    data class Params(val today: LocalDate = LocalDate.now())
+    data class Params(val quests: List<Quest>, val habits: List<Habit>, val date: LocalDate)
 
     data class Result(
         val player: Player,

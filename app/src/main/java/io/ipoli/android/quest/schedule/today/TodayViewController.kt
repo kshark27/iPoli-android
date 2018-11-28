@@ -95,11 +95,8 @@ class TodayViewController(args: Bundle? = null) :
         view.questItems.isNestedScrollingEnabled = false
         view.questItems.adapter = TodayItemAdapter()
 
-        val gridLayoutManager = GridLayoutManager(view.context, 3)
-        view.habitItems.layoutManager = gridLayoutManager
-
-        val adapter = HabitListAdapter()
-        view.habitItems.adapter = adapter
+        view.habitItems.layoutManager = GridLayoutManager(view.context, 3)
+        view.habitItems.adapter = HabitAdapter()
 
         view.completedQuests.layoutManager = LinearLayoutManager(view.context)
         view.completedQuests.isNestedScrollingEnabled = false
@@ -607,7 +604,7 @@ class TodayViewController(args: Bundle? = null) :
         } else {
             view.habitItemsEmpty.gone()
             view.habitItems.visible()
-            (view.habitItems.adapter as HabitListAdapter).updateAll(habitVMs)
+            (view.habitItems.adapter as HabitAdapter).updateAll(habitVMs)
         }
     }
 
@@ -757,7 +754,7 @@ class TodayViewController(args: Bundle? = null) :
         val showCompletedCount: Boolean
     ) : RecyclerViewViewModel
 
-    inner class HabitListAdapter :
+    inner class HabitAdapter :
         BaseRecyclerViewAdapter<HabitViewModel>(R.layout.item_today_habit) {
         override fun onBindViewModel(vm: HabitViewModel, view: View, holder: SimpleViewHolder) {
             renderName(view, vm.name, vm.isGood)

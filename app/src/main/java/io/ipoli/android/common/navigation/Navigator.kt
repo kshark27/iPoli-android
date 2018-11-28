@@ -10,7 +10,6 @@ import com.bluelinelabs.conductor.changehandler.SimpleSwapChangeHandler
 import com.bluelinelabs.conductor.changehandler.VerticalChangeHandler
 import com.google.firebase.auth.FirebaseAuth
 import io.ipoli.android.Constants
-import io.ipoli.android.R.id.showCompleted
 import io.ipoli.android.achievement.list.AchievementListViewController
 import io.ipoli.android.challenge.QuestPickerViewController
 import io.ipoli.android.challenge.add.AddChallengeViewController
@@ -70,6 +69,7 @@ import io.ipoli.android.pet.PetViewController
 import io.ipoli.android.pet.store.PetStoreViewController
 import io.ipoli.android.planday.PlanDayViewController
 import io.ipoli.android.planday.RescheduleDialogController
+import io.ipoli.android.planday.review.ReviewDayViewController
 import io.ipoli.android.player.attribute.AttributeListViewController
 import io.ipoli.android.player.auth.AuthViewController
 import io.ipoli.android.player.data.Avatar
@@ -81,6 +81,8 @@ import io.ipoli.android.player.view.RevivePlayerDialogController
 import io.ipoli.android.quest.Color
 import io.ipoli.android.quest.CompletedQuestViewController
 import io.ipoli.android.quest.Icon
+import io.ipoli.android.quest.Quest
+import io.ipoli.android.quest.bucketlist.BucketListPickerDialogController
 import io.ipoli.android.quest.edit.EditQuestViewController
 import io.ipoli.android.quest.reminder.picker.ReminderPickerDialogController
 import io.ipoli.android.quest.reminder.picker.ReminderViewModel
@@ -387,8 +389,8 @@ class Navigator(private val router: Router) {
         pushDialog { IconPickerDialogController(listener, selectedIcon) }
     }
 
-    fun toBuyPowerUp(powerUp: PowerUp.Type, listener: (BuyPowerUpDialogController.Result) -> Unit) {
-        pushDialog { BuyPowerUpDialogController(powerUp, listener) }
+    fun toBuyPowerUp(powerUp: PowerUp.Type) {
+        pushDialog { BuyPowerUpDialogController(powerUp) }
     }
 
     fun toCalendarPicker(listener: (Set<Player.Preferences.SyncCalendar>) -> Unit) {
@@ -501,6 +503,12 @@ class Navigator(private val router: Router) {
         pushController(
             { AddPresetChallengeViewController(category, color) },
             VerticalChangeHandler()
+        )
+    }
+
+    fun toReviewDay() {
+        pushController(
+            { ReviewDayViewController() }, null
         )
     }
 
@@ -702,6 +710,10 @@ class Navigator(private val router: Router) {
         pushDialog { RevivePlayerDialogController() }
     }
 
+    fun toBucketListPicker(listener: (List<Quest>) -> Unit) {
+        pushDialog { BucketListPickerDialogController(listener) }
+    }
+
     private inline fun <reified C : Controller> pushDialog(createDialogController: () -> C) {
         val t = tag<C>()
         val c = router.getControllerWithTag(t)
@@ -795,10 +807,6 @@ class Navigator(private val router: Router) {
 
     fun replaceWithAgenda() {
         replaceTopController({ AgendaViewController() }, FadeChangeHandler())
-    }
-
-    fun replaceWithHome(changeHandler: ControllerChangeHandler? = null) {
-        replaceTopController({ HomeViewController() }, changeHandler)
     }
 
     companion object {

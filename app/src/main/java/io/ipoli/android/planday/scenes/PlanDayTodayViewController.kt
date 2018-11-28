@@ -20,7 +20,6 @@ import io.ipoli.android.Constants
 import io.ipoli.android.R
 import io.ipoli.android.common.ViewUtils
 import io.ipoli.android.common.redux.android.BaseViewController
-import io.ipoli.android.common.text.DurationFormatter
 import io.ipoli.android.common.text.QuestStartTimeFormatter
 import io.ipoli.android.common.view.*
 import io.ipoli.android.common.view.recyclerview.BaseRecyclerViewAdapter
@@ -93,6 +92,12 @@ class PlanDayTodayViewController(args: Bundle? = null) :
                 .color(attrData(R.attr.colorAccent))
                 .sizeDp(24)
         )
+
+        view.importFromBucketList.onDebounceClick {
+            navigate().toBucketListPicker { qs ->
+                dispatch(PlanDayAction.MoveBucketListQuestsToToday(qs))
+            }
+        }
         return view
     }
 
@@ -110,7 +115,14 @@ class PlanDayTodayViewController(args: Bundle? = null) :
                         .toReschedule(
                             includeToday = false,
                             listener = { date, time, duration ->
-                                dispatch(PlanDayAction.RescheduleQuest(questId, date, time, duration))
+                                dispatch(
+                                    PlanDayAction.RescheduleQuest(
+                                        questId,
+                                        date,
+                                        time,
+                                        duration
+                                    )
+                                )
                             },
                             cancelListener = {
                                 view.todayQuests.adapter.notifyItemChanged(viewHolder.adapterPosition)
@@ -150,13 +162,13 @@ class PlanDayTodayViewController(args: Bundle? = null) :
             background = view.addContainerBackground
         )
 
-        view.addContainerBackground.setOnClickListener {
+        view.addContainerBackground.onDebounceClick {
             addContainerRouter(view).popCurrentController()
             ViewUtils.hideKeyboard(view)
             addQuestAnimationHelper.closeAddContainer()
         }
 
-        view.addQuest.setOnClickListener {
+        view.addQuest.onDebounceClick {
             addQuestAnimationHelper.openAddContainer(LocalDate.now())
         }
     }
@@ -166,14 +178,14 @@ class PlanDayTodayViewController(args: Bundle? = null) :
         getChildRouter(view.addContainer, "add-quest")
 
     private fun initEmptyView(view: View) {
-        view.emptyAnimation.setAnimation("empty_plan_day.json")
+        view.emptyAnimation.gone()
         view.emptyTitle.setText(R.string.empty_plan_today_list_title)
         view.emptyText.setText(R.string.empty_plan_today_list_text)
     }
 
     override fun onAttach(view: View) {
         super.onAttach(view)
-        showBackButton()
+        exitFullScreen()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -290,7 +302,6 @@ class PlanDayTodayViewController(args: Bundle? = null) :
         override val id: String,
         val name: String,
         val startTime: String,
-        val duration: String,
         @ColorRes val color: Int,
         val tags: List<TagViewModel>,
         val icon: IIcon,
@@ -327,22 +338,11 @@ class PlanDayTodayViewController(args: Bundle? = null) :
             view.questIcon.backgroundTintList =
                 ColorStateList.valueOf(colorRes(vm.color))
 
-            view.questIcon.setImageDrawable(listItemIcon(vm.icon))
-
-            val width = view.questStartTime.paint.measureText("12:00 am")
+            view.questIcon.setImageDrawable(smallListItemIcon(vm.icon))
 
             view.questStartTime.text = vm.startTime
-            if (vm.startTime.isEmpty()) {
-                view.questStartTime.invisible()
-                view.questNoStartTime.visible()
-            } else {
-                view.questStartTime.visible()
-                view.questNoStartTime.gone()
-            }
-            view.questStartTime.layoutParams.width = width.toInt()
 
-            view.questDuration.text = vm.duration
-            view.questDuration.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            view.questStartTime.setCompoundDrawablesRelativeWithIntrinsicBounds(
                 IconicsDrawable(view.context)
                     .icon(GoogleMaterial.Icon.gmd_timer)
                     .sizeDp(16)
@@ -361,7 +361,6 @@ class PlanDayTodayViewController(args: Bundle? = null) :
                 if (vm.isRepeating) View.VISIBLE else View.GONE
             view.questChallengeIndicator.visibility =
                 if (vm.isFromChallenge) View.VISIBLE else View.GONE
-
 
             if (vm.isForDailyChallenge && !vm.isSelectableForDailyChallenge) {
                 view.questStar.visible()
@@ -382,7 +381,6 @@ class PlanDayTodayViewController(args: Bundle? = null) :
             } else {
                 view.questStar.gone()
             }
-
         }
     }
 
@@ -394,7 +392,7 @@ class PlanDayTodayViewController(args: Bundle? = null) :
             view.suggestionIcon.backgroundTintList =
                 ColorStateList.valueOf(colorRes(vm.color))
 
-            view.suggestionIcon.setImageDrawable(listItemIcon(vm.icon))
+            view.suggestionIcon.setImageDrawable(smallListItemIcon(vm.icon))
 
             view.suggestionStartTime.text = vm.startTime
 
@@ -431,10 +429,10 @@ class PlanDayTodayViewController(args: Bundle? = null) :
                 SuggestionItem(
                     id = it.id,
                     name = it.name,
-                    tags = it.tags.map {
+                    tags = it.tags.map { t ->
                         TagViewModel(
-                            it.name,
-                            AndroidColor.valueOf(it.color.name).color500
+                            t.name,
+                            t.color.androidColor.color500
                         )
                     },
                     startTime = QuestStartTimeFormatter.formatWithDuration(
@@ -462,14 +460,17 @@ class PlanDayTodayViewController(args: Bundle? = null) :
                 QuestItem(
                     id = it.id,
                     name = it.name,
-                    tags = it.tags.map {
+                    tags = it.tags.map { t ->
                         TagViewModel(
-                            it.name,
-                            AndroidColor.valueOf(it.color.name).color500
+                            t.name,
+                            t.color.androidColor.color500
                         )
                     },
-                    startTime = QuestStartTimeFormatter.format(it, shouldUse24HourFormat),
-                    duration = DurationFormatter.formatShort(it.duration),
+                    startTime = QuestStartTimeFormatter.formatWithDuration(
+                        it,
+                        activity!!,
+                        shouldUse24HourFormat
+                    ),
                     color = it.color.androidColor.color500,
                     icon = it.icon?.androidIcon?.icon
                         ?: Ionicons.Icon.ion_checkmark,

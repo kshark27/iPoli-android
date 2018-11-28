@@ -265,7 +265,7 @@ class TagPickerDialogController(args: Bundle? = null) :
             )
             view.tagCheckBox.setOnCheckedChangeListener(null)
             view.tagCheckBox.isChecked = vm.isChecked
-            view.setOnClickListener {
+            view.onDebounceClick {
                 view.tagCheckBox.isChecked = !vm.isChecked
             }
             view.tagCheckBox.setOnCheckedChangeListener { _, isChecked ->

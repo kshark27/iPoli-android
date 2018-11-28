@@ -167,13 +167,7 @@ import io.ipoli.android.store.membership.job.CheckMembershipStatusScheduler
 import io.ipoli.android.store.membership.usecase.CalculateMembershipPlanPriceUseCase
 import io.ipoli.android.store.membership.usecase.RemoveMembershipUseCase
 import io.ipoli.android.store.membership.usecase.UpdatePlayerMembershipUseCase
-import io.ipoli.android.store.powerup.job.AndroidRemoveExpiredPowerUpsScheduler
-import io.ipoli.android.store.powerup.job.RemoveExpiredPowerUpsScheduler
 import io.ipoli.android.store.powerup.middleware.CheckEnabledPowerUpMiddleWare
-import io.ipoli.android.store.powerup.sideeffect.PowerUpSideEffectHandler
-import io.ipoli.android.store.powerup.usecase.BuyPowerUpUseCase
-import io.ipoli.android.store.powerup.usecase.EnableAllPowerUpsUseCase
-import io.ipoli.android.store.powerup.usecase.RemoveExpiredPowerUpsUseCase
 import io.ipoli.android.store.sideeffect.StoreSideEffectHandler
 import io.ipoli.android.store.theme.sideeffect.ThemeSideEffectHandler
 import io.ipoli.android.store.theme.usecase.BuyThemeUseCase
@@ -303,7 +297,6 @@ interface UseCaseModule {
     val rewardScheduler: RewardScheduler
     val levelUpScheduler: LevelUpScheduler
     val levelDownScheduler: LevelDownScheduler
-    val removeExpiredPowerUpsScheduler: RemoveExpiredPowerUpsScheduler
     val checkMembershipStatusScheduler: CheckMembershipStatusScheduler
     val ratePopupScheduler: RatePopupScheduler
     val planDayScheduler: PlanDayScheduler
@@ -375,9 +368,6 @@ interface UseCaseModule {
     val findNextDateForChallengeUseCase: FindNextDateForChallengeUseCase
     val findChallengeProgressUseCase: FindChallengeProgressUseCase
     val completeChallengeUseCase: CompleteChallengeUseCase
-    val buyPowerUpUseCase: BuyPowerUpUseCase
-    val removeExpiredPowerUpsUseCase: RemoveExpiredPowerUpsUseCase
-    val enableAllPowerUpsUseCase: EnableAllPowerUpsUseCase
     val updatePlayerMembershipUseCase: UpdatePlayerMembershipUseCase
     val calculateMembershipPlanPriceUseCase: CalculateMembershipPlanPriceUseCase
     val removeMembershipUseCase: RemoveMembershipUseCase
@@ -443,6 +433,7 @@ interface UseCaseModule {
     val createAgendaPreviewItemsUseCase: CreateAgendaPreviewItemsUseCase
     val createPresetChallengeUseCase: CreatePresetChallengeUseCase
     val saveHabitRemindersUseCase: SaveHabitRemindersUseCase
+    val findIncompleteItemsUseCase: FindIncompleteItemsUseCase
 }
 
 class MainUseCaseModule(private val context: Context) : UseCaseModule {
@@ -550,8 +541,6 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
     override val levelUpScheduler get() = AndroidLevelUpScheduler()
 
     override val levelDownScheduler get() = AndroidLevelDownScheduler()
-
-    override val removeExpiredPowerUpsScheduler get() = AndroidRemoveExpiredPowerUpsScheduler()
 
     override val checkMembershipStatusScheduler
         get() = AndroidCheckMembershipStatusScheduler()
@@ -702,9 +691,7 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
 
     override val applyDamageToPlayerUseCase
         get() = ApplyDamageToPlayerUseCase(
-            questRepository,
             playerRepository,
-            habitRepository,
             dailyChallengeRepository,
             CalculateHabitStreakUseCase()
         )
@@ -812,19 +799,9 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
             playerRepository
         )
 
-    override val buyPowerUpUseCase
-        get() = BuyPowerUpUseCase(playerRepository)
-
-    override val removeExpiredPowerUpsUseCase
-        get() = RemoveExpiredPowerUpsUseCase(playerRepository)
-
-    override val enableAllPowerUpsUseCase
-        get() = EnableAllPowerUpsUseCase(playerRepository)
-
     override val updatePlayerMembershipUseCase
         get() = UpdatePlayerMembershipUseCase(
-            playerRepository,
-            enableAllPowerUpsUseCase
+            playerRepository
         )
 
     override val calculateMembershipPlanPriceUseCase
@@ -1070,6 +1047,9 @@ class MainUseCaseModule(private val context: Context) : UseCaseModule {
             habitRepository,
             entityReminderRepository
         )
+
+    override val findIncompleteItemsUseCase
+        get() = FindIncompleteItemsUseCase(habitRepository)
 }
 
 interface StateStoreModule {
@@ -1099,7 +1079,6 @@ class AndroidStateStoreModule : StateStoreModule, Injects<UIModule> {
                 ChallengeSideEffectHandler,
                 CalendarSideEffectHandler,
                 MembershipSideEffectHandler,
-                PowerUpSideEffectHandler,
                 QuestSideEffectHandler,
                 EditQuestSideEffectHandler,
                 AvatarSideEffectHandler,

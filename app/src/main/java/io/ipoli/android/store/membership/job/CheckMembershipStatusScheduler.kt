@@ -6,19 +6,14 @@ import com.crashlytics.android.Crashlytics
 import com.evernote.android.job.DailyJob
 import com.evernote.android.job.JobRequest
 import io.ipoli.android.BuildConfig
-import io.ipoli.android.Constants
 import io.ipoli.android.MyPoliApp
-import io.ipoli.android.common.api.Api
 import io.ipoli.android.common.billing.BillingError
-import io.ipoli.android.common.datetime.isBetween
 import io.ipoli.android.common.di.BackgroundModule
 import io.ipoli.android.store.membership.error.SubscriptionError
 import io.ipoli.android.store.membership.usecase.RemoveMembershipUseCase
-import io.ipoli.android.store.powerup.usecase.EnableAllPowerUpsUseCase
 import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.runBlocking
 import kotlinx.coroutines.experimental.withContext
-import org.threeten.bp.LocalDate
 import space.traversal.kapsule.Injects
 import space.traversal.kapsule.Kapsule
 import java.util.concurrent.TimeUnit
@@ -34,7 +29,6 @@ class CheckMembershipStatusJob : DailyJob(), Injects<BackgroundModule> {
         val kap = Kapsule<BackgroundModule>()
         val playerRepository by kap.required { playerRepository }
         val removeMembershipUseCase by kap.required { removeMembershipUseCase }
-        val enableAllPowerUpsUseCase by kap.required { enableAllPowerUpsUseCase }
 
         kap.inject(MyPoliApp.backgroundModule(context))
 
@@ -52,7 +46,7 @@ class CheckMembershipStatusJob : DailyJob(), Injects<BackgroundModule> {
                     null
                 }
             } ?: return@runBlocking
-            checkMembershipStatus(billingClient, removeMembershipUseCase, enableAllPowerUpsUseCase)
+            checkMembershipStatus(billingClient, removeMembershipUseCase)
             withContext(Dispatchers.Main) { billingClient.endConnection() }
         }
 
@@ -80,8 +74,7 @@ class CheckMembershipStatusJob : DailyJob(), Injects<BackgroundModule> {
 
     private suspend fun checkMembershipStatus(
         billingClient: BillingClient,
-        removeMembershipUseCase: RemoveMembershipUseCase,
-        enableAllPowerUpsUseCase: EnableAllPowerUpsUseCase
+        removeMembershipUseCase: RemoveMembershipUseCase
     ) {
 
         val purchasesResult =
@@ -92,19 +85,6 @@ class CheckMembershipStatusJob : DailyJob(), Injects<BackgroundModule> {
         }
         if (purchasesResult.purchasesList.isEmpty()) {
             removeMembershipUseCase.execute(Unit)
-        } else {
-            val activePurchase = purchasesResult.purchasesList.first()
-            try {
-                val status =
-                    Api.getMembershipStatus(activePurchase.sku, activePurchase.purchaseToken)
-                if (status.isAutoRenewing) {
-                    updatePowerUpsExpirationDate(status, enableAllPowerUpsUseCase)
-                }
-
-            } catch (e: Api.MembershipStatusException) {
-                logError(e)
-            }
-
         }
     }
 
@@ -117,30 +97,6 @@ class CheckMembershipStatusJob : DailyJob(), Injects<BackgroundModule> {
             )
         }
     }
-
-    private fun updatePowerUpsExpirationDate(
-        status: Api.MembershipStatus,
-        enableAllPowerUpsUseCase: EnableAllPowerUpsUseCase
-    ) {
-        val gracePeriodStart =
-            status.expirationDate.minusDays((Constants.POWER_UP_GRACE_PERIOD_DAYS - 1).toLong())
-        if (isInGracePeriod(gracePeriodStart, status.expirationDate)) {
-            enableAllPowerUpsUseCase.execute(EnableAllPowerUpsUseCase.Params(status.expirationDate))
-        } else {
-            enableAllPowerUpsUseCase.execute(
-                EnableAllPowerUpsUseCase.Params(
-                    status.expirationDate.minusDays(
-                        Constants.POWER_UP_GRACE_PERIOD_DAYS.toLong()
-                    )
-                )
-            )
-        }
-    }
-
-    private fun isInGracePeriod(
-        gracePeriodStart: LocalDate,
-        expirationDate: LocalDate
-    ) = LocalDate.now().isBetween(gracePeriodStart, expirationDate)
 
     companion object {
         const val TAG = "check_membership_status_tag"

@@ -35,7 +35,6 @@ object AuthSideEffectHandler : AppSideEffectHandler() {
     private val tagRepository by required { tagRepository }
     private val questRepository by required { questRepository }
     private val sharedPreferences by required { sharedPreferences }
-    private val removeExpiredPowerUpsScheduler by required { removeExpiredPowerUpsScheduler }
     private val checkMembershipStatusScheduler by required { checkMembershipStatusScheduler }
     private val planDayScheduler by required { planDayScheduler }
     private val updateAchievementProgressScheduler by required { updateAchievementProgressScheduler }
@@ -419,7 +418,6 @@ object AuthSideEffectHandler : AppSideEffectHandler() {
 
     private fun prepareAppStart() {
         dispatch(LoadDataAction.All)
-        removeExpiredPowerUpsScheduler.schedule()
         checkMembershipStatusScheduler.schedule()
         planDayScheduler.schedule()
         updateAchievementProgressScheduler.schedule()

@@ -31,7 +31,6 @@ import io.ipoli.android.player.usecase.FindPlayerRankUseCase
 import io.ipoli.android.quest.Color
 import io.ipoli.android.quest.ColorPack
 import io.ipoli.android.quest.IconPack
-import io.ipoli.android.store.powerup.PowerUp
 import io.ipoli.android.tag.Tag
 import io.ipoli.android.tag.persistence.RoomTagMapper
 import io.ipoli.android.tag.persistence.TagDao
@@ -230,12 +229,6 @@ class AndroidPlayerRepository(
         val inventory = Inventory(
             food = ci.food.entries.associate { Food.valueOf(it.key) to it.value.toInt() },
             avatars = ci.avatars.map { Avatar.valueOf(it) }.toSet(),
-            powerUps = ci.powerUps.map {
-                PowerUp.fromType(
-                    PowerUp.Type.valueOf(it.key),
-                    it.value.startOfDayUTC
-                )
-            },
             pets = ci.pets.map {
                 val cip = DbInventoryPet(it)
                 InventoryPet(
@@ -535,9 +528,7 @@ class AndroidPlayerRepository(
                 .associate { it.key.name to it.value.toLong() }
                 .toMutableMap()
             it.avatars = inventory.avatars.map { it.name }
-            it.powerUps = inventory.powerUps
-                .associate { it.type.name to it.expirationDate.startOfDayUTC() }
-                .toMutableMap()
+            it.powerUps = mutableMapOf()
             it.pets = inventory.pets
                 .map { createDbInventoryPet(it).map }
             it.themes = inventory.themes.map { it.name }
@@ -874,12 +865,6 @@ class FirestorePlayerRepository(
         val inventory = Inventory(
             food = ci.food.entries.associate { Food.valueOf(it.key) to it.value.toInt() },
             avatars = ci.avatars.map { Avatar.valueOf(it) }.toSet(),
-            powerUps = ci.powerUps.map {
-                PowerUp.fromType(
-                    PowerUp.Type.valueOf(it.key),
-                    it.value.startOfDayUTC
-                )
-            },
             pets = ci.pets.map {
                 val cip = DbInventoryPet(it)
                 InventoryPet(
@@ -1181,9 +1166,7 @@ class FirestorePlayerRepository(
                 .associate { it.key.name to it.value.toLong() }
                 .toMutableMap()
             it.avatars = inventory.avatars.map { it.name }
-            it.powerUps = inventory.powerUps
-                .associate { it.type.name to it.expirationDate.startOfDayUTC() }
-                .toMutableMap()
+            it.powerUps = mutableMapOf()
             it.pets = inventory.pets
                 .map { createDbInventoryPet(it).map }
             it.themes = inventory.themes.map { it.name }

@@ -1,5 +1,6 @@
 package io.ipoli.android.common.view
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
@@ -79,6 +80,7 @@ abstract class BaseDialogController : RestoreViewOnCreateController {
         return View(activity)
     }
 
+    @SuppressLint("InflateParams")
     protected open fun createHeaderView(inflater: LayoutInflater): View? {
         return inflater.inflate(R.layout.view_dialog_header, null)
     }

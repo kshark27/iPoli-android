@@ -44,6 +44,7 @@ data class Statistics(
     val wellBeingStatusIndex: Long = 0,
     val willpowerStatusIndex: Long = 0
 ) {
+
     data class StreakStatistic(val count: Long = 0, val lastDate: LocalDate? = null)
 
     data class DayStatistic(val count: Long = 0, val day: LocalDate = LocalDate.now()) {

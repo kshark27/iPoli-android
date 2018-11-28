@@ -221,9 +221,7 @@ interface Constants {
         val SYNC_CALENDAR_JOB_ID = 1
         val PROFILES_FIRST_SCHEMA_VERSION = 7
 
-        val POWER_UP_GRACE_PERIOD_DAYS = 7
         const val MEMBERSHIP_TRIAL_PERIOD_DAYS = 7
-        const val POWER_UP_PURCHASE_DURATION_DAYS = 30
 
         val SKU_SUBSCRIPTION_MONTHLY = "monthly_plan_70_percent"
         val SKU_SUBSCRIPTION_QUARTERLY = "quarterly_plan_70_percent"
@@ -332,5 +330,7 @@ interface Constants {
 
         const val KEY_BUCKET_LIST_SHOW_COMPLETED = "BUCKET_LIST_SHOW_COMPLETED"
         const val DEFAULT_BUCKET_LIST_SHOW_COMPLETED = true
+
+        const val KEY_SHOULD_REVIEW_DAY = "SHOULD_REVIEW_DAY"
     }
 }

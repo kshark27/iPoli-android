@@ -341,7 +341,7 @@ class MembershipViewController(args: Bundle? = null) :
             if (currentPlan != null)
                 stringRes(R.string.upgrade_now)
             else
-                stringRes(R.string.go_premium)
+                stringRes(R.string.join_now)
 
     enum class AndroidMembershipPlan(
         @StringRes val title: Int,

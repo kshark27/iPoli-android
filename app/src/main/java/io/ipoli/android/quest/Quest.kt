@@ -184,6 +184,12 @@ data class Quest(
 
     val isCompleted get() = completedAtDate != null
     val endTime get() = startTime?.plus(duration)
+
+    val endDateTime
+        get() = endTime?.let {
+            scheduledDate?.toLocalDateTime(it)
+        }
+
     val isScheduled get() = startTime != null && scheduledDate != null
 
     val startMillisecond

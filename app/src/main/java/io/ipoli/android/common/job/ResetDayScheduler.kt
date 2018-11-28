@@ -3,11 +3,9 @@ package io.ipoli.android.common.job
 import android.content.Context
 import io.ipoli.android.Constants
 import io.ipoli.android.MyPoliApp
-import io.ipoli.android.achievement.usecase.UpdatePlayerStatsUseCase
 import io.ipoli.android.common.di.BackgroundModule
 import io.ipoli.android.common.notification.QuickDoNotificationUtil
 import io.ipoli.android.common.view.AppWidgetUtil
-import io.ipoli.android.pet.usecase.ApplyDamageToPlayerUseCase
 import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
@@ -20,40 +18,19 @@ class ResetDayJob : FixedDailyJob(ResetDayJob.TAG) {
 
         val kap = Kapsule<BackgroundModule>()
         val playerRepository by kap.required { playerRepository }
-        val applyDamageToPlayerUseCase by kap.required { applyDamageToPlayerUseCase }
-        val updatePlayerStatsUseCase by kap.required { updatePlayerStatsUseCase }
-        val sharedPreferences by kap.required { sharedPreferences }
         val questRepository by kap.required { questRepository }
+        val sharedPreferences by kap.required { sharedPreferences }
         kap.inject(MyPoliApp.backgroundModule(context))
 
         val player = playerRepository.find()!!
 
-        val oldPet = player.pet
-
-        val newPlayer =
-            applyDamageToPlayerUseCase.execute(ApplyDamageToPlayerUseCase.Params()).player
-        val newPet = newPlayer.pet
-
-        if (oldPet.isDead != newPet.isDead) {
-            updatePlayerStatsUseCase.execute(
-                UpdatePlayerStatsUseCase.Params(
-                    player = playerRepository.find()!!,
-                    eventType = UpdatePlayerStatsUseCase.Params.EventType.PetDied
-                )
-            )
-        }
-
-        if (newPlayer.isDead) {
-            sharedPreferences.edit().putBoolean(Constants.KEY_PLAYER_DEAD, true).commit()
-        }
-
         val todayQuests = questRepository.findScheduledAt(LocalDate.now())
+
+        sharedPreferences.edit().putBoolean(Constants.KEY_SHOULD_REVIEW_DAY, true).apply()
 
         GlobalScope.launch(Dispatchers.Main) {
 
-            if (newPlayer.preferences.isQuickDoNotificationEnabled && newPlayer.isDead) {
-                QuickDoNotificationUtil.showDefeated(context)
-            } else if (newPlayer.preferences.isQuickDoNotificationEnabled) {
+            if (player.preferences.isQuickDoNotificationEnabled) {
                 QuickDoNotificationUtil.update(context, todayQuests)
             }
 

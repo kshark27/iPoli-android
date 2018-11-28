@@ -9,7 +9,6 @@
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
 
-
     <ImageView
         android:id="@+id/questIcon"
         android:layout_width="32dp"
@@ -78,7 +77,6 @@
             android:layout_height="16dp"
             app:srcCompat="@drawable/ic_sword_primary_text_24dp" />
     </LinearLayout>
-
 
     <TextView
         android:id="@+id/questStartTime"

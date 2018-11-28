@@ -31,7 +31,6 @@ import io.ipoli.android.planday.PlanDayViewState.StateType.*
 import io.ipoli.android.planday.data.Weather
 import io.ipoli.android.planday.persistence.Quote
 import io.ipoli.android.planday.scenes.PlanDayMotivationViewController
-import io.ipoli.android.planday.scenes.PlanDayReviewViewController
 import io.ipoli.android.planday.scenes.PlanDayTodayViewController
 import io.ipoli.android.player.data.Player
 import io.ipoli.android.quest.Quest
@@ -41,21 +40,6 @@ import org.threeten.bp.format.TextStyle
 import java.util.*
 
 sealed class PlanDayAction : Action {
-    data class CompleteYesterdayQuest(val questId: String) : PlanDayAction() {
-        override fun toMap() = mapOf("questId" to questId)
-    }
-
-    data class UndoCompleteQuest(val questId: String) : PlanDayAction() {
-        override fun toMap() = mapOf("questId" to questId)
-    }
-
-    data class ScheduleQuestForToday(val questId: String) : PlanDayAction() {
-        override fun toMap() = mapOf("questId" to questId)
-    }
-
-    data class MoveQuestToBucketList(val questId: String) : PlanDayAction() {
-        override fun toMap() = mapOf("questId" to questId)
-    }
 
     data class RemoveQuest(val questId: String) : PlanDayAction() {
         override fun toMap() = mapOf("questId" to questId)
@@ -95,12 +79,13 @@ sealed class PlanDayAction : Action {
         override fun toMap() = mapOf("dailyChallenge" to dailyChallenge)
     }
 
+    data class MoveBucketListQuestsToToday(val quests: List<Quest>) : PlanDayAction()
+
     object Load : PlanDayAction()
     object ShowNext : PlanDayAction()
     object GetWeather : PlanDayAction()
     object ImageLoaded : PlanDayAction()
     object RisingSunAnimationDone : PlanDayAction()
-    object LoadReviewDay : PlanDayAction()
     object Done : PlanDayAction()
     object Back : PlanDayAction()
     object LoadToday : PlanDayAction()
@@ -126,7 +111,7 @@ object PlanDayReducer : BaseViewStateReducer<PlanDayViewState>() {
                 val player = state.dataState.player
 
                 val playerName = player?.let {
-                    it.displayName?.let { firstNameOf(it) }
+                    it.displayName?.let { n -> firstNameOf(n) }
                 }
 
                 subState.copy(
@@ -164,24 +149,6 @@ object PlanDayReducer : BaseViewStateReducer<PlanDayViewState>() {
 
             is PlanDayAction.LoadMotivation ->
                 createNewStateIfMotivationalDataIsLoaded(subState)
-
-            is PlanDayAction.LoadReviewDay ->
-                createNewStateIfReviewDataIsLoaded(subState)
-
-            is DataLoadedAction.ReviewDayQuestsChanged -> {
-                val newState = subState.copy(
-                    type = DATA_CHANGED,
-                    reviewDayQuests = action.quests,
-                    awesomenessScore = when {
-                        action.awesomenessScore > 4.99 -> PlanDayViewState.AwesomenessGrade.A
-                        action.awesomenessScore > 3.99 -> PlanDayViewState.AwesomenessGrade.B
-                        action.awesomenessScore > 2.99 -> PlanDayViewState.AwesomenessGrade.C
-                        action.awesomenessScore > 1.99 -> PlanDayViewState.AwesomenessGrade.D
-                        else -> PlanDayViewState.AwesomenessGrade.F
-                    }
-                )
-                createNewStateIfReviewDataIsLoaded(newState)
-            }
 
             is DataLoadedAction.TodayQuestsChanged -> {
                 val newState = subState.copy(
@@ -294,10 +261,9 @@ object PlanDayReducer : BaseViewStateReducer<PlanDayViewState>() {
             }
 
             is PlanDayAction.Back ->
-                if (subState.adapterPosition == 2)
+                if (subState.adapterPosition == 1)
                     subState.copy(
-                        type = BACK_TO_REVIEW,
-                        adapterPosition = 1
+                        adapterPosition = 0
                     )
                 else
                     subState.copy(
@@ -377,17 +343,6 @@ object PlanDayReducer : BaseViewStateReducer<PlanDayViewState>() {
     private fun hasTodayDataLoaded(state: PlanDayViewState) =
         state.todayQuests != null && state.suggestedQuests != null
 
-    private fun createNewStateIfReviewDataIsLoaded(newState: PlanDayViewState) =
-        if (hasReviewDataLoaded(newState))
-            newState.copy(
-                type = REVIEW_DATA_LOADED
-            )
-        else
-            newState
-
-    private fun hasReviewDataLoaded(newState: PlanDayViewState) =
-        newState.reviewDayQuests != null && newState.awesomenessScore != null && newState.petAvatar != null
-
     override fun defaultState() =
         PlanDayViewState(
             type = INITIAL,
@@ -396,7 +351,6 @@ object PlanDayReducer : BaseViewStateReducer<PlanDayViewState>() {
             imageAuthor = "",
             imageAuthorUrl = "",
             quote = null,
-            reviewDayQuests = null,
             todayQuests = null,
             dailyChallengeQuestIds = emptyList(),
             isDailyChallengeCompleted = false,
@@ -412,7 +366,6 @@ object PlanDayReducer : BaseViewStateReducer<PlanDayViewState>() {
             hasShownMotivationalData = false,
             risingSunAnimationDone = false,
             petAvatar = null,
-            awesomenessScore = null,
             temperatureUnit = Constants.DEFAULT_TEMPERATURE_UNIT,
             timeFormat = Constants.DEFAULT_TIME_FORMAT
         )
@@ -429,7 +382,6 @@ data class PlanDayViewState(
     val imageAuthorUrl: String,
     val weather: Weather?,
     val quote: Quote?,
-    val reviewDayQuests: List<Quest>?,
     val todayQuests: List<Quest>?,
     val suggestedQuests: List<Quest>?,
     val dailyChallengeQuestIds: List<String>?,
@@ -444,7 +396,6 @@ data class PlanDayViewState(
     val hasShownMotivationalData: Boolean,
     val risingSunAnimationDone: Boolean,
     val petAvatar: PetAvatar?,
-    val awesomenessScore: AwesomenessGrade?,
     val temperatureUnit: Player.Preferences.TemperatureUnit,
     val timeFormat: Player.Preferences.TimeFormat
 ) : BaseViewState() {
@@ -452,22 +403,16 @@ data class PlanDayViewState(
         INITIAL,
         FIRST_PAGE,
         NEXT_PAGE,
-        BACK_TO_REVIEW,
         CLOSE,
         DATA_CHANGED,
         IMAGE_LOADED,
         MOTIVATION_DATA_LOADED,
         SHOW_MOTIVATION_DATA,
-        REVIEW_DATA_LOADED,
         TODAY_DATA_LOADED,
         MAX_DAILY_CHALLENGE_QUESTS_REACHED,
         DAILY_CHALLENGE_QUESTS_CHANGED,
         DAY_STARTED,
         NOT_ENOUGH_DAILY_CHALLENGE_QUESTS
-    }
-
-    enum class AwesomenessGrade {
-        A, B, C, D, F
     }
 }
 
@@ -520,9 +465,6 @@ class PlanDayViewController(args: Bundle? = null) :
                     animate = true
                 )
 
-            BACK_TO_REVIEW ->
-                getChildRouter(view.planDayPager).popCurrentController()
-
             CLOSE -> {
                 exitFullScreen()
                 navigateFromRoot().setHome()
@@ -553,15 +495,13 @@ class PlanDayViewController(args: Bundle? = null) :
     private fun createControllerForPosition(position: Int): Controller =
         when (position) {
             MOTIVATION_INDEX -> PlanDayMotivationViewController()
-            REVIEW_YESTERDAY_INDEX -> PlanDayReviewViewController()
             PLAN_TODAY_INDEX -> PlanDayTodayViewController()
             else -> throw IllegalArgumentException("Unknown controller position $position")
         }
 
     companion object {
         const val MOTIVATION_INDEX = 0
-        const val REVIEW_YESTERDAY_INDEX = 1
-        const val PLAN_TODAY_INDEX = 2
+        const val PLAN_TODAY_INDEX = 1
     }
 
 }

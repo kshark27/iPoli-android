@@ -22,8 +22,7 @@ class RemoveMembershipUseCase(private val playerRepository: PlayerRepository) :
 
         return playerRepository.save(
             p.copy(
-                membership = Membership.NONE,
-                inventory = p.inventory.setPowerUps(listOf())
+                membership = Membership.NONE
             )
         )
     }

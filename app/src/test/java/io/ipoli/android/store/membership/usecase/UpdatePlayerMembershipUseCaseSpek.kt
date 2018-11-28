@@ -1,13 +1,11 @@
 package io.ipoli.android.store.membership.usecase
 
-import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import io.ipoli.android.TestUtil
 import io.ipoli.android.player.data.Membership
 import io.ipoli.android.player.data.Player
 import io.ipoli.android.store.membership.MembershipPlan
 import io.ipoli.android.store.powerup.PowerUp
-import io.ipoli.android.store.powerup.usecase.EnableAllPowerUpsUseCase
 import org.amshove.kluent.*
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe

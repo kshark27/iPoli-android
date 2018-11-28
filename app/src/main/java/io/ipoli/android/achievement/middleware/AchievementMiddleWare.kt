@@ -23,7 +23,6 @@ import io.ipoli.android.player.usecase.RewardPlayerUseCase
 import io.ipoli.android.repeatingquest.add.EditRepeatingQuestAction
 import io.ipoli.android.store.avatar.AvatarStoreAction
 import io.ipoli.android.store.membership.MembershipAction
-import io.ipoli.android.store.powerup.PowerUpStoreAction
 import org.threeten.bp.LocalDate
 import space.traversal.kapsule.Injects
 import space.traversal.kapsule.inject
@@ -102,9 +101,6 @@ object AchievementProgressMiddleWare : MiddleWare<AppState>, Injects<BackgroundM
 
             is MembershipAction.Subscribed ->
                 BecomeMember
-
-            is PowerUpStoreAction.Enable ->
-                PowerUpActivated
 
             is PetAction.PetRevived ->
                 PetRevived

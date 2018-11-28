@@ -106,7 +106,7 @@ object DurationPickerDialogReducer :
         selectedDuration: Duration<Minute>?
     ): DurationPickerDialogViewState {
         val isCustom = selectedDuration != null && !subState.durations.contains(selectedDuration)
-            && player.inventory.isPowerUpEnabled(PowerUp.Type.CUSTOM_DURATION)
+            && player.isMember
         val duration: Duration<Minute> =
             selectedDuration ?: Constants.DEFAULT_QUEST_DURATION.minutes
 

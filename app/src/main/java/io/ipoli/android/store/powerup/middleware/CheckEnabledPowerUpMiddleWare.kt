@@ -12,7 +12,7 @@ import io.ipoli.android.event.calendar.picker.CalendarPickerAction
 import io.ipoli.android.event.calendar.picker.CalendarPickerViewState
 import io.ipoli.android.growth.GrowthAction
 import io.ipoli.android.habit.list.HabitListAction
-import io.ipoli.android.player.data.Inventory
+import io.ipoli.android.player.data.Player
 import io.ipoli.android.store.powerup.PowerUp
 import io.ipoli.android.tag.list.TagListAction
 
@@ -31,19 +31,11 @@ object CheckEnabledPowerUpMiddleWare : MiddleWare<AppState> {
     ): MiddleWare.Result {
         val p = state.dataState.player ?: return MiddleWare.Result.Continue
 
-        val inventory = p.inventory
-
         return when (action) {
 
             is GrowthAction.ShowWeek,
             is GrowthAction.ShowMonth ->
-                checkForAvailablePowerUp(PowerUp.Type.GROWTH, inventory, dispatcher)
-
-//            is ChallengeListAction.AddChallenge ->
-//                checkForAvailablePowerUp(PowerUp.Type.CHALLENGES, inventory, dispatcher)
-
-//            is QuestAction.Start ->
-//                checkForAvailablePowerUp(PowerUp.Type.TIMER, inventory, dispatcher)
+                checkForAvailablePowerUp(PowerUp.Type.GROWTH, p, dispatcher)
 
             is HabitListAction.AddPreset,
             is HabitListAction.Add -> {
@@ -51,7 +43,7 @@ object CheckEnabledPowerUpMiddleWare : MiddleWare<AppState> {
                 if (habits == null || habits.size < Constants.MAX_FREE_HABITS) {
                     MiddleWare.Result.Continue
                 } else {
-                    checkForAvailablePowerUp(PowerUp.Type.HABITS, inventory, dispatcher)
+                    checkForAvailablePowerUp(PowerUp.Type.HABITS, p, dispatcher)
                 }
             }
 
@@ -59,36 +51,26 @@ object CheckEnabledPowerUpMiddleWare : MiddleWare<AppState> {
                 if (state.dataState.tags.size < Constants.MAX_FREE_TAGS)
                     MiddleWare.Result.Continue
                 else
-                    checkForAvailablePowerUp(PowerUp.Type.TAGS, inventory, dispatcher)
+                    checkForAvailablePowerUp(PowerUp.Type.TAGS, p, dispatcher)
 
             is DurationPickerDialogAction.ShowCustom ->
-                checkForAvailablePowerUp(PowerUp.Type.CUSTOM_DURATION, inventory, dispatcher)
-
-//            is QuestAction.AddSubQuest,
-//            is EditRepeatingQuestAction.AddSubQuest ->
-//                checkForAvailablePowerUp(PowerUp.Type.SUB_QUESTS, inventory, dispatcher)
-//
-//            is NoteAction.Save ->
-//                checkForAvailablePowerUp(PowerUp.Type.NOTES, inventory, dispatcher)
-//
-//            is SettingsAction.ToggleSyncCalendar ->
-//                checkForAvailablePowerUp(PowerUp.Type.CALENDAR_SYNC, inventory, dispatcher)
+                checkForAvailablePowerUp(PowerUp.Type.CUSTOM_DURATION, p, dispatcher)
 
             is CalendarPickerAction.SyncSelectedCalendars -> {
                 val s = state.stateFor(CalendarPickerViewState::class.java)
                 if (s.syncCalendars.size <= Constants.MAX_FREE_SYNC_CALENDARS)
                     MiddleWare.Result.Continue
                 else
-                    checkForAvailablePowerUp(PowerUp.Type.CALENDAR_SYNC, inventory, dispatcher)
+                    checkForAvailablePowerUp(PowerUp.Type.CALENDAR_SYNC, p, dispatcher)
             }
 
 
             is EditChallengeAction.ShowTargetTrackedValuePicker -> {
-                checkForAddChallengeValue(action.trackedValues, inventory, dispatcher)
+                checkForAddChallengeValue(action.trackedValues, p, dispatcher)
             }
 
             is EditChallengeAction.ShowAverageTrackedValuePicker -> {
-                checkForAddChallengeValue(action.trackedValues, inventory, dispatcher)
+                checkForAddChallengeValue(action.trackedValues, p, dispatcher)
             }
 
             else -> MiddleWare.Result.Continue
@@ -97,13 +79,13 @@ object CheckEnabledPowerUpMiddleWare : MiddleWare<AppState> {
 
     private fun checkForAddChallengeValue(
         trackedValues: List<Challenge.TrackedValue>,
-        inventory: Inventory,
+        player: Player,
         dispatcher: Dispatcher
     ) =
         if (trackedValues.any { it !is Challenge.TrackedValue.Progress }) {
             checkForAvailablePowerUp(
                 PowerUp.Type.TRACK_CHALLENGE_VALUES,
-                inventory,
+                player,
                 dispatcher
             )
         } else {
@@ -113,11 +95,11 @@ object CheckEnabledPowerUpMiddleWare : MiddleWare<AppState> {
 
     private fun checkForAvailablePowerUp(
         powerUp: PowerUp.Type,
-        inventory: Inventory,
+        player: Player,
         dispatcher: Dispatcher
     ) =
         when {
-            inventory.isPowerUpEnabled(powerUp) -> MiddleWare.Result.Continue
+            player.isMember -> MiddleWare.Result.Continue
             else -> {
                 dispatcher.dispatch(ShowBuyPowerUpAction(powerUp))
                 MiddleWare.Result.Stop

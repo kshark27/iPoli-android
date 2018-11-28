@@ -9,6 +9,7 @@ import io.ipoli.android.common.datetime.Minute
 import io.ipoli.android.common.datetime.Time
 import io.ipoli.android.common.redux.Action
 import io.ipoli.android.planday.PlanDayAction
+import io.ipoli.android.planday.review.ReviewDayAction
 import io.ipoli.android.quest.Color
 import io.ipoli.android.quest.Reminder
 import io.ipoli.android.quest.bucketlist.BucketListAction
@@ -122,29 +123,17 @@ object EditQuestSideEffectHandler : AppSideEffectHandler() {
                 saveQuestUseCase.execute(questParams)
             }
 
-            is PlanDayAction.ScheduleQuestForToday ->
-                rescheduleQuest(action.questId, LocalDate.now(), null, null)
-
             is PlanDayAction.RescheduleQuest ->
                 rescheduleQuest(action.questId, action.date, action.time, action.duration)
 
             is PlanDayAction.AcceptSuggestion ->
                 rescheduleQuest(action.questId, LocalDate.now(), null, null)
 
-            is PlanDayAction.MoveQuestToBucketList ->
-                rescheduleQuest(action.questId, null, null, null)
-
             is PlanDayAction.RemoveQuest ->
                 removeQuestUseCase.execute(action.questId)
 
             is PlanDayAction.UndoRemoveQuest ->
                 undoRemoveQuestUseCase.execute(action.questId)
-
-            is PlanDayAction.CompleteYesterdayQuest ->
-                completeQuest(action.questId, LocalDate.now().minusDays(1))
-
-            is PlanDayAction.UndoCompleteQuest ->
-                undoCompletedQuestUseCase.execute(action.questId)
 
             is BucketListAction.CompleteQuest ->
                 completeQuest(action.questId)
@@ -196,6 +185,18 @@ object EditQuestSideEffectHandler : AppSideEffectHandler() {
 
             is BucketListAction.RemoveAllCompleted ->
                 removeAllCompletedFromBucketListUseCase.execute(Unit)
+
+            is ReviewDayAction.CompleteQuest ->
+                completeQuest(
+                    questId = action.questId,
+                    completedDate = LocalDate.now().minusDays(1)
+                )
+
+            is ReviewDayAction.RescheduleQuest ->
+                rescheduleQuest(action.questId, action.date, action.time, action.duration)
+
+            is ReviewDayAction.UndoCompleteQuest ->
+                undoCompletedQuestUseCase.execute(action.questId)
         }
     }
 
@@ -231,5 +232,6 @@ object EditQuestSideEffectHandler : AppSideEffectHandler() {
             || action is BucketListAction
             || action is PlanDayAction
             || action is AgendaAction
+            || action is ReviewDayAction
 
 }

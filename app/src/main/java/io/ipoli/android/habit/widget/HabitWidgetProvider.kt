@@ -82,7 +82,7 @@ class HabitWidgetProvider : AppWidgetProvider(), Injects<BackgroundModule> {
                     val rv = RemoteViews(context.packageName, R.layout.widget_habits)
                     if (player == null) {
                         showEmptyView(rv)
-                    } else if (!player.isPowerUpEnabled(PowerUp.Type.HABIT_WIDGET)) {
+                    } else if (!player.isMember) {
                         showNoPowerUp(rv, context)
                     } else if(player.isDead) {
                         showDeadView(rv, context)

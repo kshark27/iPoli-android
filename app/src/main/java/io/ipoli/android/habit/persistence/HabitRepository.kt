@@ -24,6 +24,7 @@ import io.ipoli.android.tag.Tag
 import io.ipoli.android.tag.persistence.RoomTag
 import io.ipoli.android.tag.persistence.RoomTagMapper
 import io.ipoli.android.tag.persistence.TagDao
+import kotlinx.coroutines.experimental.channels.Channel
 import org.jetbrains.annotations.NotNull
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
@@ -36,6 +37,7 @@ import java.util.*
  */
 interface HabitRepository : CollectionRepository<Habit> {
 
+    fun listenForAll(ids: List<String>): Channel<List<Habit>>
     fun findAllForChallenge(challengeId: String): List<Habit>
     fun findNotRemovedForChallenge(challengeId: String): List<Habit>
     fun findHabitsToRemind(remindTime: LocalDateTime): List<Habit>
@@ -94,6 +96,9 @@ abstract class HabitDao : BaseDao<RoomHabit>() {
 
     @Query("SELECT * FROM habits WHERE id = :id")
     abstract fun findById(id: String): RoomHabit
+
+    @Query("SELECT * FROM habits WHERE removedAt IS NULL AND id IN (:ids)")
+    abstract fun listenForAll(ids: List<String>): LiveData<List<RoomHabit>>
 
     @Query("SELECT * FROM habits WHERE challengeId = :challengeId")
     abstract fun findAllForChallenge(challengeId: String): List<RoomHabit>
@@ -189,6 +194,9 @@ class RoomHabitRepository(
 
     override fun listenForAll() =
         dao.listenForNotRemoved().notify()
+
+    override fun listenForAll(ids: List<String>) =
+        dao.listenForAll(ids).notify()
 
     override fun removeFromChallenge(habitId: String) {
         val currentTime = System.currentTimeMillis()

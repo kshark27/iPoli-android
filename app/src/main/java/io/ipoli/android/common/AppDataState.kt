@@ -88,8 +88,12 @@ sealed class DataLoadedAction : Action {
 
     data class GemPacksLoaded(val gemPacks: List<GemPack>) : DataLoadedAction()
     data class ReviewDayQuestsChanged(
-        val quests: List<Quest>,
-        val awesomenessScore: Double
+        val quests: List<Quest>
+    ) : DataLoadedAction()
+
+    data class ReviewDayHabitsChanged(
+        val habits: List<Habit>,
+        val date: LocalDate
     ) : DataLoadedAction()
 
     data class WeatherChanged(val weather: Weather?) : DataLoadedAction()

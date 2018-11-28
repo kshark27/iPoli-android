@@ -219,8 +219,9 @@
     <string name="controller_power_up_store_title">Power-Ups</string>
     <string name="power_up_bought">Enjoy %s for 30 days</string>
     <string name="power_up_too_expensive">Not enough coins to buy this</string>
-    <string name="power_up_dialog_title">You\'ve discovered %s</string>
-    <string name="go_premium">Join now</string>
+    <string name="power_up_dialog_title">You discovered %s</string>
+    <string name="join_now">Join now</string>
+    <string name="go_premium">Go Premium</string>
     <string name="unlock_all">Unlock all</string>
     <string name="membership_store_title">Premium membership</string>
     <string name="life_coins_title">Life Coins</string>
@@ -595,7 +596,7 @@
     <string name="gems">Gems</string>
     <string name="colors">Colors</string>
     <string name="icons">Icons</string>
-    <string name="power_up_all_unlocked">All Unlocked! YaY!</string>
+    <string name="power_up_all_unlocked">Unlocked</string>
     <string name="controller_avatar_store_title">Avatars</string>
     <string name="avatar_bought">Enjoy your Avatar</string>
     <string name="avatar_too_expensive">This Avatar is too expensive</string>
@@ -693,14 +694,14 @@
     <string name="plan_day_afternoon">Good day, %s!</string>
     <string name="plan_day_evening">Good evening, %s!</string>
     <string name="plan_day_hello">Hello, %s!</string>
+    <string name="review_yesterday">Review yesterday</string>
     <string name="start_my_day">Start my day</string>
-    <string name="yesterday_review">Yesterday Review</string>
     <string name="plan_day">Plan day</string>
     <string name="empty_review_quest_list_title">Feeling lazy these days?</string>
     <string name="empty_review_quest_list_text">Did you achieve anything yesterday? You can log your progress now.</string>
     <string name="daily_awesomeness_score">Your Awesomeness Grade</string>
     <string name="plan_my_day">Plan my day</string>
-    <string name="empty_plan_today_list_title">Plan your amazing day</string>
+    <string name="empty_plan_today_list_title">Plan an amazing day</string>
     <string name="empty_plan_today_list_text">You\'re gonna rock today. Start by adding your first Quest now.</string>
     <string name="empty_friend_list_title">Help your friends</string>
     <string name="empty_friend_list_text">Invite your friends to myPoli and crush your Challenges together!</string>
@@ -762,7 +763,7 @@
     <string name="score">Score</string>
     <string name="daily_goal">Daily goal</string>
     <string name="productive_hours">Productive hours</string>
-    <string name="daily_challenge_description">The Daily Challenge should include your 3 most important Quests for the day</string>
+    <string name="daily_challenge_description">The Daily Challenge should include your 3 most important Quests for the day. Tap a star to add a Quest for it.</string>
     <string name="growth_tag_time_spent_no_progress_today">You haven\'t spent time on any Tag today</string>
     <string name="growth_tag_time_spent_no_progress_week">You haven\'t spent time on any Tag this week</string>
     <string name="growth_tag_time_spent_no_progress_month">You haven\'t spent time on any Tag this month</string>
@@ -1098,6 +1099,9 @@ These are your physical and mental characteristics.\n\n
     <string name="today_empty_habits">You have no Habits for today</string>
     <string name="today_empty_quests">You haven\'t added any Quests for today</string>
     <string name="today_all_quests_done">All Quests done for today. Yay!</string>
+    <string name="yesterday_empty_habits">You had no Habits yesterday</string>
+    <string name="yesterday_empty_quests">You had no Quests yesterday</string>
+    <string name="yesterday_all_quests_done">You got done every Quest yesterday</string>
     <string name="power_up_habits_widget_sub_title">Never forget completing a Habit</string>
     <string name="power_up_habits_widget_long_desc">Complete your Daily Habits from your home screen.
     The widget provides you a simple and easy way to manage your habits for the day.
@@ -1305,8 +1309,10 @@ These are your physical and mental characteristics.\n\n
     <string name="onboard_intro">Ahem… *finishing its biscuit*. Hey there, rookie! The war against the Evil Snail is raging and I am really busy! I\'ll explain everything later. Let me help you get started. *Looking for another biscuit*</string>
     <string name="apply">Apply</string>
     <string name="dialog_filter_title">Filter your Quests</string>
+    <string name="dialog_bucket_list_picker_title">Schedule for Today</string>
     <string name="filter">Filter</string>
     <string name="remove_completed">Remove completed</string>
     <string name="dialog_remove_completed_quests_confirmation_message">Do you really want to remove all completed Quests?</string>
     <string name="no_one">No one</string>
+    <string name="enable">Enable</string>
 </resources>

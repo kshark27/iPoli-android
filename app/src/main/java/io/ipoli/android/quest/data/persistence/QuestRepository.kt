@@ -41,6 +41,8 @@ interface QuestRepository : CollectionRepository<Quest> {
 
     fun listenForAllUnscheduled(): Channel<List<Quest>>
 
+    fun findAll(ids: List<String>): List<Quest>
+
     fun findRandomUnscheduledAndUncompleted(count: Int): List<Quest>
 
     fun findScheduledAt(date: LocalDate): List<Quest>
@@ -205,7 +207,7 @@ abstract class QuestDao : BaseDao<RoomQuest>() {
         maxQuests: Int
     ): List<RoomQuest>
 
-    @Query("SELECT * FROM quests WHERE removedAt IS NULL AND completedAtDate IS NULL ORDER BY RANDOM() LIMIT :count")
+    @Query("SELECT * FROM quests WHERE removedAt IS NULL AND completedAtDate IS NULL AND scheduledDate IS NULL ORDER BY RANDOM() LIMIT :count")
     abstract fun findRandomUnscheduledAndUncompleted(count: Int): List<RoomQuest>
 
     @Query("SELECT * FROM quests WHERE removedAt IS NULL AND completedAtDate = :date")
@@ -706,6 +708,9 @@ class RoomQuestRepository(
             .findAll(dailyChallenge.questIds)
             .map { toEntityObject(it) }
     }
+
+    override fun findAll(ids: List<String>) =
+        dao.findAll(ids).map { toEntityObject(it) }
 
     override fun findOriginallyScheduledOrCompletedInPeriod(
         startDate: LocalDate,

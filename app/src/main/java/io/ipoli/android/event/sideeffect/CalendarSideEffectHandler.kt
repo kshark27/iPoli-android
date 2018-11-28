@@ -29,11 +29,6 @@ object CalendarSideEffectHandler : AppSideEffectHandler() {
                     SaveSyncCalendarsUseCase.Params(action.calendars)
                 )
 
-            is PowerUpStoreAction.SyncCalendarsSelected ->
-                saveSyncCalendarsUseCase.execute(
-                    SaveSyncCalendarsUseCase.Params(action.calendars)
-                )
-
             is SettingsAction.ToggleSyncCalendar -> {
                 if (!action.isChecked) {
                     saveSyncCalendarsUseCase.execute(SaveSyncCalendarsUseCase.Params(setOf()))
@@ -47,7 +42,6 @@ object CalendarSideEffectHandler : AppSideEffectHandler() {
         action == CalendarPickerAction.Load
             || action is SettingsAction.ToggleSyncCalendar
             || action is SettingsAction.SyncCalendarsSelected
-            || action is PowerUpStoreAction.SyncCalendarsSelected
 
 
 }

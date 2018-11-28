@@ -3,13 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="48dp">
+    android:layout_height="48dp"
+    android:background="?colorSurface"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
     <ImageView
         android:id="@+id/questIcon"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_marginStart="16dp"
         android:adjustViewBounds="true"
         android:background="@drawable/oval_background"
         android:scaleType="centerInside"
@@ -29,7 +32,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="?android:textColorPrimary"
         app:layout_constraintBottom_toTopOf="@+id/questStartTime"
-        app:layout_constraintEnd_toStartOf="@+id/questStar"
+        app:layout_constraintEnd_toStartOf="@+id/questSelected"
         app:layout_constraintStart_toEndOf="@+id/questIcon"
         app:layout_constraintTop_toTopOf="@+id/questIcon"
         app:layout_constraintVertical_chainStyle="packed"
@@ -88,20 +91,15 @@
         android:layout_height="16dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="@+id/questTagName"
-        app:layout_constraintEnd_toStartOf="@+id/questStar"
+        app:layout_constraintEnd_toStartOf="@+id/questSelected"
         app:layout_constraintStart_toEndOf="@+id/questRepeatIndicator"
         app:layout_constraintTop_toTopOf="@+id/questTagName"
         app:srcCompat="@drawable/ic_sword_text_secondary_24dp" />
 
-    <ImageButton
-        android:id="@+id/questStar"
+    <CheckBox
+        android:id="@+id/questSelected"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginEnd="16dp"
-        android:background="?selectableItemBackgroundBorderless"
-        android:scaleType="fitXY"
-        android:src="@drawable/ic_star_border_text_secondary_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

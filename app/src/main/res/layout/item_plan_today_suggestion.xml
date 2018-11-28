@@ -3,16 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="48dp"
     android:background="?colorSurface">
 
     <ImageView
         android:id="@+id/suggestionIcon"
-        android:layout_width="38dp"
-        android:layout_height="38dp"
-        android:layout_marginBottom="8dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
         android:adjustViewBounds="true"
         android:background="@drawable/oval_background"
         android:scaleType="centerInside"
@@ -25,12 +23,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textSize="18sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="?android:textColorPrimary"
         app:layout_constraintBottom_toTopOf="@+id/suggestionStartTime"
         app:layout_constraintEnd_toStartOf="@+id/suggestionAccept"
         app:layout_constraintStart_toEndOf="@+id/suggestionIcon"
@@ -43,8 +41,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:drawablePadding="4dp"
         android:drawableStart="@drawable/tag_indicator"
+        android:drawablePadding="4dp"
         android:ellipsize="end"
         android:includeFontPadding="false"
         android:maxLines="1"
@@ -67,6 +65,7 @@
         android:gravity="center_vertical"
         android:includeFontPadding="false"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="?android:textColorSecondary"
         app:layout_constraintBottom_toBottomOf="@+id/suggestionTagName"
         app:layout_constraintEnd_toStartOf="@+id/suggestionRepeatIndicator"
         app:layout_constraintStart_toEndOf="@+id/suggestionTagName"
@@ -95,26 +94,14 @@
         app:layout_constraintTop_toTopOf="@+id/suggestionTagName"
         app:srcCompat="@drawable/ic_sword_text_secondary_24dp" />
 
-    <ImageView
+    <Button
         android:id="@+id/suggestionAccept"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_marginEnd="16dp"
-        android:background="?selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_add_circle_accent_24dp"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/accept"
+        android:textColor="?attr/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-
-    <View
-        android:id="@+id/suggestionDivider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="74dp"
-        android:background="?android:listDivider"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/suggestionAccept"
-        app:layout_constraintStart_toEndOf="@+id/suggestionIcon" />
 </android.support.constraint.ConstraintLayout>

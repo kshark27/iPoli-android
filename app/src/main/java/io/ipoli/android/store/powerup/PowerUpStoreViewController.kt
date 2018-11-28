@@ -19,7 +19,6 @@ import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic
 import io.ipoli.android.R
 import io.ipoli.android.common.ViewUtils
 import io.ipoli.android.common.redux.android.ReduxViewController
-import io.ipoli.android.common.text.DateFormatter
 import io.ipoli.android.common.view.*
 import io.ipoli.android.common.view.pager.BasePagerAdapter
 import io.ipoli.android.player.inventory.InventoryViewController
@@ -41,22 +40,6 @@ enum class AndroidPowerUp(
     @ColorRes val darkBackgroundColor: Int
 
 ) {
-    REMINDERS(
-        R.string.reminders,
-        R.string.power_up_reminders_sub_title,
-        R.string.power_up_reminders_long_desc,
-        GoogleMaterial.Icon.gmd_notifications_active,
-        R.color.md_green_600,
-        R.color.md_green_800
-    ),
-    CHALLENGES(
-        R.string.challenges,
-        R.string.power_up_challenges_sub_title,
-        R.string.power_up_challenges_long_desc,
-        Ionicons.Icon.ion_ios_flag,
-        R.color.md_deep_purple_300,
-        R.color.md_deep_purple_400
-    ),
     TAGS(
         R.string.power_up_tags_title,
         R.string.power_up_tags_sub_title,
@@ -80,22 +63,6 @@ enum class AndroidPowerUp(
         GoogleMaterial.Icon.gmd_timer,
         R.color.md_teal_500,
         R.color.md_teal_700
-    ),
-    SUB_QUESTS(
-        R.string.sub_quests,
-        R.string.power_up_sub_quests_sub_title,
-        R.string.power_up_sub_quests_long_desc,
-        GoogleMaterial.Icon.gmd_list,
-        R.color.md_pink_400,
-        R.color.md_pink_600
-    ),
-    NOTES(
-        R.string.notes,
-        R.string.power_up_notes_sub_title,
-        R.string.power_up_notes_long_desc,
-        GoogleMaterial.Icon.gmd_note_add,
-        R.color.md_blue_600,
-        R.color.md_blue_800
     ),
     CUSTOM_DURATION(
         R.string.custom_duration,
@@ -241,26 +208,9 @@ class PowerUpStoreViewController(args: Bundle? = null) :
                 colorLayout(vm)
             }
 
-            PowerUpStoreViewState.StateType.POWER_UP_BOUGHT ->
-                showLongToast(state.message)
-
-            PowerUpStoreViewState.StateType.POWER_UP_TOO_EXPENSIVE ->
-                showShortToast(R.string.power_up_too_expensive)
-
             else -> {
             }
         }
-    }
-
-
-    private fun showCalendarPicker() {
-        navigate().toCalendarPicker { calendarIds ->
-            dispatch(PowerUpStoreAction.SyncCalendarsSelected(calendarIds))
-        }
-    }
-
-    override fun onPermissionsGranted(requestCode: Int, permissions: List<String>) {
-        showCalendarPicker()
     }
 
     sealed class PowerUpViewModel(
@@ -288,8 +238,7 @@ class PowerUpStoreViewController(args: Bundle? = null) :
             @ColorInt override val darkBackgroundColor: Int,
             override val name: String,
             override val slogan: String,
-            override val description: String,
-            val coinPrice: String
+            override val description: String
         ) : PowerUpViewModel(icon, backgroundColor, darkBackgroundColor, name, slogan, description)
     }
 
@@ -331,10 +280,9 @@ class PowerUpStoreViewController(args: Bundle? = null) :
             view.pName.text = item.name
             view.pSlogan.text = item.slogan
             view.pDescription.text = item.description
-            view.pBuy.text = item.coinPrice
 
             view.pBuy.onDebounceClick {
-                dispatch(PowerUpStoreAction.Enable(item.type))
+                navigate().toMembership()
             }
         }
 
@@ -357,29 +305,13 @@ class PowerUpStoreViewController(args: Bundle? = null) :
         }
     }
 
-    private val PowerUpStoreViewState.message: String
-        get() = stringRes(
-            R.string.power_up_bought,
-            stringRes(AndroidPowerUp.valueOf(powerUp.name).title)
-        )
-
     private val PowerUpStoreViewState.powerUpViewModels
         get() = powerUps.map {
             when (it) {
                 is PowerUpItem.Enabled -> {
-                    val expirationMessage = if (it.showExpirationDate)
-                        stringRes(
-                            R.string.power_up_expires_on,
-                            it.daysUntilExpiration,
-                            DateFormatter.formatWithoutYear(
-                                activity!!,
-                                it.expirationDate
-                            )
-                        )
-                    else
-                        stringRes(
-                            R.string.power_up_all_unlocked
-                        )
+                    val expirationMessage = stringRes(
+                        R.string.power_up_all_unlocked
+                    )
                     val ap = AndroidPowerUp.valueOf(it.type.name)
                     PowerUpViewModel.Enabled(
                         ap.icon,
@@ -401,8 +333,7 @@ class PowerUpStoreViewController(args: Bundle? = null) :
                         colorRes(ap.darkBackgroundColor),
                         stringRes(ap.title),
                         stringRes(ap.subTitle),
-                        stringRes(ap.longDescription),
-                        it.coinPrice.toString() + " *"
+                        stringRes(ap.longDescription)
                     )
                 }
 

@@ -9,7 +9,6 @@ import io.ipoli.android.planday.job.PlanDayJob
 import io.ipoli.android.planday.job.SnoozedPlanDayJob
 import io.ipoli.android.quest.show.job.TimerCompleteNotificationJob
 import io.ipoli.android.store.membership.job.CheckMembershipStatusJob
-import io.ipoli.android.store.powerup.job.RemoveExpiredPowerUpsJob
 
 /**
  * Created by Venelin Valkov <venelin@mypoli.fun>
@@ -20,7 +19,6 @@ class myPoliJobCreator : JobCreator {
         when (tag) {
             RatePopupJob.TAG -> RatePopupJob()
             TimerCompleteNotificationJob.TAG -> TimerCompleteNotificationJob()
-            RemoveExpiredPowerUpsJob.TAG -> RemoveExpiredPowerUpsJob()
             CheckMembershipStatusJob.TAG -> CheckMembershipStatusJob()
             PlanDayJob.TAG -> PlanDayJob()
             SnoozedPlanDayJob.TAG -> SnoozedPlanDayJob()

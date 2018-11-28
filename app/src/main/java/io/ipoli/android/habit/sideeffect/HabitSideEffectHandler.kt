@@ -13,6 +13,7 @@ import io.ipoli.android.habit.list.HabitListAction
 import io.ipoli.android.habit.show.HabitAction
 import io.ipoli.android.habit.show.HabitViewState
 import io.ipoli.android.habit.usecase.*
+import io.ipoli.android.planday.review.ReviewDayAction
 import io.ipoli.android.quest.schedule.today.TodayAction
 import org.threeten.bp.LocalDate
 import org.threeten.bp.temporal.TemporalAdjusters
@@ -80,6 +81,14 @@ object HabitSideEffectHandler : AppSideEffectHandler() {
 
             is TodayAction.CompleteHabit ->
                 completeHabitUseCase.execute(CompleteHabitUseCase.Params(habitId = action.habitId))
+
+            is ReviewDayAction.CompleteHabit ->
+                completeHabitUseCase.execute(
+                    CompleteHabitUseCase.Params(
+                        habitId = action.habitId,
+                        date = LocalDate.now().minusDays(1)
+                    )
+                )
 
             is TodayAction.UndoCompleteHabit ->
                 undoCompleteHabitUseCase.execute(UndoCompleteHabitUseCase.Params(habitId = action.habitId))
@@ -176,4 +185,5 @@ object HabitSideEffectHandler : AppSideEffectHandler() {
             || action is HabitListAction || action is DataLoadedAction.HabitsChanged
             || action is TodayAction
             || action is HabitAction
+            || action is ReviewDayAction.CompleteHabit
 }

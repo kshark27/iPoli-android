@@ -358,8 +358,6 @@ data class Player(
 
     fun hasChallenge(challenge: PresetChallenge) = inventory.hasChallenge(challenge)
 
-    fun isPowerUpEnabled(powerUp: PowerUp.Type) = inventory.isPowerUpEnabled(powerUp)
-
     val experienceProgressForLevel: Int
         get() {
             val thisLevelXP = ExperienceForLevelGenerator.forLevel(level).toInt()
@@ -390,6 +388,8 @@ data class Player(
             coins = 0
         )
     }
+
+    val isMember get() = membership != Membership.NONE
 
     fun isLoggedIn() =
         authProvider is AuthProvider.Google || authProvider is AuthProvider.Facebook
@@ -512,8 +512,7 @@ data class Inventory(
     val themes: Set<Theme> = setOf(),
     val colorPacks: Set<ColorPack> = setOf(),
     val iconPacks: Set<IconPack> = setOf(),
-    val presetChallengeIds: Set<String> = setOf(),
-    val powerUps: List<PowerUp> = listOf()
+    val presetChallengeIds: Set<String> = setOf()
 ) {
     fun addFood(food: Food, quantity: Int = 1): Inventory {
         val qty = this.food.let {
@@ -601,25 +600,6 @@ data class Inventory(
 
     fun addChallenge(presetChallenge: PresetChallenge) =
         copy(presetChallengeIds = this.presetChallengeIds + presetChallenge.id)
-
-    fun addPowerUp(powerUp: PowerUp): Inventory {
-        require(!isPowerUpEnabled(powerUp.type))
-        return copy(powerUps = powerUps + powerUp)
-    }
-
-    fun isPowerUpEnabled(powerUpType: PowerUp.Type) =
-        getPowerUp(powerUpType) != null
-
-    fun getPowerUp(powerUpType: PowerUp.Type) =
-        powerUps.firstOrNull { it.type == powerUpType }
-
-    fun removePowerUp(powerUp: PowerUp): Inventory {
-        require(isPowerUpEnabled(powerUp.type))
-        return copy(powerUps = powerUps - powerUp)
-    }
-
-    fun setPowerUps(powerUps: List<PowerUp>) =
-        copy(powerUps = powerUps)
 }
 
 sealed class AuthProvider {

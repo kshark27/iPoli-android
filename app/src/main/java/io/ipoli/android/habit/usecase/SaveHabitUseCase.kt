@@ -126,13 +126,14 @@ class SaveHabitUseCase(
 
         if (habit.isCompletedForDate(date)) {
             val history = habit.history
-            val reward = history[date]!!.reward!!
-            removeRewardFromPlayerUseCase.execute(
-                RemoveRewardFromPlayerUseCase.Params(
-                    RemoveRewardFromPlayerUseCase.Params.RewardType.GOOD_HABIT,
-                    reward
+            history[date]!!.reward?.let { r ->
+                removeRewardFromPlayerUseCase.execute(
+                    RemoveRewardFromPlayerUseCase.Params(
+                        RemoveRewardFromPlayerUseCase.Params.RewardType.GOOD_HABIT,
+                        r
+                    )
                 )
-            )
+            }
         }
 
         return habit
