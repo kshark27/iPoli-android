@@ -22,7 +22,6 @@ data class PowerUp(
         TAGS(300),
         GROWTH(300),
         CALENDAR_SYNC(450),
-        SUB_QUESTS(180),
         CUSTOM_DURATION(130),
         TRACK_CHALLENGE_VALUES(400),
         HABIT_WIDGET(500),

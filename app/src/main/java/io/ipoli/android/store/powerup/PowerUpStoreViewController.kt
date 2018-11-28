@@ -56,14 +56,6 @@ enum class AndroidPowerUp(
         R.color.md_teal_400,
         R.color.md_teal_600
     ),
-    TIMER(
-        R.string.timer,
-        R.string.power_up_timer_sub_title,
-        R.string.power_up_timer_long_desc,
-        GoogleMaterial.Icon.gmd_timer,
-        R.color.md_teal_500,
-        R.color.md_teal_700
-    ),
     CUSTOM_DURATION(
         R.string.custom_duration,
         R.string.power_up_custom_duration_sub_title,
