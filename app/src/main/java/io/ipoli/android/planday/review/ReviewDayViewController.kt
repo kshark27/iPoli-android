@@ -196,16 +196,15 @@ class ReviewDayViewController(args: Bundle? = null) :
         exitFullScreen()
     }
 
-    override fun handleBack(): Boolean {
-        return if (!hasLoaded) {
-            false
+    override fun handleBack() =
+        if (!hasLoaded) {
+            true
         } else if (!canBack) {
             dispatch(ReviewDayAction.Done)
-            false
-        } else {
             true
+        } else {
+            false
         }
-    }
 
     override fun render(state: ReviewDayViewState, view: View) {
         when (state.type) {
