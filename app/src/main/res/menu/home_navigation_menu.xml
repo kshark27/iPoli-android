@@ -64,7 +64,7 @@
         <item
             android:id="@+id/tags"
             android:checked="false"
-            android:icon="@drawable/ic_tags_white_24dp"
+            android:icon="@drawable/ic_label_white_24dp"
             android:orderInCategory="0"
             android:title="@string/tags"
             app:actionLayout="@layout/menu_item_tags_view" />
