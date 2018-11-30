@@ -155,25 +155,6 @@
                 android:drawableStart="@drawable/ic_trending_up_white_24dp"
                 android:text="@string/tracked_values" />
 
-            <include
-                android:id="@+id/resultCompletionItem"
-                layout="@layout/item_challenge_summary_tracked_value"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="56dp" />
-
-            <TextView
-                android:id="@+id/addChallengeCompleteAll"
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:layout_marginStart="56dp"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:maxLines="1"
-                android:text="Track Complete All"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="@color/md_light_text_70" />
-
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/challengeTargetValueList"
                 android:layout_width="match_parent"

@@ -82,21 +82,6 @@ open class EditChallengeViewController(args: Bundle? = null) :
         view.challengeAverageValueList.layoutManager = LinearLayoutManager(view.context)
         view.challengeAverageValueList.adapter = TrackedValueAdapter()
 
-        view.resultCompletionItem.gone()
-        view.expectedResultText.text = "Complete all Quests"
-
-        view.expectedResultRemove.setImageDrawable(
-            IconicsDrawable(view.context).normalIcon(
-                GoogleMaterial.Icon.gmd_close,
-                R.color.md_light_text_70
-            ).respectFontBounds(true)
-        )
-        view.expectedResultRemove.dispatchOnClick { EditChallengeAction.RemoveCompleteAll }
-
-        view.addChallengeCompleteAll.dispatchOnClick {
-            EditChallengeAction.AddCompleteAllTrackedValue
-        }
-
         view.addChallengeTargetValue.onDebounceClick {
             navigate().toTargetValuePicker(targetValueSelectedListener = { t ->
                 dispatch(
@@ -233,13 +218,6 @@ open class EditChallengeViewController(args: Bundle? = null) :
         view: View,
         state: EditChallengeViewState
     ) {
-        if (state.shouldTrackCompleteAll) {
-            view.resultCompletionItem.visible()
-            view.addChallengeCompleteAll.gone()
-        } else {
-            view.resultCompletionItem.gone()
-            view.addChallengeCompleteAll.visible()
-        }
         (view.challengeTargetValueList.adapter as TrackedValueAdapter).updateAll(state.trackTargetViewModels)
         (view.challengeAverageValueList.adapter as TrackedValueAdapter).updateAll(state.trackAverageViewModels)
     }

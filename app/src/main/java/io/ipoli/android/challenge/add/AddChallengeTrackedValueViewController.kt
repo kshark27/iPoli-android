@@ -11,7 +11,10 @@ import io.ipoli.android.R
 import io.ipoli.android.challenge.add.EditChallengeViewState.StateType.*
 import io.ipoli.android.challenge.entity.Challenge
 import io.ipoli.android.common.redux.android.BaseViewController
-import io.ipoli.android.common.view.*
+import io.ipoli.android.common.view.colorRes
+import io.ipoli.android.common.view.inflate
+import io.ipoli.android.common.view.navigate
+import io.ipoli.android.common.view.normalIcon
 import io.ipoli.android.common.view.recyclerview.BaseRecyclerViewAdapter
 import io.ipoli.android.common.view.recyclerview.RecyclerViewViewModel
 import io.ipoli.android.common.view.recyclerview.SimpleViewHolder
@@ -35,14 +38,6 @@ class AddChallengeTrackedValueViewController(args: Bundle? = null) :
         applyStatusBarColors = false
         val view = container.inflate(R.layout.controller_add_challenge_tracked_value)
 
-        view.resultCompletionIcon.setImageDrawable(
-            IconicsDrawable(view.context)
-                .icon(GoogleMaterial.Icon.gmd_done_all)
-                .colorRes(R.color.md_red_500)
-                .paddingDp(8)
-                .sizeDp(40)
-        )
-
         view.resultAverageValueIcon.setImageDrawable(
             IconicsDrawable(view.context)
                 .icon(CommunityMaterial.Icon.cmd_scale_balance)
@@ -51,10 +46,6 @@ class AddChallengeTrackedValueViewController(args: Bundle? = null) :
                 .sizeDp(40)
         )
 
-        view.resultCompletionBackground.dispatchOnClick {
-            EditChallengeAction.AddCompleteAllTrackedValue
-        }
-
         view.resultReachValueBackground.onDebounceClick {
             dispatch(EditChallengeAction.ShowTargetTrackedValuePicker(emptyList()))
         }
@@ -62,20 +53,6 @@ class AddChallengeTrackedValueViewController(args: Bundle? = null) :
         view.resultAverageBackground.onDebounceClick {
             dispatch(EditChallengeAction.ShowAverageTrackedValuePicker(emptyList()))
         }
-
-        view.expectedResultText.setTextColor(colorRes(R.color.md_dark_text_87))
-        view.expectedResultText.text = "Complete all Quests"
-
-        view.expectedResultRemove.setImageDrawable(
-            IconicsDrawable(view.context).normalIcon(
-                GoogleMaterial.Icon.gmd_close,
-                R.color.md_dark_text_87
-            ).respectFontBounds(true)
-        )
-        view.expectedResultRemove.dispatchOnClick { EditChallengeAction.RemoveCompleteAll }
-
-        view.resultCompletionDivider.gone()
-        view.resultCompletionItem.gone()
 
         view.resultReachItems.layoutManager = LinearLayoutManager(view.context)
         view.resultReachItems.adapter = TrackedValueAdapter()
@@ -114,23 +91,6 @@ class AddChallengeTrackedValueViewController(args: Bundle? = null) :
             TRACKED_VALUES_CHANGED -> {
                 showNext = state.trackedValues.isNotEmpty()
                 activity?.invalidateOptionsMenu()
-                if (state.shouldTrackCompleteAll) {
-                    view.resultCompletionBackground.isEnabled = false
-                    view.resultCompletionBackground.isClickable = false
-                    view.resultCompletionBackground.isFocusable = false
-                    view.resultCompletionBackground.setOnClickListener(null)
-                    view.resultCompletionDivider.visible()
-                    view.resultCompletionItem.visible()
-                } else {
-                    view.resultCompletionBackground.isEnabled = true
-                    view.resultCompletionBackground.isClickable = true
-                    view.resultCompletionBackground.isFocusable = true
-                    view.resultCompletionBackground.dispatchOnClick {
-                        EditChallengeAction.AddCompleteAllTrackedValue
-                    }
-                    view.resultCompletionDivider.gone()
-                    view.resultCompletionItem.gone()
-                }
                 (view.resultReachItems.adapter as TrackedValueAdapter).updateAll(state.trackTargetViewModels)
                 (view.resultAverageItems.adapter as TrackedValueAdapter).updateAll(state.trackAverageViewModels)
 

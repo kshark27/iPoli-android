@@ -16,7 +16,6 @@ import io.ipoli.android.quest.Color
 import io.ipoli.android.quest.Icon
 import io.ipoli.android.tag.Tag
 import org.threeten.bp.LocalDate
-import java.util.*
 
 /**
  * Created by Polina Zhelyazkova <polina@mypoli.fun>
@@ -137,8 +136,7 @@ sealed class EditChallengeAction : Action {
     object Save : EditChallengeAction()
     object LoadFirstPage : EditChallengeAction()
     object SaveNew : EditChallengeAction()
-    object AddCompleteAllTrackedValue : EditChallengeAction()
-    object RemoveCompleteAll : EditChallengeAction()
+
     data class ShowTargetTrackedValuePicker(val trackedValues: List<Challenge.TrackedValue>) :
         EditChallengeAction()
 
@@ -385,16 +383,6 @@ object EditChallengeReducer : BaseViewStateReducer<EditChallengeViewState>() {
                     type = SHOW_AVERAGE_TRACKED_VALUE_PICKER
                 )
 
-            is EditChallengeAction.AddCompleteAllTrackedValue ->
-                subState.copy(
-                    type = TRACKED_VALUES_CHANGED,
-                    trackedValues = subState.trackedValues + Challenge.TrackedValue.Progress(
-                        id = UUID.randomUUID().toString(),
-                        history = emptyMap<LocalDate, Challenge.TrackedValue.Log>().toSortedMap()
-                    ),
-                    shouldTrackCompleteAll = true
-                )
-
             is EditChallengeAction.AddTargetTrackedValue ->
                 subState.copy(
                     type = TRACKED_VALUES_CHANGED,
@@ -405,14 +393,6 @@ object EditChallengeReducer : BaseViewStateReducer<EditChallengeViewState>() {
                 subState.copy(
                     type = TRACKED_VALUES_CHANGED,
                     trackedValues = subState.trackedValues + action.trackedValue
-                )
-
-            is EditChallengeAction.RemoveCompleteAll ->
-                subState.copy(
-                    type = TRACKED_VALUES_CHANGED,
-                    trackedValues = subState.trackedValues
-                        .filter { it !is Challenge.TrackedValue.Progress },
-                    shouldTrackCompleteAll = false
                 )
 
             is EditChallengeAction.RemoveTrackedValue ->
@@ -464,7 +444,6 @@ object EditChallengeReducer : BaseViewStateReducer<EditChallengeViewState>() {
             selectedQuestIds = emptySet(),
             note = "",
             maxTagsReached = false,
-            shouldTrackCompleteAll = false,
             hasChangedColor = false,
             hasChangedIcon = false
         )
@@ -494,7 +473,6 @@ data class EditChallengeViewState(
     val selectedQuestIds: Set<String>,
     val note: String,
     val maxTagsReached: Boolean,
-    val shouldTrackCompleteAll: Boolean,
     val hasChangedColor: Boolean,
     val hasChangedIcon: Boolean
 ) : BaseViewState() {

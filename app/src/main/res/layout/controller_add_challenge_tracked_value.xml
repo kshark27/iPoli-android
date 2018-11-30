@@ -9,88 +9,12 @@
         android:layout_height="wrap_content">
 
         <View
-            android:id="@+id/resultCompletionBackground"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/rounded_rectangle_white_background"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            app:layout_constraintBottom_toBottomOf="@+id/resultCompletionItem"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/resultCompletionIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/challenge_circle_completion"
-            android:scaleType="fitCenter"
-            app:layout_constraintStart_toStartOf="@+id/resultCompletionBackground"
-            app:layout_constraintTop_toTopOf="@+id/resultCompletionBackground" />
-
-        <TextView
-            android:id="@+id/resultCompletionName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="Complete all"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textColor="@color/md_dark_text_87"
-            app:layout_constraintBottom_toBottomOf="@+id/resultCompletionIcon"
-            app:layout_constraintStart_toEndOf="@+id/resultCompletionIcon"
-            app:layout_constraintTop_toTopOf="@+id/resultCompletionIcon" />
-
-        <TextView
-            android:id="@+id/resultCompletionHint"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:paddingBottom="16dp"
-            android:text="Complete all Quests and Habits from this Challenge. Good for college/online courses, work-related projects, learning a new language or writing a book!"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:textColor="@color/md_dark_text_54"
-            app:layout_constraintBottom_toTopOf="@+id/resultCompletionDivider"
-            app:layout_constraintEnd_toEndOf="@+id/resultCompletionBackground"
-            app:layout_constraintStart_toStartOf="@+id/resultCompletionBackground"
-            app:layout_constraintTop_toBottomOf="@+id/resultCompletionIcon" />
-
-        <View
-            android:id="@+id/resultCompletionDivider"
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:background="@color/md_dark_text_12"
-            app:layout_constraintBottom_toTopOf="@+id/resultCompletionItem"
-            app:layout_constraintEnd_toEndOf="@+id/resultCompletionBackground"
-            app:layout_constraintStart_toStartOf="@+id/resultCompletionBackground"
-            app:layout_constraintTop_toBottomOf="@+id/resultCompletionHint" />
-
-        <include
-            android:id="@+id/resultCompletionItem"
-            layout="@layout/item_challenge_summary_tracked_value"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textColor="@color/md_dark_text_87"
-            app:layout_constraintBottom_toBottomOf="@+id/resultCompletionBackground"
-            app:layout_constraintEnd_toEndOf="@+id/resultCompletionBackground"
-            app:layout_constraintStart_toStartOf="@+id/resultCompletionBackground"
-            app:layout_constraintTop_toBottomOf="@+id/resultCompletionDivider" />
-
-        <View
             android:id="@+id/resultReachValueBackground"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:background="@drawable/rounded_rectangle_white_background"
             android:clickable="true"
             android:focusable="true"
@@ -98,7 +22,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/resultReachItems"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/resultCompletionBackground" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/resultReachValueIcon"
@@ -130,9 +54,9 @@
             android:id="@+id/resultReachValueHint"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
             android:paddingBottom="16dp"
             android:text="Reach a target number that you set. Ideal for hitting target weight, savings in your account or number of blog posts that you write!"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
@@ -164,9 +88,9 @@
             android:id="@+id/resultAverageBackground"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:background="@drawable/rounded_rectangle_white_background"
             android:clickable="true"
             android:focusable="true"
@@ -204,9 +128,9 @@
             android:id="@+id/resultAverageValueHint"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
             android:paddingBottom="16dp"
             android:text="Try to stay as close as possible to a target number that you set. Useful for tracking hours of sleep, macros, calories or number of pages you want to read daily!"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
