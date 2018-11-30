@@ -20,7 +20,6 @@ import io.ipoli.android.common.view.recyclerview.BaseRecyclerViewAdapter
 import io.ipoli.android.common.view.recyclerview.RecyclerViewViewModel
 import io.ipoli.android.common.view.recyclerview.SimpleViewHolder
 import io.ipoli.android.tag.Tag
-import io.ipoli.android.tag.widget.EditItemAutocompleteTagAdapter
 import kotlinx.android.synthetic.main.controller_add_challenge_name.view.*
 import kotlinx.android.synthetic.main.item_choose_tag.view.*
 
@@ -123,25 +122,25 @@ class AddChallengeNameViewController(args: Bundle? = null) :
     ) {
 //        (view.challengeTagList.adapter as EditItemTagAdapter).updateAll(state.tagViewModels)
         (view.challengeTagList.adapter as TagAdapter).updateAll(state.tagViewModels)
-        val add = view.addChallengeTag
+//        val add = view.addChallengeTag
         if (state.maxTagsReached) {
-            add.gone()
+//            add.gone()
             view.maxTagsMessage.visible()
         } else {
-            add.visible()
+//            add.visible()
             view.maxTagsMessage.gone()
 
-            val adapter = EditItemAutocompleteTagAdapter(state.tags, activity!!)
-            add.setAdapter(adapter)
-            add.setOnItemClickListener { _, _, position, _ ->
-                dispatch(EditChallengeAction.AddTag(adapter.getItem(position).name))
-                add.setText("")
-            }
-            add.threshold = 0
-            add.setOnTouchListener { _, _ ->
-                add.showDropDown()
-                false
-            }
+//            val adapter = EditItemAutocompleteTagAdapter(state.tags, activity!!)
+//            add.setAdapter(adapter)
+//            add.setOnItemClickListener { _, _, position, _ ->
+//                dispatch(EditChallengeAction.AddTag(adapter.getItem(position).name))
+//                add.setText("")
+//            }
+//            add.threshold = 0
+//            add.setOnTouchListener { _, _ ->
+//                add.showDropDown()
+//                false
+//            }
         }
     }
 

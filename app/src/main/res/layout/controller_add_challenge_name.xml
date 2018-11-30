@@ -49,7 +49,7 @@
             android:layout_height="48dp"
             android:layout_marginEnd="8dp"
             android:clickable="false"
-            android:drawableStart="@drawable/ic_label_white_24dp"
+            android:drawableStart="@drawable/ic_tag_white_24dp"
             android:focusable="false"
             android:paddingStart="0dp"
             android:paddingEnd="0dp"
@@ -69,32 +69,13 @@
             app:layout_constraintEnd_toEndOf="@+id/challengeNameLayout"
             app:layout_constraintTop_toTopOf="@+id/challengeTagsTitle" />
 
-        <LinearLayout
-            android:id="@+id/tagContainer"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/challengeTagList"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="@+id/challengeNameLayout"
             app:layout_constraintStart_toStartOf="@+id/challengeNameLayout"
-            app:layout_constraintTop_toBottomOf="@+id/challengeTagsTitle">
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/challengeTagList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <AutoCompleteTextView
-                android:id="@+id/addChallengeTag"
-                style="@style/TagAutocompleteTheme"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:hint="@string/add_tag"
-                android:maxLines="1" />
-
-        </LinearLayout>
+            app:layout_constraintTop_toBottomOf="@+id/challengeTagsTitle" />
 
         <TextView
             android:id="@+id/challengeColor"
@@ -110,7 +91,7 @@
             android:textColor="@color/md_white"
             app:layout_constraintEnd_toEndOf="@+id/challengeNameLayout"
             app:layout_constraintStart_toStartOf="@+id/challengeNameLayout"
-            app:layout_constraintTop_toBottomOf="@+id/tagContainer" />
+            app:layout_constraintTop_toBottomOf="@+id/challengeTagList" />
 
         <TextView
             android:id="@+id/challengeIcon"
