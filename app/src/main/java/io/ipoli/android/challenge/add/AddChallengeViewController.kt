@@ -24,8 +24,8 @@ class AddChallengeViewController(args: Bundle? = null) :
 
     companion object {
         const val NAME_INDEX = 0
-        const val TRACKED_VALUE_INDEX = 1
-        const val END_DATE_INDEX = 2
+        const val END_DATE_INDEX = 1
+        const val TRACKED_VALUE_INDEX = 2
         const val QUEST_PICKER_INDEX = 3
         const val SUMMARY_INDEX = 4
     }
@@ -132,8 +132,8 @@ class AddChallengeViewController(args: Bundle? = null) :
     private fun createControllerForPosition(position: Int): Controller =
         when (position) {
             NAME_INDEX -> AddChallengeNameViewController()
-            TRACKED_VALUE_INDEX -> AddChallengeTrackedValueViewController()
             END_DATE_INDEX -> AddChallengeEndDateViewController()
+            TRACKED_VALUE_INDEX -> AddChallengeTrackedValueViewController()
             QUEST_PICKER_INDEX -> AddChallengeQuestsViewController()
             SUMMARY_INDEX -> AddChallengeSummaryViewController()
             else -> throw IllegalArgumentException("Unknown controller position $position")
@@ -155,8 +155,8 @@ class AddChallengeViewController(args: Bundle? = null) :
     private val EditChallengeViewState.toolbarTitle: String
         get() = when (adapterPosition) {
             NAME_INDEX -> "New Challenge"
-            TRACKED_VALUE_INDEX -> "Track your progress"
             END_DATE_INDEX -> "Set a deadline"
+            TRACKED_VALUE_INDEX -> "Track your progress"
             QUEST_PICKER_INDEX -> "Add some quests"
             SUMMARY_INDEX -> "Summary"
             else -> throw IllegalArgumentException("No controller for position $adapterPosition")
