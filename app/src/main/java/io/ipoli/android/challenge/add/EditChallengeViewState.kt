@@ -474,7 +474,6 @@ object EditChallengeReducer : BaseViewStateReducer<EditChallengeViewState>() {
     }
 }
 
-
 data class EditChallengeViewState(
     val type: EditChallengeViewState.StateType,
     val adapterPosition: Int,

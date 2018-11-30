@@ -24,11 +24,10 @@ class AddChallengeViewController(args: Bundle? = null) :
 
     companion object {
         const val NAME_INDEX = 0
-        const val MOTIVATION_INDEX = 1
-        const val TRACKED_VALUE_INDEX = 2
-        const val END_DATE_INDEX = 3
-        const val QUEST_PICKER_INDEX = 4
-        const val SUMMARY_INDEX = 5
+        const val TRACKED_VALUE_INDEX = 1
+        const val END_DATE_INDEX = 2
+        const val QUEST_PICKER_INDEX = 3
+        const val SUMMARY_INDEX = 4
     }
 
     override fun onCreateView(
@@ -38,7 +37,7 @@ class AddChallengeViewController(args: Bundle? = null) :
     ): View {
         applyStatusBarColors = false
         setHasOptionsMenu(true)
-        val view = inflater.inflate(R.layout.controller_add_challenge, container, false)
+        val view = container.inflate(R.layout.controller_add_challenge)
         setToolbar(view.toolbar)
         return view
     }
@@ -133,7 +132,6 @@ class AddChallengeViewController(args: Bundle? = null) :
     private fun createControllerForPosition(position: Int): Controller =
         when (position) {
             NAME_INDEX -> AddChallengeNameViewController()
-            MOTIVATION_INDEX -> AddChallengeMotivationViewController()
             TRACKED_VALUE_INDEX -> AddChallengeTrackedValueViewController()
             END_DATE_INDEX -> AddChallengeEndDateViewController()
             QUEST_PICKER_INDEX -> AddChallengeQuestsViewController()
@@ -157,9 +155,8 @@ class AddChallengeViewController(args: Bundle? = null) :
     private val EditChallengeViewState.toolbarTitle: String
         get() = when (adapterPosition) {
             NAME_INDEX -> "New Challenge"
-            MOTIVATION_INDEX -> "Motivations to do it"
-            TRACKED_VALUE_INDEX -> "Measure your success"
-            END_DATE_INDEX -> "Achieve it in"
+            TRACKED_VALUE_INDEX -> "Track your progress"
+            END_DATE_INDEX -> "Set a deadline"
             QUEST_PICKER_INDEX -> "Add some quests"
             SUMMARY_INDEX -> "Summary"
             else -> throw IllegalArgumentException("No controller for position $adapterPosition")

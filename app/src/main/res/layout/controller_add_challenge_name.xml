@@ -47,6 +47,7 @@
             style="@style/EditSimpleTextViewRow"
             android:layout_width="0dp"
             android:layout_height="48dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:clickable="false"
             android:drawableStart="@drawable/ic_tag_white_24dp"
