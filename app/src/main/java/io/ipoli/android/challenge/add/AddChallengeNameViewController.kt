@@ -199,7 +199,8 @@ class AddChallengeNameViewController(args: Bundle? = null) :
                 tag = it,
                 iconColor = if (isSelected) it.color.androidColor.color500 else R.color.md_light_text_70,
                 background = if (isSelected) R.drawable.circle_white else R.drawable.bordered_circle_white_background,
-                isSelected = isSelected
+                isSelected = isSelected,
+                canBeAdded = !maxTagsReached
             )
         }
 
@@ -209,7 +210,8 @@ class AddChallengeNameViewController(args: Bundle? = null) :
         val tag: Tag,
         @ColorRes val iconColor: Int,
         @DrawableRes val background: Int,
-        val isSelected: Boolean
+        val isSelected: Boolean,
+        val canBeAdded: Boolean
     ) : RecyclerViewViewModel {
         override val id: String
             get() = tag.id
@@ -233,8 +235,12 @@ class AddChallengeNameViewController(args: Bundle? = null) :
                     EditChallengeAction.RemoveTag(vm.tag)
                 }
             } else {
-                view.dispatchOnClick {
-                    EditChallengeAction.AddTag(vm.tag.name)
+                if (vm.canBeAdded) {
+                    view.dispatchOnClick {
+                        EditChallengeAction.AddTag(vm.tag.name)
+                    }
+                } else {
+                    view.setOnClickListener(null)
                 }
             }
         }

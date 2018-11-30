@@ -1315,4 +1315,5 @@ These are your physical and mental characteristics.\n\n
     <string name="dialog_remove_completed_quests_confirmation_message">Do you really want to remove all completed Quests?</string>
     <string name="no_one">No one</string>
     <string name="enable">Enable</string>
+    <string name="add_tags_label">Tag(s)</string>
 </resources>
