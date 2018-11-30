@@ -32,8 +32,11 @@ fun IconicsDrawable.listItemIcon(icon: IIcon, @ColorRes color: Int): IconicsDraw
         .paddingDp(3)
         .sizeDp(24)
 
-fun IconicsDrawable.smallListItemIcon(icon: IIcon): IconicsDrawable =
+fun IconicsDrawable.smallListItemIcon(icon: IIcon, @ColorRes color: Int): IconicsDrawable =
     icon(icon)
-        .colorRes(R.color.md_white)
+        .colorRes(color)
         .paddingDp(4)
         .sizeDp(24)
+
+fun IconicsDrawable.smallListItemIcon(icon: IIcon): IconicsDrawable =
+    smallListItemIcon(icon, R.color.md_white)

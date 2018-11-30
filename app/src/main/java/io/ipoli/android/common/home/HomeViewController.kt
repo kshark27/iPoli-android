@@ -229,6 +229,7 @@ class HomeViewController(args: Bundle? = null) :
                 RouterTransaction.with(TodayViewController())
             )
         }
+        navigate().toAddChallenge()
     }
 
     override fun onDetach(view: View) {

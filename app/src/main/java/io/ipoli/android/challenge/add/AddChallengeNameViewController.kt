@@ -3,6 +3,7 @@ package io.ipoli.android.challenge.add
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.annotation.ColorRes
+import android.support.annotation.DrawableRes
 import android.support.v7.widget.LinearLayoutManager
 import android.view.*
 import android.widget.AdapterView
@@ -39,7 +40,7 @@ class AddChallengeNameViewController(args: Bundle? = null) :
         savedViewState: Bundle?
     ): View {
         setHasOptionsMenu(true)
-        val view = inflater.inflate(R.layout.controller_add_challenge_name, container, false)
+        val view = container.inflate(R.layout.controller_add_challenge_name)
 
         view.challengeDifficulty.background.setColorFilter(
             colorRes(R.color.md_white),
@@ -171,8 +172,8 @@ class AddChallengeNameViewController(args: Bundle? = null) :
         view.challengeColor.onDebounceClick {
             navigate()
                 .toColorPicker(
-                    {
-                        dispatch(EditChallengeAction.ChangeColor(it))
+                    { c ->
+                        dispatch(EditChallengeAction.ChangeColor(c))
                     }, state.color
                 )
         }
@@ -189,12 +190,17 @@ class AddChallengeNameViewController(args: Bundle? = null) :
         get() = icon?.androidIcon?.icon ?: GoogleMaterial.Icon.gmd_local_florist
 
     private val EditChallengeViewState.tagViewModels
-        get() = challengeTags.map {
+        get() = tags.map {
+
+            val isSelected = selectedTagIds.contains(it.id)
+
             TagViewModel(
                 name = it.name,
                 icon = it.icon?.androidIcon?.icon ?: MaterialDesignIconic.Icon.gmi_label,
                 tag = it,
-                iconColor = it.color.androidColor.color500
+                iconColor = if (isSelected) it.color.androidColor.color500 else R.color.md_light_text_70,
+                background = if (isSelected) R.drawable.circle_white else R.drawable.bordered_circle_white_background,
+                isSelected = isSelected
             )
         }
 
@@ -202,7 +208,9 @@ class AddChallengeNameViewController(args: Bundle? = null) :
         val name: String,
         val icon: IIcon,
         val tag: Tag,
-        @ColorRes val iconColor: Int
+        @ColorRes val iconColor: Int,
+        @DrawableRes val background: Int,
+        val isSelected: Boolean
     ) : RecyclerViewViewModel {
         override val id: String
             get() = tag.id
@@ -211,13 +219,25 @@ class AddChallengeNameViewController(args: Bundle? = null) :
     inner class TagAdapter : BaseRecyclerViewAdapter<TagViewModel>(R.layout.item_choose_tag) {
 
         override fun onBindViewModel(vm: TagViewModel, view: View, holder: SimpleViewHolder) {
+
             view.tagIcon.setImageDrawable(
                 IconicsDrawable(view.context)
-                    .normalIcon(
+                    .listItemIcon(
                         vm.icon,
                         vm.iconColor
                     )
             )
+            view.tagBackground.setBackgroundResource(vm.background)
+
+            if (vm.isSelected) {
+                view.dispatchOnClick {
+                    EditChallengeAction.RemoveTag(vm.tag)
+                }
+            } else {
+                view.dispatchOnClick {
+                    EditChallengeAction.AddTag(vm.tag.name)
+                }
+            }
         }
 
     }

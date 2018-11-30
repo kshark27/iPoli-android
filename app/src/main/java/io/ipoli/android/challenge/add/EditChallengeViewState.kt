@@ -214,7 +214,8 @@ object EditChallengeReducer : BaseViewStateReducer<EditChallengeViewState>() {
                 subState.copy(
                     type = TAGS_CHANGED,
                     challengeTags = challengeTags,
-                    tags = subState.tags + action.tag,
+                    tags = subState.tags,
+                    selectedTagIds = subState.selectedTagIds - action.tag.id,
                     maxTagsReached = challengeTags.size >= Constants.MAX_TAGS_PER_ITEM
                 )
             }
@@ -225,7 +226,8 @@ object EditChallengeReducer : BaseViewStateReducer<EditChallengeViewState>() {
                 subState.copy(
                     type = TAGS_CHANGED,
                     challengeTags = challengeTags,
-                    tags = subState.tags - tag,
+                    tags = subState.tags,
+                    selectedTagIds = subState.selectedTagIds + tag.id,
                     maxTagsReached = challengeTags.size >= Constants.MAX_TAGS_PER_ITEM
                 )
             }
@@ -432,6 +434,7 @@ object EditChallengeReducer : BaseViewStateReducer<EditChallengeViewState>() {
             adapterPosition = 0,
             id = "",
             name = "",
+            selectedTagIds = emptySet(),
             challengeTags = emptyList(),
             tags = emptyList(),
             color = Color.GREEN,
@@ -462,6 +465,7 @@ data class EditChallengeViewState(
     val id: String,
     val name: String,
     val challengeTags: List<Tag>,
+    val selectedTagIds: Set<String>,
     val tags: List<Tag>,
     val color: Color,
     val icon: Icon?,
