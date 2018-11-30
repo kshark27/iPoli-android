@@ -93,10 +93,10 @@
 
         </LinearLayout>
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <View
-            style="@style/EditSimpleDivider"
+            style="@style/LightHorizontalDivider"
             android:layout_marginTop="60dp" />
 
         <TextView
@@ -104,28 +104,28 @@
             style="@style/EditSimpleTextViewRow"
             android:drawableStart="@drawable/ic_repeat_white_24dp" />
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <TextView
             android:id="@+id/summaryStartTime"
             style="@style/EditSimpleTextViewRow"
             android:drawableStart="@drawable/ic_clock_white_24dp" />
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <TextView
             android:id="@+id/summaryDuration"
             style="@style/EditSimpleTextViewRow"
             android:drawableStart="@drawable/ic_sandclock_white_24dp" />
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <TextView
             android:id="@+id/summaryReminder"
             style="@style/EditSimpleTextViewRow"
             android:drawableStart="@drawable/ic_reminder_white_24dp" />
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <TextView
             android:id="@+id/summaryColor"
@@ -133,7 +133,7 @@
             android:drawableStart="@drawable/ic_color_palette_white_24dp"
             android:text="@string/color" />
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <TextView
             android:id="@+id/summaryIcon"
@@ -141,10 +141,10 @@
             android:drawableStart="@drawable/ic_icon_white_24dp"
             android:text="@string/icon" />
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <View
-            style="@style/EditSimpleDivider"
+            style="@style/LightHorizontalDivider"
             android:layout_marginTop="60dp" />
 
         <TextView
@@ -193,14 +193,14 @@
                 android:visibility="gone" />
         </LinearLayout>
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <TextView
             android:id="@+id/summaryChallenge"
             style="@style/EditSimpleTextViewRow"
             android:drawableStart="@drawable/ic_sword_white_24dp" />
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <TextView
             android:id="@+id/summaryNote"

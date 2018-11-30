@@ -89,7 +89,7 @@
 
         </LinearLayout>
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <LinearLayout
             android:id="@+id/challengeMotivations"
@@ -140,7 +140,7 @@
 
         </LinearLayout>
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <LinearLayout
             android:id="@+id/challengeTrackedValues"
@@ -212,10 +212,10 @@
 
         </LinearLayout>
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <View
-            style="@style/EditSimpleDivider"
+            style="@style/LightHorizontalDivider"
             android:layout_marginTop="60dp" />
 
         <TextView
@@ -224,7 +224,7 @@
             android:layout_marginTop="32dp"
             android:drawableStart="@drawable/ic_due_date_white_24dp" />
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -250,7 +250,7 @@
         </LinearLayout>
 
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <TextView
             android:id="@+id/challengeColor"
@@ -258,7 +258,7 @@
             android:drawableStart="@drawable/ic_color_palette_white_24dp"
             android:text="@string/color" />
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <TextView
             android:id="@+id/challengeIcon"
@@ -266,11 +266,11 @@
             android:drawableStart="@drawable/ic_icon_white_24dp"
             android:text="@string/icon" />
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
         <View
             android:id="@+id/questsTopDivider"
-            style="@style/EditSimpleDivider"
+            style="@style/LightHorizontalDivider"
             android:layout_marginTop="60dp" />
 
         <TextView
@@ -306,7 +306,7 @@
 
         <View
             android:id="@+id/questsBottomDivider"
-            style="@style/EditSimpleDivider" />
+            style="@style/LightHorizontalDivider" />
 
         <TextView
             android:id="@+id/challengeNote"
@@ -315,7 +315,7 @@
             android:ellipsize="end"
             android:maxLines="3" />
 
-        <View style="@style/EditSimpleDivider" />
+        <View style="@style/LightHorizontalDivider" />
 
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

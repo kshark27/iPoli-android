@@ -102,10 +102,10 @@
 
             </LinearLayout>
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <View
-                style="@style/EditSimpleDivider"
+                style="@style/LightHorizontalDivider"
                 android:layout_marginTop="60dp" />
 
             <TextView
@@ -114,28 +114,28 @@
                 android:layout_marginTop="16dp"
                 android:drawableStart="@drawable/ic_event_white_24dp" />
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <TextView
                 android:id="@+id/questStartTime"
                 style="@style/EditSimpleTextViewRow"
                 android:drawableStart="@drawable/ic_clock_white_24dp" />
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <TextView
                 android:id="@+id/questDuration"
                 style="@style/EditSimpleTextViewRow"
                 android:drawableStart="@drawable/ic_sandclock_white_24dp" />
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <TextView
                 android:id="@+id/questReminder"
                 style="@style/EditSimpleTextViewRow"
                 android:drawableStart="@drawable/ic_reminder_white_24dp" />
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <TextView
                 android:id="@+id/questColor"
@@ -143,7 +143,7 @@
                 android:drawableStart="@drawable/ic_color_palette_white_24dp"
                 android:text="@string/color" />
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <TextView
                 android:id="@+id/questIcon"
@@ -151,10 +151,10 @@
                 android:drawableStart="@drawable/ic_icon_white_24dp"
                 android:text="@string/icon" />
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <View
-                style="@style/EditSimpleDivider"
+                style="@style/LightHorizontalDivider"
                 android:layout_marginTop="60dp" />
 
             <TextView
@@ -200,14 +200,14 @@
                     android:visibility="gone" />
             </LinearLayout>
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <TextView
                 android:id="@+id/questChallenge"
                 style="@style/EditSimpleTextViewRow"
                 android:drawableStart="@drawable/ic_sword_white_24dp" />
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <TextView
                 android:id="@+id/questNote"
@@ -216,7 +216,7 @@
                 android:ellipsize="end"
                 android:maxLines="3" />
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

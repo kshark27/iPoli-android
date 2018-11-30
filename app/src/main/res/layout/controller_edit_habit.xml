@@ -112,7 +112,7 @@
             </android.support.constraint.ConstraintLayout>
 
             <View
-                style="@style/EditSimpleDivider"
+                style="@style/LightHorizontalDivider"
                 android:layout_marginTop="16dp" />
 
             <LinearLayout
@@ -169,7 +169,7 @@
 
             <View
                 android:id="@+id/timesADayDivider"
-                style="@style/EditSimpleDivider" />
+                style="@style/LightHorizontalDivider" />
 
             <LinearLayout
                 android:id="@+id/timesADayContainer"
@@ -197,7 +197,7 @@
 
             <View
                 android:id="@+id/habitRemindersDivider"
-                style="@style/EditSimpleDivider" />
+                style="@style/LightHorizontalDivider" />
 
             <TextView
                 android:id="@+id/habitRemindersLabel"
@@ -239,7 +239,7 @@
 
             </LinearLayout>
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <TextView
                 style="@style/EditSimpleTextViewRow"
@@ -354,7 +354,7 @@
 
             </android.support.constraint.ConstraintLayout>
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <TextView
                 android:id="@+id/habitColor"
@@ -362,7 +362,7 @@
                 android:drawableStart="@drawable/ic_color_palette_white_24dp"
                 android:text="@string/color" />
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <TextView
                 android:id="@+id/habitIcon"
@@ -370,10 +370,10 @@
                 android:drawableStart="@drawable/ic_icon_white_24dp"
                 android:text="@string/icon" />
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <View
-                style="@style/EditSimpleDivider"
+                style="@style/LightHorizontalDivider"
                 android:layout_marginTop="60dp" />
 
             <TextView
@@ -381,7 +381,7 @@
                 style="@style/EditSimpleTextViewRow"
                 android:drawableStart="@drawable/ic_sword_white_24dp" />
 
-            <View style="@style/EditSimpleDivider" />
+            <View style="@style/LightHorizontalDivider" />
 
             <TextView
                 android:id="@+id/habitNote"
