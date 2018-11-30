@@ -2,8 +2,8 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/spinnerItemId"
     style="?android:attr/spinnerDropDownItemStyle"
-    android:singleLine="true"
-    android:textColor="@color/md_white"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    android:ellipsize="marquee"/>
+    android:ellipsize="marquee"
+    android:singleLine="true"
+    android:textColor="@color/md_black" />

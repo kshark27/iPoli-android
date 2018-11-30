@@ -1,11 +1,12 @@
 package io.ipoli.android.challenge.add
 
-import android.graphics.PorterDuff
 import android.os.Bundle
+import android.support.v4.widget.TextViewCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.IIcon
@@ -35,10 +36,6 @@ class AddChallengeNameViewController(args: Bundle? = null) :
         setHasOptionsMenu(true)
         val view = container.inflate(R.layout.controller_add_challenge_name)
 
-        view.challengeDifficulty.background.setColorFilter(
-            colorRes(R.color.md_white),
-            PorterDuff.Mode.SRC_ATOP
-        )
         view.challengeDifficulty.adapter = ArrayAdapter<String>(
             view.context,
             R.layout.item_add_challenge_difficulty_item,
@@ -46,21 +43,26 @@ class AddChallengeNameViewController(args: Bundle? = null) :
             view.resources.getStringArray(R.array.difficulties)
         )
 
-        view.challengeDifficulty.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(parent: AdapterView<*>?) {
+        view.challengeDifficulty.post {
+            styleSelectedDifficulty(view)
+            view.challengeDifficulty.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+                    }
+
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        v: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        styleSelectedDifficulty(view)
+                        dispatch(EditChallengeAction.ChangeDifficulty(position))
+                    }
+
                 }
 
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    dispatch(EditChallengeAction.ChangeDifficulty(position))
-                }
-
-            }
+        }
 
         view.challengeTagList.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
@@ -150,7 +152,6 @@ class AddChallengeNameViewController(args: Bundle? = null) :
         view: View,
         state: EditChallengeViewState
     ) {
-        colorLayout(view, state)
         view.challengeColor.onDebounceClick {
             navigate()
                 .toColorPicker(
@@ -161,11 +162,13 @@ class AddChallengeNameViewController(args: Bundle? = null) :
         }
     }
 
-    private fun colorLayout(
-        view: View,
-        state: EditChallengeViewState
-    ) {
-        view.challengeDifficulty.setPopupBackgroundResource(state.color.androidColor.color500)
+    private fun styleSelectedDifficulty(view: View) {
+        view.challengeDifficulty.selectedView?.let {
+            val item = it as TextView
+            TextViewCompat.setTextAppearance(item, R.style.TextAppearance_AppCompat_Subhead)
+            item.setTextColor(colorRes(R.color.md_light_text_100))
+            item.setPadding(0, 0, 0, 0)
+        }
     }
 
     private val EditChallengeViewState.iicon: IIcon

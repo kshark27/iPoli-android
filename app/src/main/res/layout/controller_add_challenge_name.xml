@@ -79,11 +79,16 @@
             app:layout_constraintStart_toStartOf="@+id/challengeNameLayout"
             app:layout_constraintTop_toBottomOf="@+id/challengeTagsTitle" />
 
-        <ImageView
+        <TextView
             android:id="@+id/difficultyIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
+            android:drawableStart="@drawable/ic_dumbbell_white_24dp"
+            android:drawablePadding="16dp"
+            android:text="@string/difficulty"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="@color/md_white"
             app:layout_constraintEnd_toEndOf="@+id/challengeNameLayout"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/challengeNameLayout"
@@ -94,19 +99,18 @@
             android:id="@+id/challengeDifficulty"
             style="@style/Widget.AppCompat.Spinner.DropDown"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:backgroundTint="@color/md_white"
             android:entries="@array/difficulties"
-            android:popupBackground="@color/colorPrimary"
-            app:layout_constraintBottom_toBottomOf="@+id/difficultyIcon"
-            app:layout_constraintStart_toEndOf="@+id/difficultyIcon"
-            app:layout_constraintTop_toTopOf="@+id/difficultyIcon" />
+            app:layout_constraintStart_toStartOf="@+id/difficultyIcon"
+            app:layout_constraintTop_toBottomOf="@+id/difficultyIcon" />
 
         <View
             android:id="@+id/difficultyDivider"
             style="@style/LightHorizontalDivider"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/difficultyIcon" />
+            app:layout_constraintTop_toBottomOf="@+id/challengeDifficulty" />
 
         <TextView
             android:id="@+id/challengeColor"
