@@ -27,8 +27,6 @@ class AddChallengeTrackedValueViewController(args: Bundle? = null) :
     ) {
     override val stateKey = EditChallengeReducer.stateKey
 
-    private var showNext = false
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup,
@@ -68,12 +66,6 @@ class AddChallengeTrackedValueViewController(args: Bundle? = null) :
         inflater.inflate(R.menu.next_wizard_menu, menu)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        val nextItem = menu.findItem(R.id.actionNext)
-        nextItem.isVisible = showNext
-        super.onPrepareOptionsMenu(menu)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem) =
         when (item.itemId) {
             R.id.actionNext -> {
@@ -89,7 +81,6 @@ class AddChallengeTrackedValueViewController(args: Bundle? = null) :
         when (state.type) {
 
             TRACKED_VALUES_CHANGED -> {
-                showNext = state.trackedValues.isNotEmpty()
                 activity?.invalidateOptionsMenu()
                 (view.resultReachItems.adapter as TrackedValueAdapter).updateAll(state.trackTargetViewModels)
                 (view.resultAverageItems.adapter as TrackedValueAdapter).updateAll(state.trackAverageViewModels)

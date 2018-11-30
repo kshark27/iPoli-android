@@ -88,24 +88,23 @@ class AddChallengeEndDateViewController(args: Bundle? = null) :
     private val viewModels: List<DateViewModel>
         get() {
             val today = LocalDate.now()
-            val viewModels = mutableListOf<DateViewModel>()
-            viewModels.add(DateViewModel(stringRes(R.string.seven_days), today.plusDays(7)))
-            viewModels.add(DateViewModel(stringRes(R.string.ten_days), today.plusDays(10)))
-            viewModels.add(DateViewModel(stringRes(R.string.fourteen_days), today.plusDays(14)))
-            viewModels.add(DateViewModel(stringRes(R.string.thirty_days), today.plusDays(30)))
-            viewModels.add(
+            return listOf(
                 DateViewModel(
                     stringRes(R.string.end_of_week),
                     today.with(DateUtils.lastDayOfWeek)
-                )
-            )
-            viewModels.add(
+                ),
                 DateViewModel(
                     stringRes(R.string.end_of_month),
                     today.with(TemporalAdjusters.lastDayOfMonth())
-                )
+                ),
+                DateViewModel(
+                    stringRes(R.string.end_of_year),
+                    today.with(TemporalAdjusters.lastDayOfYear())
+                ),
+                DateViewModel(stringRes(R.string.seven_days), today.plusDays(7)),
+                DateViewModel(stringRes(R.string.ten_days), today.plusDays(10)),
+                DateViewModel(stringRes(R.string.thirty_days), today.plusDays(30)),
+                DateViewModel(stringRes(R.string.exact_date), null)
             )
-            viewModels.add(DateViewModel(stringRes(R.string.exact_date), null))
-            return viewModels
         }
 }

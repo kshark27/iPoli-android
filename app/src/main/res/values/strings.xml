@@ -108,8 +108,9 @@
     <string name="ten_days">10 days</string>
     <string name="fourteen_days">14 days</string>
     <string name="thirty_days">30 days</string>
-    <string name="end_of_week">End of this week</string>
-    <string name="end_of_month">End of this month</string>
+    <string name="end_of_week">End of the week</string>
+    <string name="end_of_month">End of the month</string>
+    <string name="end_of_year">End of the year</string>
     <string name="exact_date">Choose date…</string>
     <string name="sign_in_button">Sign in</string>
     <string name="continue_as_guest">Continue as Guest*</string>
