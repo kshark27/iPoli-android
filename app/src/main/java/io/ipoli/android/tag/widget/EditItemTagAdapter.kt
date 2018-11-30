@@ -1,6 +1,8 @@
 package io.ipoli.android.tag.widget
 
 import android.content.Context
+import android.support.annotation.ColorRes
+import android.support.annotation.DrawableRes
 import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
@@ -11,15 +13,13 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.IIcon
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic
 import io.ipoli.android.R
-import io.ipoli.android.common.view.AndroidColor
-import io.ipoli.android.common.view.AndroidIcon
-import io.ipoli.android.common.view.Debounce
-import io.ipoli.android.common.view.normalIcon
+import io.ipoli.android.common.view.*
 import io.ipoli.android.common.view.recyclerview.BaseRecyclerViewAdapter
 import io.ipoli.android.common.view.recyclerview.RecyclerViewViewModel
 import io.ipoli.android.common.view.recyclerview.SimpleViewHolder
 import io.ipoli.android.quest.Color
 import io.ipoli.android.tag.Tag
+import kotlinx.android.synthetic.main.item_choose_tag.view.*
 import kotlinx.android.synthetic.main.item_edit_quest_tag.view.*
 
 
@@ -102,4 +102,50 @@ class EditItemTagAdapter(
             removeTagCallback(vm.tag)
         })
     }
+}
+
+class TagAdapter(
+    private val removeTagCallback: (Tag) -> Unit,
+    private val addTagCallback: (Tag) -> Unit
+) : BaseRecyclerViewAdapter<TagAdapter.TagViewModel>(R.layout.item_choose_tag) {
+
+    data class TagViewModel(
+        val name: String,
+        val icon: IIcon,
+        val tag: Tag,
+        @ColorRes val iconColor: Int,
+        @DrawableRes val background: Int,
+        val isSelected: Boolean,
+        val canBeAdded: Boolean
+    ) : RecyclerViewViewModel {
+        override val id: String
+            get() = tag.id
+    }
+
+    override fun onBindViewModel(vm: TagViewModel, view: View, holder: SimpleViewHolder) {
+
+        view.tagIcon.setImageDrawable(
+            IconicsDrawable(view.context)
+                .listItemIcon(
+                    vm.icon,
+                    vm.iconColor
+                )
+        )
+        view.tagBackground.setBackgroundResource(vm.background)
+
+        if (vm.isSelected) {
+            view.setOnClickListener(Debounce.clickListener {
+                removeTagCallback(vm.tag)
+            })
+        } else {
+            if (vm.canBeAdded) {
+                view.setOnClickListener(Debounce.clickListener {
+                    addTagCallback(vm.tag)
+                })
+            } else {
+                view.setOnClickListener(null)
+            }
+        }
+    }
+
 }

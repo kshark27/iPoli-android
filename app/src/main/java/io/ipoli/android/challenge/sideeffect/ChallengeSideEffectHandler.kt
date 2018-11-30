@@ -74,7 +74,7 @@ object ChallengeSideEffectHandler : AppSideEffectHandler() {
                 val s = state.stateFor(EditChallengeViewState::class.java)
                 val params = SaveChallengeUseCase.Params.WithExistingQuests(
                     name = s.name,
-                    tags = s.challengeTags,
+                    tags = s.selectedTags,
                     color = s.color,
                     icon = s.icon,
                     difficulty = s.difficulty,
@@ -96,7 +96,7 @@ object ChallengeSideEffectHandler : AppSideEffectHandler() {
                     SaveChallengeUseCase.Params.WithExistingQuests(
                         id = s.id,
                         name = s.name,
-                        tags = s.challengeTags,
+                        tags = s.selectedTags,
                         color = s.color,
                         icon = s.icon,
                         difficulty = s.difficulty,
@@ -184,7 +184,7 @@ object ChallengeSideEffectHandler : AppSideEffectHandler() {
                 if (state.hasState(ChallengeViewState::class.java)) {
                     val challengeState = state.stateFor(ChallengeViewState::class.java)
                     val c = state.dataState.challenges!!.firstOrNull { it.id == challengeState.id }
-                    if(c != null) {
+                    if (c != null) {
                         val newChallenge = c.copy(
                             trackedValues = c.trackedValues.map {
                                 if (it is Challenge.TrackedValue.Progress) {

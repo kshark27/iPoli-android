@@ -470,7 +470,7 @@ class AddChallengeSummaryViewController(args: Bundle? = null) :
         get() = if (note.isBlank()) stringRes(R.string.tap_to_add_note) else note
 
     private val EditChallengeViewState.tagViewModels: List<EditItemTagAdapter.TagViewModel>
-        get() = challengeTags.map {
+        get() = tags.map {
             EditItemTagAdapter.TagViewModel(
                 name = it.name,
                 icon = it.icon?.androidIcon?.icon ?: MaterialDesignIconic.Icon.gmi_label,

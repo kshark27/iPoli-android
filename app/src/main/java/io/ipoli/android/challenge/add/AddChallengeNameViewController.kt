@@ -2,8 +2,6 @@ package io.ipoli.android.challenge.add
 
 import android.graphics.PorterDuff
 import android.os.Bundle
-import android.support.annotation.ColorRes
-import android.support.annotation.DrawableRes
 import android.support.v7.widget.LinearLayoutManager
 import android.view.*
 import android.widget.AdapterView
@@ -16,12 +14,8 @@ import io.ipoli.android.R
 import io.ipoli.android.challenge.add.EditChallengeViewState.StateType.*
 import io.ipoli.android.common.redux.android.BaseViewController
 import io.ipoli.android.common.view.*
-import io.ipoli.android.common.view.recyclerview.BaseRecyclerViewAdapter
-import io.ipoli.android.common.view.recyclerview.RecyclerViewViewModel
-import io.ipoli.android.common.view.recyclerview.SimpleViewHolder
-import io.ipoli.android.tag.Tag
+import io.ipoli.android.tag.widget.TagAdapter
 import kotlinx.android.synthetic.main.controller_add_challenge_name.view.*
-import kotlinx.android.synthetic.main.item_choose_tag.view.*
 
 /**
  * Created by Polina Zhelyazkova <polina@mypoli.fun>
@@ -70,10 +64,14 @@ class AddChallengeNameViewController(args: Bundle? = null) :
 
         view.challengeTagList.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
-        view.challengeTagList.adapter = TagAdapter()
-//        view.challengeTagList.adapter = EditItemTagAdapter(removeTagCallback = {
-//            dispatch(EditChallengeAction.RemoveTag(it))
-//        })
+        view.challengeTagList.adapter = TagAdapter(
+            removeTagCallback = { t ->
+                dispatch(EditChallengeAction.RemoveTag(t))
+            },
+            addTagCallback = { t ->
+                dispatch(EditChallengeAction.AddTag(t.name))
+            }
+        )
         return view
     }
 
@@ -120,27 +118,12 @@ class AddChallengeNameViewController(args: Bundle? = null) :
         view: View,
         state: EditChallengeViewState
     ) {
-//        (view.challengeTagList.adapter as EditItemTagAdapter).updateAll(state.tagViewModels)
         (view.challengeTagList.adapter as TagAdapter).updateAll(state.tagViewModels)
-//        val add = view.addChallengeTag
+
         if (state.maxTagsReached) {
-//            add.gone()
             view.maxTagsMessage.visible()
         } else {
-//            add.visible()
             view.maxTagsMessage.gone()
-
-//            val adapter = EditItemAutocompleteTagAdapter(state.tags, activity!!)
-//            add.setAdapter(adapter)
-//            add.setOnItemClickListener { _, _, position, _ ->
-//                dispatch(EditChallengeAction.AddTag(adapter.getItem(position).name))
-//                add.setText("")
-//            }
-//            add.threshold = 0
-//            add.setOnTouchListener { _, _ ->
-//                add.showDropDown()
-//                false
-//            }
         }
     }
 
@@ -188,62 +171,23 @@ class AddChallengeNameViewController(args: Bundle? = null) :
     private val EditChallengeViewState.iicon: IIcon
         get() = icon?.androidIcon?.icon ?: GoogleMaterial.Icon.gmd_local_florist
 
-    private val EditChallengeViewState.tagViewModels
-        get() = tags.map {
+    private val EditChallengeViewState.tagViewModels: List<TagAdapter.TagViewModel>
+        get() {
+            val selectedTagIds = selectedTags.map { it.id }.toSet()
+            return tags.map {
 
-            val isSelected = selectedTagIds.contains(it.id)
+                val isSelected = selectedTagIds.contains(it.id)
 
-            TagViewModel(
-                name = it.name,
-                icon = it.icon?.androidIcon?.icon ?: MaterialDesignIconic.Icon.gmi_label,
-                tag = it,
-                iconColor = if (isSelected) it.color.androidColor.color500 else R.color.md_light_text_70,
-                background = if (isSelected) R.drawable.circle_white else R.drawable.bordered_circle_white_background,
-                isSelected = isSelected,
-                canBeAdded = !maxTagsReached
-            )
-        }
-
-    data class TagViewModel(
-        val name: String,
-        val icon: IIcon,
-        val tag: Tag,
-        @ColorRes val iconColor: Int,
-        @DrawableRes val background: Int,
-        val isSelected: Boolean,
-        val canBeAdded: Boolean
-    ) : RecyclerViewViewModel {
-        override val id: String
-            get() = tag.id
-    }
-
-    inner class TagAdapter : BaseRecyclerViewAdapter<TagViewModel>(R.layout.item_choose_tag) {
-
-        override fun onBindViewModel(vm: TagViewModel, view: View, holder: SimpleViewHolder) {
-
-            view.tagIcon.setImageDrawable(
-                IconicsDrawable(view.context)
-                    .listItemIcon(
-                        vm.icon,
-                        vm.iconColor
-                    )
-            )
-            view.tagBackground.setBackgroundResource(vm.background)
-
-            if (vm.isSelected) {
-                view.dispatchOnClick {
-                    EditChallengeAction.RemoveTag(vm.tag)
-                }
-            } else {
-                if (vm.canBeAdded) {
-                    view.dispatchOnClick {
-                        EditChallengeAction.AddTag(vm.tag.name)
-                    }
-                } else {
-                    view.setOnClickListener(null)
-                }
+                TagAdapter.TagViewModel(
+                    name = it.name,
+                    icon = it.icon?.androidIcon?.icon ?: MaterialDesignIconic.Icon.gmi_label,
+                    tag = it,
+                    iconColor = if (isSelected) it.color.androidColor.color500 else R.color.md_light_text_70,
+                    background = if (isSelected) R.drawable.circle_white else R.drawable.bordered_circle_white_background,
+                    isSelected = isSelected,
+                    canBeAdded = !maxTagsReached
+                )
             }
-        }
 
-    }
+        }
 }

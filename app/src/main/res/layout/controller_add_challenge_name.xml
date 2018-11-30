@@ -73,6 +73,7 @@
             android:id="@+id/challengeTagList"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="@+id/challengeNameLayout"
             app:layout_constraintStart_toStartOf="@+id/challengeNameLayout"
             app:layout_constraintTop_toBottomOf="@+id/challengeTagsTitle" />
