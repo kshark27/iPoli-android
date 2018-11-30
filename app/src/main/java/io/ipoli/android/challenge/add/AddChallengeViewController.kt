@@ -104,6 +104,9 @@ class AddChallengeViewController(args: Bundle? = null) :
             COLOR_CHANGED ->
                 colorLayout(view, state)
 
+            TAGS_CHANGED ->
+                colorLayout(view, state)
+
             else -> {
             }
         }

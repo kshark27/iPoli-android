@@ -182,7 +182,9 @@ object EditChallengeReducer : BaseViewStateReducer<EditChallengeViewState>() {
                     note = c.note,
                     quests = c.baseQuests,
                     maxTagsReached = c.tags.size >= Constants.MAX_TAGS_PER_ITEM,
-                    trackedValues = c.trackedValues
+                    trackedValues = c.trackedValues,
+                    hasChangedColor = true,
+                    hasChangedIcon = true
                 )
             }
 
@@ -198,7 +200,9 @@ object EditChallengeReducer : BaseViewStateReducer<EditChallengeViewState>() {
             is EditChallengeAction.LoadTags -> {
                 subState.copy(
                     type = TAGS_CHANGED,
-                    tags = state.dataState.tags
+                    tags = state.dataState.tags,
+                    hasChangedColor = false,
+                    hasChangedIcon = false
                 )
             }
 
@@ -221,25 +225,39 @@ object EditChallengeReducer : BaseViewStateReducer<EditChallengeViewState>() {
             is EditChallengeAction.AddTag -> {
                 val tag = subState.tags.first { it.name == action.tagName }
                 val selectedTags = subState.selectedTags + tag
+
+                val color = if (!subState.hasChangedColor && subState.selectedTags.isEmpty())
+                    tag.color
+                else subState.color
+
+                val icon =
+                    if (!subState.hasChangedIcon && subState.selectedTags.isEmpty() && tag.icon != null)
+                        tag.icon
+                    else subState.icon
+
                 subState.copy(
                     type = TAGS_CHANGED,
                     tags = subState.tags,
                     selectedTags = selectedTags,
-                    maxTagsReached = selectedTags.size >= Constants.MAX_TAGS_PER_ITEM
+                    maxTagsReached = selectedTags.size >= Constants.MAX_TAGS_PER_ITEM,
+                    color = color,
+                    icon = icon
                 )
             }
 
             is EditChallengeAction.ChangeColor -> {
                 subState.copy(
                     type = COLOR_CHANGED,
-                    color = action.color
+                    color = action.color,
+                    hasChangedColor = true
                 )
             }
 
             is EditChallengeAction.ChangeIcon ->
                 subState.copy(
                     type = ICON_CHANGED,
-                    icon = action.icon
+                    icon = action.icon,
+                    hasChangedIcon = true
                 )
 
             is EditChallengeAction.ChangeDifficulty ->
@@ -446,7 +464,9 @@ object EditChallengeReducer : BaseViewStateReducer<EditChallengeViewState>() {
             selectedQuestIds = emptySet(),
             note = "",
             maxTagsReached = false,
-            shouldTrackCompleteAll = false
+            shouldTrackCompleteAll = false,
+            hasChangedColor = false,
+            hasChangedIcon = false
         )
 
     enum class ValidationError {
@@ -475,7 +495,9 @@ data class EditChallengeViewState(
     val selectedQuestIds: Set<String>,
     val note: String,
     val maxTagsReached: Boolean,
-    val shouldTrackCompleteAll: Boolean
+    val shouldTrackCompleteAll: Boolean,
+    val hasChangedColor: Boolean,
+    val hasChangedIcon: Boolean
 ) : BaseViewState() {
     enum class StateType {
         INITIAL,
