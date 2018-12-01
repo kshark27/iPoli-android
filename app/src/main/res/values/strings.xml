@@ -58,6 +58,7 @@
     <string name="no_challenge_days">No days selected</string>
     <string name="do_not_know">Don\'t know</string>
     <string name="add_challenge_name_hint">Name (e.g. Run a 5k marathon)</string>
+    <string name="add_challenge_motivation_hint">Motivation (e.g. Stay in shape)</string>
     <string name="title_edit_challenge">Edit Challenge</string>
     <string name="reminder_dialog_title">When should I remind you?</string>
     <string name="do_not_remind">Don\'t remind</string>

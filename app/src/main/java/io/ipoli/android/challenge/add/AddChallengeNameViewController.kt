@@ -87,7 +87,12 @@ class AddChallengeNameViewController(args: Bundle? = null) :
     override fun onOptionsItemSelected(item: MenuItem) =
         when (item.itemId) {
             R.id.actionNext -> {
-                dispatch(EditChallengeAction.ValidateName(view!!.challengeName.text.toString()))
+                dispatch(
+                    EditChallengeAction.ValidateName(
+                        view!!.challengeName.text.toString(),
+                        view!!.challengeMotivation.text.toString()
+                    )
+                )
                 true
             }
 

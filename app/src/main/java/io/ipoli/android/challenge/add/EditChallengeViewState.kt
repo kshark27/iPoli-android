@@ -34,7 +34,8 @@ sealed class EditChallengeAction : Action {
         override fun toMap() = mapOf("position" to position)
     }
 
-    data class ValidateName(val name: String) : EditChallengeAction() {
+    data class ValidateName(val name: String, val motivation: String? = null) :
+        EditChallengeAction() {
         override fun toMap() = mapOf("name" to name)
     }
 
@@ -270,13 +271,18 @@ object EditChallengeReducer : BaseViewStateReducer<EditChallengeViewState>() {
                         given { name.isEmpty() } addError ValidationError.EMPTY_NAME
                     }
                 }
+
                 subState.copy(
                     type = if (errors.isEmpty()) {
                         VALIDATION_NAME_SUCCESSFUL
                     } else {
                         VALIDATION_ERROR_EMPTY_NAME
                     },
-                    name = action.name
+                    name = action.name,
+                    motivation1 = if (action.motivation != null && action.motivation.isNotBlank())
+                        action.motivation
+                    else
+                        subState.motivation1
                 )
             }
 

@@ -42,6 +42,23 @@
                 tools:text="Hello World" />
         </android.support.design.widget.TextInputLayout>
 
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/challengeMotivationLayout"
+            style="@style/TextAppearance.myPoli.Subhead.TextInputLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColorHint="@color/md_light_text_50"
+            app:layout_constraintEnd_toEndOf="@+id/challengeNameLayout"
+            app:layout_constraintStart_toStartOf="@+id/challengeNameLayout"
+            app:layout_constraintTop_toBottomOf="@+id/challengeNameLayout">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/challengeMotivation"
+                style="@style/TextAppearance.myPoli.SubHead.TextInputEditText"
+                android:hint="@string/add_challenge_motivation_hint"
+                tools:text="Hello World" />
+        </android.support.design.widget.TextInputLayout>
+
         <TextView
             android:id="@+id/challengeTagsTitle"
             style="@style/EditSimpleTextViewRow"
@@ -57,7 +74,7 @@
             android:text="@string/add_tags_label"
             app:layout_constraintEnd_toStartOf="@+id/maxTagsMessage"
             app:layout_constraintStart_toStartOf="@+id/challengeNameLayout"
-            app:layout_constraintTop_toBottomOf="@+id/challengeNameLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/challengeMotivationLayout" />
 
         <TextView
             android:id="@+id/maxTagsMessage"

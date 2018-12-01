@@ -437,6 +437,25 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
+    <style name="TextAppearance.myPoli.Subhead.TextInputLayout" parent="TextAppearance.myPoli.EditText">
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="hintTextAppearance">
+            @style/TextAppearance.myPoli.TextInputLayout.HintAppearance
+        </item>
+    </style>
+
+    <style name="TextAppearance.myPoli.SubHead.TextInputEditText" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:theme">@style/WhiteEditTextTheme</item>
+        <item name="android:textColor">@color/md_white</item>
+        <item name="android:inputType">textCapSentences</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
     <style name="TagAutocomplete" parent="TextAppearance.AppCompat.Subhead">
         <item name="android:textColorHint">@color/md_light_text_70</item>
         <item name="android:textColor">@color/md_light_text_100</item>
