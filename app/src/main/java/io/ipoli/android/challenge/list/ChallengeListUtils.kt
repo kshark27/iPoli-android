@@ -2,8 +2,11 @@ package io.ipoli.android.challenge.list
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.PorterDuff
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
 import android.support.annotation.ColorRes
+import android.support.v4.content.ContextCompat
 import android.support.v4.widget.TextViewCompat
 import android.view.View
 import android.widget.TextView
@@ -126,8 +129,17 @@ class ChallengeAdapter : MultiViewRecyclerViewAdapter<ChallengeItemViewModel>() 
         view.cNext.text = vm.next
         view.cEnd.text = vm.end
 
+        val drawable = view.cProgress.progressDrawable as LayerDrawable
+        val progressDrawable = drawable.getDrawable(1)
+        progressDrawable.setColorFilter(
+            ContextCompat.getColor(view.context, vm.color),
+            PorterDuff.Mode.SRC_ATOP
+        )
+
         view.cProgress.max = vm.progressMax
         view.cProgress.progress = vm.progress
+
+
 
         view.setOnClickListener {
             vm.clickListener()

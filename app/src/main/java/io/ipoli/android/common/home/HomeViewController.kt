@@ -226,10 +226,10 @@ class HomeViewController(args: Bundle? = null) :
         val childRouter = getChildRouter(view.childControllerContainer, null)
         if (!childRouter.hasRootController()) {
             childRouter.setRoot(
-                RouterTransaction.with(TodayViewController())
+//                RouterTransaction.with(TodayViewController())
+                RouterTransaction.with(ChallengeListViewController())
             )
         }
-//        navigate().toAddChallenge()
     }
 
     override fun onDetach(view: View) {

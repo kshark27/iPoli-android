@@ -102,7 +102,7 @@
                         android:clickable="false"
                         android:max="100"
                         android:progress="0"
-                        android:progressDrawable="@drawable/repeating_quest_item_progress"
+                        android:progressDrawable="@drawable/item_challenge_tracked_value_progress"
                         android:visibility="gone" />
 
                 </RelativeLayout>

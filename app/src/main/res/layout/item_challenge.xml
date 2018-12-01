@@ -73,25 +73,25 @@
         android:id="@+id/cProgress"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="0dp"
-        android:layout_height="4dp"
+        android:layout_height="6dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:adjustViewBounds="true"
         android:clickable="false"
-        android:progressDrawable="@drawable/repeating_quest_item_progress"
+        android:progressDrawable="@drawable/item_challenge_tracked_value_progress"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@+id/cName"
         app:layout_constraintTop_toBottomOf="@+id/cNext"
-        app:layout_constraintWidth_percent="0.6" />
+        app:layout_constraintWidth_percent="0.55" />
 
     <TextView
         android:id="@+id/cProgressText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginEnd="8dp"
         android:text="9/12 done"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
@@ -99,6 +99,24 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/cProgress"
         app:layout_constraintTop_toTopOf="@+id/cProgress" />
+
+    <ProgressBar
+        android:id="@+id/pagesProgress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="6dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:adjustViewBounds="true"
+        android:clickable="false"
+        android:progressDrawable="@drawable/item_challenge_tracked_value_progress"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/cName"
+        app:layout_constraintTop_toBottomOf="@+id/cNext"
+        app:layout_constraintWidth_percent="0.55" />
 
     <TextView
         android:id="@+id/cNext"
