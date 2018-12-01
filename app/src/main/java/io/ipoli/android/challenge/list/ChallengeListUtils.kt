@@ -86,7 +86,7 @@ class ChallengeAdapter : MultiViewRecyclerViewAdapter<ChallengeItemViewModel>() 
         view.ccIcon.backgroundTintList =
             ColorStateList.valueOf(view.context.colorRes(vm.color))
         view.ccIcon.setImageDrawable(
-            IconicsDrawable(view.context).listItemIcon(vm.icon)
+            IconicsDrawable(view.context).smallListItemIcon(vm.icon)
         )
 
         view.ccStart.text = vm.start
@@ -113,7 +113,7 @@ class ChallengeAdapter : MultiViewRecyclerViewAdapter<ChallengeItemViewModel>() 
         view.cIcon.backgroundTintList =
             ColorStateList.valueOf(view.context.colorRes(vm.color))
         view.cIcon.setImageDrawable(
-            IconicsDrawable(view.context).listItemIcon(vm.icon)
+            IconicsDrawable(view.context).smallListItemIcon(vm.icon)
         )
 
         if (vm.tags.isNotEmpty()) {
@@ -169,7 +169,7 @@ sealed class ChallengeItemViewModel(override val id: String) : RecyclerViewViewM
         val end: String,
         val progress: Int,
         val progressMax: Int,
-        val clickListener : () -> Unit = {}
+        val clickListener: () -> Unit = {}
 
     ) : ChallengeItemViewModel(id)
 
@@ -183,7 +183,7 @@ sealed class ChallengeItemViewModel(override val id: String) : RecyclerViewViewM
         @ColorRes val color: Int,
         val start: String,
         val complete: String,
-        val clickListener : () -> Unit = {}
+        val clickListener: () -> Unit = {}
     ) : ChallengeItemViewModel(id)
 }
 
@@ -270,7 +270,7 @@ fun toChallengeViewModels(
                     ChallengeItemViewModel.Complete(
                         id = id,
                         name = name,
-                        tags = tags.map {t ->
+                        tags = tags.map { t ->
                             TagViewModel(
                                 t.name,
                                 AndroidColor.valueOf(t.color.name).color500
