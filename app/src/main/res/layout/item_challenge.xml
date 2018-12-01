@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
+    android:layout_height="wrap_content"
     android:background="?colorSurface"
     android:clickable="true"
     android:focusable="true"
@@ -69,54 +69,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/cName" />
 
-    <ProgressBar
-        android:id="@+id/cProgress"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="0dp"
-        android:layout_height="6dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:adjustViewBounds="true"
-        android:clickable="false"
-        android:progressDrawable="@drawable/item_challenge_tracked_value_progress"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="@+id/cName"
-        app:layout_constraintTop_toBottomOf="@+id/cNext"
-        app:layout_constraintWidth_percent="0.55" />
-
-    <TextView
-        android:id="@+id/cProgressText"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/cTrackedValueList"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
-        android:text="9/12 done"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        app:layout_constraintBottom_toBottomOf="@+id/cProgress"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/cProgress"
-        app:layout_constraintTop_toTopOf="@+id/cProgress" />
-
-    <ProgressBar
-        android:id="@+id/pagesProgress"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="0dp"
-        android:layout_height="6dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:adjustViewBounds="true"
-        android:clickable="false"
-        android:progressDrawable="@drawable/item_challenge_tracked_value_progress"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:nestedScrollingEnabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@+id/cName"
-        app:layout_constraintTop_toBottomOf="@+id/cNext"
-        app:layout_constraintWidth_percent="0.55" />
+        app:layout_constraintTop_toBottomOf="@+id/cNext" />
 
     <TextView
         android:id="@+id/cNext"

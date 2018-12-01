@@ -8,6 +8,7 @@ import android.graphics.drawable.LayerDrawable
 import android.support.annotation.ColorRes
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.TextViewCompat
+import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import android.widget.TextView
 import com.mikepenz.iconics.IconicsDrawable
@@ -21,9 +22,12 @@ import io.ipoli.android.common.navigation.Navigator
 import io.ipoli.android.common.text.DateFormatter
 import io.ipoli.android.common.text.DurationFormatter
 import io.ipoli.android.common.view.*
+import io.ipoli.android.common.view.recyclerview.BaseRecyclerViewAdapter
 import io.ipoli.android.common.view.recyclerview.MultiViewRecyclerViewAdapter
 import io.ipoli.android.common.view.recyclerview.RecyclerViewViewModel
+import io.ipoli.android.common.view.recyclerview.SimpleViewHolder
 import kotlinx.android.synthetic.main.item_challenge.view.*
+import kotlinx.android.synthetic.main.item_challenge_tracked_value_progress.view.*
 import kotlinx.android.synthetic.main.item_complete_challenge.view.*
 import org.threeten.bp.LocalDate
 
@@ -49,6 +53,40 @@ fun createChallengeItems(challenges: List<Challenge>): List<ChallengeItem> {
             ChallengeItem.CompleteLabel +
             complete.sortedByDescending { it.completedAtDate!! }.map { ChallengeItem.Complete(it) }
     }
+}
+
+data class TrackedValueProgressViewModel(
+    val name: String,
+    @ColorRes val color: Int,
+    val progress: Int,
+    val progressMax: Int
+) : RecyclerViewViewModel {
+
+    override val id
+        get() = name
+}
+
+class TrackedValueProgressAdapter :
+    BaseRecyclerViewAdapter<TrackedValueProgressViewModel>(R.layout.item_challenge_tracked_value_progress) {
+
+    override fun onBindViewModel(
+        vm: TrackedValueProgressViewModel,
+        view: View,
+        holder: SimpleViewHolder
+    ) {
+        val drawable = view.cProgress.progressDrawable as LayerDrawable
+        val progressDrawable = drawable.getDrawable(1)
+        progressDrawable.setColorFilter(
+            ContextCompat.getColor(view.context, vm.color),
+            PorterDuff.Mode.SRC_ATOP
+        )
+
+        view.cProgress.max = vm.progressMax
+        view.cProgress.progress = vm.progress
+
+        view.cProgressText.text = vm.name
+    }
+
 }
 
 const val INCOMPLETE_ITEM_VIEW_TYPE = 0
@@ -129,17 +167,17 @@ class ChallengeAdapter : MultiViewRecyclerViewAdapter<ChallengeItemViewModel>() 
         view.cNext.text = vm.next
         view.cEnd.text = vm.end
 
-        val drawable = view.cProgress.progressDrawable as LayerDrawable
-        val progressDrawable = drawable.getDrawable(1)
-        progressDrawable.setColorFilter(
-            ContextCompat.getColor(view.context, vm.color),
-            PorterDuff.Mode.SRC_ATOP
+        val adapter = TrackedValueProgressAdapter()
+        view.cTrackedValueList.layoutManager = LinearLayoutManager(view.context)
+        view.cTrackedValueList.adapter = adapter
+        adapter.updateAll(
+            listOf(
+                TrackedValueProgressViewModel("3/12 done", vm.color, 40, 100),
+                TrackedValueProgressViewModel("30/150 pages", vm.color, 30, 150),
+                TrackedValueProgressViewModel("2/3 papers", vm.color, 2, 3)
+            )
         )
-
-        view.cProgress.max = vm.progressMax
-        view.cProgress.progress = vm.progress
-
-
+        view.cTrackedValueList.isLayoutFrozen = true
 
         view.setOnClickListener {
             vm.clickListener()
